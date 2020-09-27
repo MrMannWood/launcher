@@ -7,7 +7,7 @@ fun String.qwertyMistakes(other: String): Int {
         return 0
     }
     if (length != other.length) {
-        return Integer.MAX_VALUE
+        return Int.MAX_VALUE
     }
 
     var mistakes = 0
@@ -16,7 +16,7 @@ fun String.qwertyMistakes(other: String): Int {
             continue
         }
         if (!isAdjacent(get(i), other[i])) {
-            return Integer.MAX_VALUE
+            return Int.MAX_VALUE
         }
         mistakes++
     }

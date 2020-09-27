@@ -32,7 +32,10 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.list)
 
         adapter = createAdapter()
-        recyclerView.layoutManager = GridLayoutManager(this, calculateNoOfColumns(), RecyclerView.VERTICAL, true)
+        recyclerView.layoutManager =
+            object : GridLayoutManager(this, calculateNoOfColumns(), RecyclerView.VERTICAL, true) {
+                override fun isLayoutRTL() : Boolean = true
+            }
         recyclerView.adapter = adapter
 
         viewModel.apps.observe(this, Observer {
@@ -53,21 +56,32 @@ class MainActivity : AppCompatActivity() {
                     if (search.isEmpty()) {
                         adapter.setData(data)
                     } else {
-                        val sorted = mutableListOf<Pair<Int, AppInfo>>()
+                        val sorted = mutableMapOf<AppInfo, Int>()
                         val length = search.length
                         data.forEach {
-                            if (length <= it.lowerLabel.length) {
-                                val label = it.lowerLabel.substring(0, length)
-                                val lDist = search.qwertyMistakes(label)
-                                sorted.add(lDist to it)
+                            if (search.contains(' ')) {
+                                if (length <= it.lowerLabel.length) {
+                                    sorted[it] = search.qwertyMistakes(it.lowerLabel.substring(0, length))
+                                }
+                            } else {
+                                var smallestVal = Int.MAX_VALUE
+                                for (label in it.labelComponents) {
+                                    if (length <= label.length) {
+                                        val result = search.qwertyMistakes(label.substring(0, length))
+                                        if (result < smallestVal) {
+                                            smallestVal = result
+                                        }
+                                    }
+                                }
+                                sorted[it] = smallestVal
                             }
                         }
 
                         adapter.setData(
-                            sorted.sortedWith(compareBy({ it.first }, { it.second.label }))
-                                .filter { it.first != Integer.MAX_VALUE }
-                                .map { it.second }
+                            sorted.filter { it.value != Int.MAX_VALUE }
                                 .toList()
+                                .sortedWith(compareBy({ it.second }, { it.first.label }))
+                                .map { it.first }
                         )
                     }
                 }

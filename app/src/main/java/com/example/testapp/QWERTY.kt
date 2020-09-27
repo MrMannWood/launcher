@@ -1,58 +1,31 @@
 package com.example.testapp
 
-import java.lang.Exception
-
-val QWERTY = arrayOf(
-    arrayOf('1','2','3','4','5','6','7','8','9','0','-','='),
-    arrayOf('q','w','e','r','t','y','u','i','o','p','[',']'),
-    arrayOf('a','s','d','f','g','h','j','k','l',';','\''),
-    arrayOf('z','x','c','v','b','n','m',',','.','/')
+val QWERTY = mapOf(
+    'q' to listOf('w', 'a'),
+    'w' to listOf('q', 'e', 'a', 's'),
+    'e' to listOf('w', 'r', 's', 'd'),
+    'r' to listOf('e', 't', 'd', 'f'),
+    't' to listOf('r', 'y', 'f', 'g'),
+    'y' to listOf('t', 'u', 'g', 'h'),
+    'u' to listOf('y', 'i', 'h', 'j'),
+    'i' to listOf('u', 'o', 'j', 'k'),
+    'o' to listOf('i', 'p', 'k', 'l'),
+    'p' to listOf('o', 'l'),
+    'a' to listOf('q', 'w', 's', 'z'),
+    's' to listOf('w', 'e', 'a', 'd', 'z', 'x'),
+    'd' to listOf('e', 'r', 's', 'f', 'x', 'c', 'z'),
+    'f' to listOf('r', 't', 'd', 'g', 'c', 'v', 'x'),
+    'g' to listOf('t', 'y', 'f', 'h', 'c', 'v', 'b'),
+    'h' to listOf('y', 'u', 'g', 'j', 'v', 'b', 'n'),
+    'j' to listOf('u', 'i', 'h', 'k', 'b', 'n', 'm'),
+    'k' to listOf('i', 'o', 'j', 'l', 'n', 'm'),
+    'l' to listOf('o', 'p', 'k', 'm'),
+    'z' to listOf('a', 's', 'd', 'x'),
+    'x' to listOf('s', 'd', 'f', 'z', 'c'),
+    'c' to listOf('d', 'f', 'g', 'x', 'v'),
+    'b' to listOf('g', 'h', 'j', 'v', 'n'),
+    'n' to listOf('h', 'j', 'k', 'b', 'm'),
+    'm' to listOf('j', 'k', 'l', 'n')
 )
 
-fun isAdjacent(char: Char, other: Char): Boolean {
-    var qwertyIndex = -1
-    var arrIndex = -1
-    for(charsIndex in QWERTY.indices) {
-        val index = QWERTY[charsIndex].indexOf(char)
-        if (index >= 0) {
-            qwertyIndex = charsIndex
-            arrIndex = index
-            break
-        }
-    }
-
-    if (qwertyIndex == -1) {
-        throw Exception("Non QWERTY character")
-    }
-
-    if (qwertyIndex != 0) {
-        if (isAdjacent(QWERTY[qwertyIndex - 1], arrIndex, other)) {
-            return true
-        }
-    }
-    if (qwertyIndex < QWERTY.size) {
-        if (isAdjacent(QWERTY[qwertyIndex], arrIndex, other)) {
-            return true
-        }
-    }
-    if (qwertyIndex < QWERTY.size - 1) {
-        if (isAdjacent(QWERTY[qwertyIndex + 1], arrIndex, other)) {
-            return true
-        }
-    }
-
-    return false
-}
-
-private fun isAdjacent(chars: Array<Char>, index: Int, char: Char) : Boolean {
-    if (index > 0 && char == chars[index - 1]) {
-        return true
-    }
-    if (index < chars.size && char == chars[index]) {
-        return true
-    }
-    if (index < chars.size - 1 && char == chars[index + 1]) {
-        return true
-    }
-    return false
-}
+fun isAdjacent(char: Char, other: Char): Boolean = QWERTY[char]?.contains(other) ?: false

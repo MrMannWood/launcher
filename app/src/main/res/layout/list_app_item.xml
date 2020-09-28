@@ -3,17 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.view.View"/>
         <variable
             name="appInfo"
-            type="com.example.testapp.AppInfo" />
+            type="com.example.testapp.launcher.AppInfo" />
     </data>
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:background="@{appInfo.backgroundColor}">
+        android:padding="12dp">
 
         <ImageView
             android:id="@+id/icon"
@@ -22,22 +22,8 @@
             android:layout_gravity="center"
             android:scaleType="fitCenter"
             android:src="@{appInfo.icon}"
+            android:visibility="@{appInfo == null ? View.INVISIBLE : View.VISIBLE}"
             />
-
-        <TextView
-            android:id="@+id/label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{appInfo.label}"
-            android:textColor="#FFFFFFFF"
-            android:layout_gravity="center_horizontal"
-            android:maxLines="1"
-            android:minLines="1"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:textSize="10sp"
-            android:visibility="gone"
-        />
 
     </LinearLayout>
 

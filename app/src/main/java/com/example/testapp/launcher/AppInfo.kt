@@ -1,4 +1,4 @@
-package com.example.testapp
+package com.example.testapp.launcher
 
 import android.graphics.drawable.Drawable
 

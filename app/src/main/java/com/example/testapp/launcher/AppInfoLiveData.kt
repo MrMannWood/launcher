@@ -7,19 +7,28 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import android.graphics.*
-import android.graphics.drawable.*
-import android.view.Gravity
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.RectF
+import android.graphics.drawable.AdaptiveIconDrawable
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.get
 import androidx.lifecycle.LiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.palette.graphics.Palette
+import com.android.launcher3.graphics.FixedScaleDrawable
+import com.android.launcher3.graphics.IconNormalizer
+import com.example.testapp.R
 import com.example.testapp.init
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
+
 
 class AppInfoLiveData(private val context: Application): LiveData<Result<List<AppInfo>>>() {
 
@@ -53,7 +62,12 @@ class AppInfoLiveData(private val context: Application): LiveData<Result<List<Ap
         executor.submit {
             println("executor running")
             val value: Result<List<AppInfo>> = try {
-                val packages: List<ResolveInfo> = pacMan.queryIntentActivities(Intent(Intent.ACTION_MAIN, null).addCategory(Intent.CATEGORY_LAUNCHER), 0)
+                val packages: List<ResolveInfo> = pacMan.queryIntentActivities(
+                    Intent(
+                        Intent.ACTION_MAIN,
+                        null
+                    ).addCategory(Intent.CATEGORY_LAUNCHER), 0
+                )
 
                 val appList = mutableListOf<AppInfo>()
                 for (pack in packages) {
@@ -68,8 +82,10 @@ class AppInfoLiveData(private val context: Application): LiveData<Result<List<Ap
                 }
                 appList.sortBy { it.label }
 
+                println("executor success")
                 success(appList)
             } catch (e: Exception) {
+                println("executor failed")
                 failure(e)
             }
             postValue(value)
@@ -85,15 +101,22 @@ class AppInfoLiveData(private val context: Application): LiveData<Result<List<Ap
     }
 
     private fun makeAdaptive(drawable: Drawable) : AdaptiveIconDrawable {
-        return drawableToBitmap(drawable) { bitmap ->
-            AdaptiveIconDrawable(
-                ColorDrawable(getBackgroundColor(bitmap)),
-                drawable
-            ).init {
-                setBounds(0, 0, 25, 25)
+        return if (drawable is AdaptiveIconDrawable) {
+            drawable
+        } else {
+            val scale = inflateMutableAdaptiveIconWrapper().let {
+                it.setBounds(0, 0, 1, 1)
+                IconNormalizer.getInstance(context).getScale(drawable, RectF(), it.iconMask, booleanArrayOf(false))
             }
-        }.init {
-            setBounds()
+
+            inflateMutableAdaptiveIconWrapper().init {
+                val fsd = foreground as FixedScaleDrawable
+                fsd.drawable = drawable
+                fsd.setScale(scale)
+
+                val bg = background as ColorDrawable
+                bg.color = getBackgroundColor(drawable)
+            }
         }
     }
 
@@ -103,7 +126,12 @@ class AppInfoLiveData(private val context: Application): LiveData<Result<List<Ap
         drawableToBitmap(drawable) { bitmap -> getBackgroundColor(bitmap) }
 
     private fun getBackgroundColor(bitmap: Bitmap) : Int =
-        Palette.from(bitmap).generate().getDominantColor(bitmap[0, 0])
+        Palette.from(bitmap).generate().let {
+            it.darkMutedSwatch?.rgb
+                ?: it.darkVibrantSwatch?.rgb
+                ?: it.dominantSwatch?.rgb
+                ?: bitmap[bitmap.width / 2, bitmap.height / 2]
+        }
 
     private fun <T> drawableToBitmap(drawable: Drawable, func: (Bitmap) -> T) : T {
         if (drawable is BitmapDrawable && drawable.bitmap != null) {
@@ -125,6 +153,9 @@ class AppInfoLiveData(private val context: Application): LiveData<Result<List<Ap
         bitmap.recycle()
         return result
     }
+
+    private fun inflateMutableAdaptiveIconWrapper() : AdaptiveIconDrawable =
+        ContextCompat.getDrawable(context, R.drawable.adaptive_icon_drawable_wrapper)!!.mutate() as AdaptiveIconDrawable
 
     private fun convertToGrayscale(drawable: Drawable): Drawable {
 //        val matrix = ColorMatrix()

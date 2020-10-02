@@ -22,6 +22,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.testapp.HandleBackPressed
 import com.example.testapp.R
 import com.example.testapp.databinding.ListAppItemBinding
+import com.example.testapp.databinding.ListItemSpacerBinding
+import com.example.testapp.launcher.Toolbar.getStatusBarHeight
 import com.example.testapp.qwertyMistakes
 
 class LauncherFragment : Fragment(), HandleBackPressed {
@@ -32,7 +34,7 @@ class LauncherFragment : Fragment(), HandleBackPressed {
 
     private val viewModel : LauncherViewModel by activityViewModels()
 
-    private var data : List<DecoratedAppInfo>? = null
+    private var data : List<AppInfo>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,67 +50,19 @@ class LauncherFragment : Fragment(), HandleBackPressed {
         adapter = createAdapter(view.context)
         val layoutManager = createLayoutManager(view.context)
         recyclerView.layoutManager = layoutManager
-//        recyclerView.addItemDecoration(createItemDecoration(layoutManager.spanCount))
         recyclerView.adapter = adapter
 
-        viewModel.apps.observe(viewLifecycleOwner, Observer {
-            it.getOrNull()?.let { apps ->
-                val data = augmentAppsWithSpacingElements(apps)
-                this.data = data
-                adapter.setData(data)
-            }
-            it.exceptionOrNull()?.let {  error ->
-                throw Exception("Oh No!", error)
-            }
-        })
-
-        searchView.addTextChangedListener(object : TextWatcher {
-
-            override fun afterTextChanged(p0: Editable) {
-                data?.let { data ->
-                    val search = searchView.text.toString().toLowerCase()
-                    if (search.isEmpty()) {
-                        adapter.setData(data)
-                    } else {
-                        val sorted = mutableMapOf<AppInfo, Int>()
-                        val length = search.length
-                        data.filterIsInstance<DecoratedAppInfo.AppInfoWrapper>()
-                            .map { it.appInfo}
-                            .forEach {
-                                if (search.contains(' ')) {
-                                    if (length <= it.lowerLabel.length) {
-                                        sorted[it] = search.qwertyMistakes(it.lowerLabel.substring(0, length))
-                                    }
-                                } else {
-                                    var smallestVal = Int.MAX_VALUE
-                                    for (label in it.labelComponents) {
-                                        if (length <= label.length) {
-                                            val result = search.qwertyMistakes(label.substring(0, length))
-                                            if (result < smallestVal) {
-                                                smallestVal = result
-                                            }
-                                        }
-                                    }
-                                    sorted[it] = smallestVal
-                                }
-                            }
-                        adapter.setData(
-                            augmentAppsWithSpacingElements(
-                                sorted.filter { it.value != Int.MAX_VALUE }
-                                    .toList()
-                                    .sortedWith(compareBy({ it.second }, { it.first.label }))
-                                    .map { it.first })
-                        )
-                    }
+        searchView.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
+            override fun onLayoutChange(
+                p0: View?, p1: Int, p2: Int, p3: Int, p4: Int, p5: Int, p6: Int, p7: Int, p8: Int
+            ) {
+                if (searchView.height > 0) {
+                    searchView.removeOnLayoutChangeListener(this)
+                    startObservingLiveData()
                 }
             }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
         })
-
-        forceShowKeyboard(searchView)
+        searchView.addTextChangedListener(createSearchTextListener())
     }
 
     override fun handleBackPressed(): Boolean {
@@ -119,9 +73,22 @@ class LauncherFragment : Fragment(), HandleBackPressed {
         return true
     }
 
+    private fun startObservingLiveData() {
+        viewModel.apps.observe(viewLifecycleOwner, Observer {
+            it.getOrNull()?.let { apps ->
+                this.data = apps
+                performSearch()
+            }
+            it.exceptionOrNull()?.let {  error ->
+                throw Exception("Oh No!", error)
+            }
+        })
+    }
+
     private fun augmentAppsWithSpacingElements(data: List<AppInfo>) : List<DecoratedAppInfo> {
         val d : MutableList<DecoratedAppInfo> = data.map { DecoratedAppInfo.AppInfoWrapper(it) }.toMutableList()
-        d.add(0, DecoratedAppInfo.FullSpan)
+        d.add(0, DecoratedAppInfo.Space(searchView.height))
+        d.add(DecoratedAppInfo.Space(requireContext().getStatusBarHeight()))
         return d
     }
 
@@ -132,54 +99,47 @@ class LauncherFragment : Fragment(), HandleBackPressed {
 
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return data?.let { data ->
-                    when (data[position]) {
-                        is DecoratedAppInfo.FullSpan -> layoutManager.spanCount
-                        else -> 1
-                    }
-                } ?: 1
+                return adapter.getItem(position)?.span?.let { if (it > 0) it else layoutManager.spanCount } ?: 1
             }
         }
 
         return layoutManager
     }
 
-    private fun createItemDecoration(spanCount: Int) : RecyclerView.ItemDecoration {
-        return object : RecyclerView.ItemDecoration() {
-            override fun getItemOffsets(
-                outRect: Rect,
-                view: View,
-                parent: RecyclerView,
-                state: RecyclerView.State
-            ) {
-                super.getItemOffsets(outRect, view, parent, state)
-                val position = parent.getChildAdapterPosition(view)
-                if (position < spanCount) {
-                    outRect.set(0, 0, 0, searchView.height)
-                } else {
-                    outRect.set(0, 0, 0, 0)
-                }
-            }
-        }
-    }
-
     private fun createAdapter(context: Context): Adapter<DecoratedAppInfo> =
         Adapter(
             context = context,
-            viewId = R.layout.list_app_item,
+            viewFunc = { item: DecoratedAppInfo ->
+                when(item) {
+                    is DecoratedAppInfo.AppInfoWrapper -> R.layout.list_app_item
+                    is DecoratedAppInfo.Space -> R.layout.list_item_spacer
+                }
+            },
             bindFunc = { vdb, appInfo ->
-                if (appInfo is DecoratedAppInfo.AppInfoWrapper) {
-                    (vdb as ListAppItemBinding).appInfo = appInfo.appInfo
-                    vdb.root.setOnClickListener {
-                        context.packageManager.getLaunchIntentForPackage(appInfo.appInfo.packageName)?.let { intent ->
-                            startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                        } ?: Toast.makeText(context, "Unable to start app", Toast.LENGTH_LONG).show()
+                when (appInfo) {
+                    is DecoratedAppInfo.AppInfoWrapper -> {
+                        (vdb as ListAppItemBinding).appInfo = appInfo.appInfo
+                        vdb.root.setOnClickListener {
+                            appInfo.startApplication(vdb.root.context)
+                        }
                     }
-                } else {
-                    (vdb as ListAppItemBinding).appInfo = null
+                    is DecoratedAppInfo.Space -> {
+                        (vdb as ListItemSpacerBinding).height = appInfo.height
+                    }
                 }
             }
         )
+
+    private fun createSearchTextListener() : TextWatcher = object : TextWatcher {
+
+        override fun afterTextChanged(p0: Editable) {
+            performSearch()
+        }
+
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
+    }
 
     private fun calculateNoOfColumns(): Int {
         val displayMetrics: DisplayMetrics = resources.displayMetrics
@@ -191,5 +151,41 @@ class LauncherFragment : Fragment(), HandleBackPressed {
         view.requestFocus()
         val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+    }
+
+    private fun performSearch() {
+        data?.let { data ->
+            val search = searchView.text.toString().toLowerCase()
+            val filtered =
+                if (search.isEmpty()) {
+                    data
+                } else {
+                    val sorted = mutableMapOf<AppInfo, Int>()
+                    val length = search.length
+                    data.forEach {
+                        if (search.contains(' ')) {
+                            if (length <= it.lowerLabel.length) {
+                                sorted[it] = search.qwertyMistakes(it.lowerLabel.substring(0, length))
+                            }
+                        } else {
+                            var smallestVal = Int.MAX_VALUE
+                            for (label in it.labelComponents) {
+                                if (length <= label.length) {
+                                    val result = search.qwertyMistakes(label.substring(0, length))
+                                    if (result < smallestVal) {
+                                        smallestVal = result
+                                    }
+                                }
+                            }
+                            sorted[it] = smallestVal
+                        }
+                    }
+                    sorted.filter { it.value != Int.MAX_VALUE }
+                        .toList()
+                        .sortedWith(compareBy({ it.second }, { it.first.label }))
+                        .map { it.first }
+                }
+            adapter.setData(augmentAppsWithSpacingElements(filtered))
+        }
     }
 }

@@ -8,14 +8,14 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.graphics.*
-import android.graphics.drawable.AdaptiveIconDrawable
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
+import android.graphics.drawable.*
+import android.view.Gravity
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.get
 import androidx.lifecycle.LiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.palette.graphics.Palette
+import com.example.testapp.init
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.Result.Companion.failure
@@ -77,35 +77,33 @@ class AppInfoLiveData(private val context: Application): LiveData<Result<List<Ap
     }
 
     private fun adaptIcon(drawable: Drawable) : Drawable {
-        return drawable
+        return if (drawable is AdaptiveIconDrawable) {
+            drawable
+        } else {
+            makeAdaptive(drawable)
+        }
+    }
+
+    private fun makeAdaptive(drawable: Drawable) : AdaptiveIconDrawable {
+        return drawableToBitmap(drawable) { bitmap ->
+            AdaptiveIconDrawable(
+                ColorDrawable(getBackgroundColor(bitmap)),
+                drawable
+            ).init {
+                setBounds(0, 0, 25, 25)
+            }
+        }.init {
+            setBounds()
+        }
     }
 
     private fun addAlphaToColor(color: Int) : Int = ColorUtils.setAlphaComponent(color, 200)
 
     private fun getBackgroundColor(drawable: Drawable) : Int =
-        drawableToBitmap(getBackgroundDrawable(drawable)) { backgroundBitmap ->
-            drawableToBitmap(getForegroundDrawable(drawable)) { foregroundBitmap ->
-                val foregroundPalette = Palette.from(foregroundBitmap).generate()
-                val backgroundPalette = Palette.from(backgroundBitmap).generate()
-                foregroundPalette.getDominantColor(backgroundPalette.getDominantColor(foregroundBitmap[0, 0]))
-            }
-        }
+        drawableToBitmap(drawable) { bitmap -> getBackgroundColor(bitmap) }
 
-    private fun getForegroundDrawable(drawable: Drawable) : Drawable {
-        return if (drawable is AdaptiveIconDrawable) {
-            drawable.foreground
-        } else {
-            drawable
-        }
-    }
-
-    private fun getBackgroundDrawable(drawable: Drawable) : Drawable {
-        return if (drawable is AdaptiveIconDrawable) {
-            drawable.background
-        } else {
-            drawable
-        }
-    }
+    private fun getBackgroundColor(bitmap: Bitmap) : Int =
+        Palette.from(bitmap).generate().getDominantColor(bitmap[0, 0])
 
     private fun <T> drawableToBitmap(drawable: Drawable, func: (Bitmap) -> T) : T {
         if (drawable is BitmapDrawable && drawable.bitmap != null) {

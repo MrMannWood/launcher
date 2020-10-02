@@ -28,6 +28,8 @@ class Adapter<T>(
         notifyDataSetChanged()
     }
 
+    fun getItem(position: Int) : T? = data?.get(position)
+
     override fun getItemCount(): Int = data?.size ?: 0
 
     override fun getItemId(position: Int): Long {
@@ -35,7 +37,7 @@ class Adapter<T>(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return viewFunc?.invoke(data!![0]) ?: viewId!!
+        return viewFunc?.invoke(data!![position]) ?: viewId!!
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder =

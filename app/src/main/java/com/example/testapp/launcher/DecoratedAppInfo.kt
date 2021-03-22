@@ -17,6 +17,4 @@ sealed class DecoratedAppInfo {
             } ?: Toast.makeText(context, "Unable to start app", Toast.LENGTH_LONG).show()
         }
     }
-
-    class Space(val height: Int, override val span: Int = -1) : DecoratedAppInfo()
 }

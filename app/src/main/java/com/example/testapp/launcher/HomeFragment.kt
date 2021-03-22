@@ -8,12 +8,9 @@ import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
 import com.example.testapp.R
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlin.math.abs
 
 class HomeFragment : Fragment() {
-
-    private lateinit var fab : FloatingActionButton
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -22,12 +19,6 @@ class HomeFragment : Fragment() {
     ): View = inflater.inflate(R.layout.fragment_home, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        fab = view.findViewById(R.id.fab)
-
-        fab.setOnClickListener {
-            showLauncherFragment()
-        }
-
         view.setOnTouchListener(object : View.OnTouchListener {
 
             val gestureDetector = createGestureDetector(view.context)
@@ -76,11 +67,11 @@ class HomeFragment : Fragment() {
             }
 
             fun onSwipeDown() {
-                launchAssistant()
+                Toast.makeText(requireContext(), "Down", Toast.LENGTH_SHORT).show()
             }
 
             fun onSwipeLeft() {
-                launchPhone()
+                Toast.makeText(requireContext(), "Left", Toast.LENGTH_SHORT).show()
             }
 
             fun onSwipeRight() {

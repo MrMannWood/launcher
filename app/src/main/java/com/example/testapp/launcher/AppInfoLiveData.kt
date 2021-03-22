@@ -9,28 +9,41 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.RectF
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.get
 import androidx.lifecycle.LiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.palette.graphics.Palette
-import com.android.launcher3.graphics.FixedScaleDrawable
-import com.android.launcher3.graphics.IconNormalizer
 import com.example.testapp.R
-import com.example.testapp.init
+import timber.log.Timber
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
 
+class AppInfoLiveData private constructor(
+        private val context: Application
+): LiveData<Result<List<AppInfo>>>() {
 
-class AppInfoLiveData(private val context: Application): LiveData<Result<List<AppInfo>>>() {
+    companion object {
+
+        private var instance: AppInfoLiveData? = null
+
+        @Synchronized fun get(application: Application) : AppInfoLiveData {
+            var liveData = instance
+            return if (liveData == null) {
+                liveData = AppInfoLiveData(application)
+                instance = liveData
+                liveData
+            } else {
+                liveData
+            }
+        }
+
+    }
 
     private val pacMan: PackageManager = context.packageManager
 
@@ -72,12 +85,20 @@ class AppInfoLiveData(private val context: Application): LiveData<Result<List<Ap
                 val appList = mutableListOf<AppInfo>()
                 for (pack in packages) {
                     val icon = pack.loadIcon(pacMan)
+                    Timber.d("Marshall: Starting app ${pack.loadLabel(pacMan).toString()}")
+                    val bgc = getBackgroundColor(icon)
                     val a = AppInfo(
                         packageName = pack.activityInfo.packageName,
-                        icon = adaptIcon(icon),
-                        backgroundColor = addAlphaToColor(getBackgroundColor(icon)),
+                        icon = icon,
+                        backgroundColor = bgc ?: 0xFFC1CC,
                         label = pack.loadLabel(pacMan).toString()
                     )
+                    if (icon !is AdaptiveIconDrawable) {
+                        Timber.i("Marshall: Icon is not adaptive: ${a.label}")
+                    }
+                    if (bgc == null) {
+                        Timber.d("Marshall: Background color is null: ${a.label}")
+                    }
                     appList.add(a)
                 }
                 appList.sortBy { it.label }
@@ -92,38 +113,35 @@ class AppInfoLiveData(private val context: Application): LiveData<Result<List<Ap
         }
     }
 
-    private fun adaptIcon(drawable: Drawable) : Drawable {
-        return if (drawable is AdaptiveIconDrawable) {
-            drawable
-        } else {
-            makeAdaptive(drawable)
-        }
-    }
+//    private fun makeAdaptive(drawable: Drawable) : AdaptiveIconDrawable {
+//        return if (drawable is AdaptiveIconDrawable) {
+//            drawable
+//        } else {
+//            val scale = inflateMutableAdaptiveIconWrapper().let {
+//                it.setBounds(0, 0, 1, 1)
+//                IconNormalizer.getInstance(context).getScale(drawable, RectF(), it.iconMask, booleanArrayOf(false))
+//            }
+//
+//            inflateMutableAdaptiveIconWrapper().init {
+//                val fsd = foreground as FixedScaleDrawable
+//                fsd.drawable = drawable
+//                fsd.setScale(scale)
+//
+//                val bg = background as ColorDrawable
+//                bg.color = getBackgroundColor(drawable)
+//            }
+//        }
+//    }
 
-    private fun makeAdaptive(drawable: Drawable) : AdaptiveIconDrawable {
-        return if (drawable is AdaptiveIconDrawable) {
-            drawable
-        } else {
-            val scale = inflateMutableAdaptiveIconWrapper().let {
-                it.setBounds(0, 0, 1, 1)
-                IconNormalizer.getInstance(context).getScale(drawable, RectF(), it.iconMask, booleanArrayOf(false))
+    private fun getBackgroundColor(drawable: Drawable) : Int? {
+        if (drawable is AdaptiveIconDrawable) {
+            val result = drawableToBitmap(drawable.background) { getDominantColor(it) }
+            if (result != null) {
+                return result
             }
-
-            inflateMutableAdaptiveIconWrapper().init {
-                val fsd = foreground as FixedScaleDrawable
-                fsd.drawable = drawable
-                fsd.setScale(scale)
-
-                val bg = background as ColorDrawable
-                bg.color = getBackgroundColor(drawable)
-            }
         }
+        return drawableToBitmap(drawable) { bitmap -> getDominantColor(bitmap) }
     }
-
-    private fun addAlphaToColor(color: Int) : Int = ColorUtils.setAlphaComponent(color, 200)
-
-    private fun getBackgroundColor(drawable: Drawable) : Int =
-        drawableToBitmap(drawable) { bitmap -> getBackgroundColor(bitmap) }
 
     private fun getBackgroundColor(bitmap: Bitmap) : Int =
         Palette.from(bitmap).generate().let {
@@ -156,6 +174,49 @@ class AppInfoLiveData(private val context: Application): LiveData<Result<List<Ap
 
     private fun inflateMutableAdaptiveIconWrapper() : AdaptiveIconDrawable =
         ContextCompat.getDrawable(context, R.drawable.adaptive_icon_drawable_wrapper)!!.mutate() as AdaptiveIconDrawable
+
+    private fun getDominantColor(bitmap: Bitmap) : Int? {
+        val result = intArrayOf(
+            0, 0,
+            0, 0,
+            0, 0
+        )
+        for (x in 0 until bitmap.width) {
+            for (y in 0 until bitmap.height) {
+                val color = bitmap[x, y]
+                if (color ushr 24 != 0xFF) {
+                    continue
+                }
+                for (i in 0 until (result.size / 2)) {
+                    if (result[i * 2] == 0) {
+                        result[i * 2] = color
+                        result[i * 2 + 1] = 1
+                        break
+                    } else if (result[i * 2] == color) {
+                        result[i * 2 + 1]++
+                        break
+                    }
+                }
+            }
+        }
+        var largest = -1
+        var color : Int? = null
+        for (i in 0 until (result.size / 2)) {
+            val count = result[i * 2 + 1]
+            val c = result[i * 2]
+            if (count > largest) {
+                largest = count
+                color = c
+            }
+        }
+
+        if (color == null) {
+            Timber.d("Marshall: Result is null")
+        } else {
+            Timber.d("Marshall: Result is 0x${Integer.toHexString(color)}")
+        }
+        return color
+    }
 
     private fun convertToGrayscale(drawable: Drawable): Drawable {
 //        val matrix = ColorMatrix()

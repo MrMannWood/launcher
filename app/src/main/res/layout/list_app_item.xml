@@ -7,24 +7,45 @@
         <variable
             name="appInfo"
             type="com.example.testapp.launcher.AppInfo" />
+        <variable
+            name="adapter"
+            type="com.example.testapp.launcher.LauncherFragmentDatabindingAdapter" />
     </data>
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="12dp">
+    <RelativeLayout
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:visibility="@{appInfo == null ? View.INVISIBLE : View.VISIBLE}">
+
+        <com.example.testapp.view.HexagonView
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_gravity="center"
+            android:scaleType="fitCenter"
+            android:src="@{appInfo.backgroundColor}"
+            android:layout_centerInParent="true"
+            />
 
         <ImageView
-            android:id="@+id/icon"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_gravity="center"
+            android:scaleType="fitCenter"
+            android:src="@{appInfo.icon}"
+            android:layout_centerInParent="true"
+            android:visibility="@{adapter.getNonAdaptiveIconVisibility(appInfo)}"
+            />
+
+        <ImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
             android:scaleType="fitCenter"
             android:src="@{appInfo.icon}"
-            android:visibility="@{appInfo == null ? View.INVISIBLE : View.VISIBLE}"
+            android:layout_centerInParent="true"
+            android:visibility="@{adapter.getAdaptiveIconVisibility(appInfo)}"
             />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </layout>

@@ -7,8 +7,6 @@ import java.lang.Exception
 
 class LauncherViewModel(app: Application): AndroidViewModel(app) {
 
-    val apps: LiveData<Result<List<AppInfo>>> by lazy {
-        AppInfoLiveData(getApplication())
-    }
+    val apps: LiveData<Result<List<AppInfo>>> = AppInfoLiveData.get(getApplication())
 
 }

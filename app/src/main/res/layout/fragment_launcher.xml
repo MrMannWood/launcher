@@ -3,12 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
-
     <EditText
         android:id="@+id/search"
         android:layout_width="match_parent"
@@ -17,10 +11,20 @@
         android:padding="12dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
+        android:layout_marginBottom="6dp"
         android:background="@drawable/rounded_corners"
         android:textCursorDrawable="@null"
         android:textColor="#FFFFFFFF"
         android:singleLine="true"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/search"
         />
 
 </RelativeLayout>

@@ -1,6 +1,7 @@
 package com.example.testapp
 
 import android.app.Application
+import com.example.testapp.contacts.ContactsLoader
 import com.example.testapp.launcher.AppInfoLiveData
 import timber.log.Timber
 
@@ -18,6 +19,12 @@ class LauncherApplication : Application() {
             }
             result.onFailure { error ->
                 Timber.e(error, "App Info changed, got error")
+            }
+        }
+
+        ContactsLoader.loadContacts(this, "bridger") { result ->
+            for (name in result) {
+                Timber.d("Marshall: $name")
             }
         }
     }

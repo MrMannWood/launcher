@@ -56,7 +56,6 @@ class AppInfoLiveData private constructor(
     }
 
     override fun onActive() {
-        println("onActive")
         super.onActive()
         triggerLoad()
 
@@ -73,7 +72,6 @@ class AppInfoLiveData private constructor(
 
     private fun triggerLoad() {
         executor.submit {
-            println("executor running")
             val value: Result<List<AppInfo>> = try {
                 val packages: List<ResolveInfo> = pacMan.queryIntentActivities(
                     Intent(
@@ -96,10 +94,8 @@ class AppInfoLiveData private constructor(
                 }
                 appList.sortBy { it.label }
 
-                println("executor success")
                 success(appList)
             } catch (e: Exception) {
-                println("executor failed")
                 failure(e)
             }
             postValue(value)

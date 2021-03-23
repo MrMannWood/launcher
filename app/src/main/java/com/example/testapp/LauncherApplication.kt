@@ -22,10 +22,12 @@ class LauncherApplication : Application() {
             }
         }
 
-        ContactsLoader.loadContacts(this, "bridger") { result ->
-            for (name in result) {
-                Timber.d("Marshall: $name")
+        ContactsLoader.tryCreate(this)?.loadContacts("br") { result ->
+            Timber.d("Marshall: start contacts print")
+            for (contact in result) {
+                Timber.d("Marshall: $contact")
             }
+            Timber.d("Marshall: end contacts print")
         }
     }
 }

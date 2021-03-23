@@ -85,7 +85,6 @@ class AppInfoLiveData private constructor(
                 val appList = mutableListOf<AppInfo>()
                 for (pack in packages) {
                     val icon = pack.loadIcon(pacMan)
-                    Timber.d("Marshall: Starting app ${pack.loadLabel(pacMan).toString()}")
                     val bgc = getBackgroundColor(icon)
                     val a = AppInfo(
                         packageName = pack.activityInfo.packageName,
@@ -93,12 +92,6 @@ class AppInfoLiveData private constructor(
                         backgroundColor = bgc ?: 0xFFC1CC,
                         label = pack.loadLabel(pacMan).toString()
                     )
-                    if (icon !is AdaptiveIconDrawable) {
-                        Timber.i("Marshall: Icon is not adaptive: ${a.label}")
-                    }
-                    if (bgc == null) {
-                        Timber.d("Marshall: Background color is null: ${a.label}")
-                    }
                     appList.add(a)
                 }
                 appList.sortBy { it.label }
@@ -208,12 +201,6 @@ class AppInfoLiveData private constructor(
                 largest = count
                 color = c
             }
-        }
-
-        if (color == null) {
-            Timber.d("Marshall: Result is null")
-        } else {
-            Timber.d("Marshall: Result is 0x${Integer.toHexString(color)}")
         }
         return color
     }

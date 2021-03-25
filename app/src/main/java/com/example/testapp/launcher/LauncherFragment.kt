@@ -23,13 +23,14 @@ import com.example.testapp.HandleBackPressed
 import com.example.testapp.R
 import com.example.testapp.databinding.ListAppItemBinding
 import com.example.testapp.qwertyMistakes
+import com.example.testapp.view.KeyboardEditText
 import timber.log.Timber
 import java.util.*
 
 
 class LauncherFragment : Fragment(), HandleBackPressed {
 
-    private lateinit var searchView: EditText
+    private lateinit var searchView: KeyboardEditText
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: Adapter<DecoratedAppInfo>
 
@@ -57,14 +58,22 @@ class LauncherFragment : Fragment(), HandleBackPressed {
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = adapter
 
+        searchView.handleBackPressed = object : HandleBackPressed {
+            override fun handleBackPressed(): Boolean {
+                performActionAndEnd { /* no-op */ }
+                return true
+            }
+        }
         searchView.addTextChangedListener(createSearchTextListener())
         searchView.setOnEditorActionListener { _, actionId, _ ->
             if (actionId != EditorInfo.IME_ACTION_SEARCH) {
                 false
             } else {
-                startActivity(Intent(Intent.ACTION_WEB_SEARCH).apply {
-                    putExtra(SearchManager.QUERY, searchView.text.toString())
-                })
+                performActionAndEnd {
+                    startActivity(Intent(Intent.ACTION_WEB_SEARCH).apply {
+                        putExtra(SearchManager.QUERY, searchView.text.toString())
+                    })
+                }
                 true
             }
         }

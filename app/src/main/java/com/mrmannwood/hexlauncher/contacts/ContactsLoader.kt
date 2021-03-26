@@ -1,4 +1,4 @@
-package com.mrmannwood.contacts
+package com.mrmannwood.hexlauncher.contacts
 
 import android.Manifest
 import android.app.Activity

@@ -1,9 +1,9 @@
-package com.mrmannwood
+package com.mrmannwood.hexlauncher
 
 import android.app.Application
 import com.mrmannwood.launcher.BuildConfig
-import com.mrmannwood.contacts.ContactsLoader
-import com.mrmannwood.launcher.AppInfoLiveData
+import com.mrmannwood.hexlauncher.contacts.ContactsLoader
+import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
 import timber.log.Timber
 
 class LauncherApplication : Application() {

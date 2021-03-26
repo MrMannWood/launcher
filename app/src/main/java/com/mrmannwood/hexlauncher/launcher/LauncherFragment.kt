@@ -1,4 +1,4 @@
-package com.mrmannwood.launcher
+package com.mrmannwood.hexlauncher.launcher
 
 import android.app.Activity
 import android.app.SearchManager
@@ -20,10 +20,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.mrmannwood.HandleBackPressed
+import com.mrmannwood.hexlauncher.HandleBackPressed
+import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
-import com.mrmannwood.qwertyMistakes
-import com.mrmannwood.view.KeyboardEditText
+import com.mrmannwood.hexlauncher.qwertyMistakes
+import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import timber.log.Timber
 import java.util.*
 

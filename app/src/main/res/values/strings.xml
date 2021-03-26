@@ -1,7 +1,5 @@
 <resources>
-    <string name="app_name">TestApp</string>
-
-    <string name="apps_search_hint">Search</string>
+    <string name="app_name">Hex Launcher</string>
 
     <string name="menu_item_uninstall_app_title">Uninstall</string>
 </resources>

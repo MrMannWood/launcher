@@ -1,4 +1,4 @@
-package com.mrmannwood.launcher
+package com.mrmannwood.hexlauncher.launcher
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

@@ -1,4 +1,4 @@
-package com.mrmannwood.wallpaper
+package com.mrmannwood.hexlauncher.wallpaper
 
 import android.app.Activity
 import android.app.WallpaperManager

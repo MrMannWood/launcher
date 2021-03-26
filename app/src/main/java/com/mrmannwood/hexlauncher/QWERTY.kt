@@ -1,4 +1,4 @@
-package com.mrmannwood
+package com.mrmannwood.hexlauncher
 
 val QWERTY = mapOf(
     'q' to listOf('w', 'a'),

@@ -1,4 +1,4 @@
-package com.mrmannwood;
+package com.mrmannwood.hexlauncher;
 
 public class TextUtil {
 

@@ -1,4 +1,4 @@
-package com.mrmannwood.contacts
+package com.mrmannwood.hexlauncher.contacts
 
 data class ContactData(
     val id: Int,

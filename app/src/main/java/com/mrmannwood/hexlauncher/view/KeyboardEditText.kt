@@ -1,4 +1,4 @@
-package com.mrmannwood.view
+package com.mrmannwood.hexlauncher.view
 
 import android.content.Context
 import android.util.AttributeSet
@@ -6,7 +6,7 @@ import android.view.KeyEvent
 import androidx.annotation.UiThread
 import androidx.appcompat.R
 import androidx.appcompat.widget.AppCompatEditText
-import com.mrmannwood.HandleBackPressed
+import com.mrmannwood.hexlauncher.HandleBackPressed
 
 @UiThread class KeyboardEditText @JvmOverloads constructor(
         context: Context,

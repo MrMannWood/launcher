@@ -1,4 +1,4 @@
-package com.mrmannwood.launcher
+package com.mrmannwood.hexlauncher.launcher
 
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -6,9 +6,9 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.mrmannwood.HandleBackPressed
+import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.launcher.R
-import com.mrmannwood.contacts.ContactsLoader
+import com.mrmannwood.hexlauncher.contacts.ContactsLoader
 
 class LauncherActivity : AppCompatActivity() {
 

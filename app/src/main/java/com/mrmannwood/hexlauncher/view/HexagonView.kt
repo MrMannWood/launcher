@@ -1,4 +1,4 @@
-package com.mrmannwood.view
+package com.mrmannwood.hexlauncher.view
 
 import android.content.Context
 import android.graphics.*

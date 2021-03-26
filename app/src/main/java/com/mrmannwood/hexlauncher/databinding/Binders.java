@@ -1,4 +1,4 @@
-package com.mrmannwood.databinding;
+package com.mrmannwood.hexlauncher.databinding;
 
 import android.view.View;
 import android.view.ViewGroup;

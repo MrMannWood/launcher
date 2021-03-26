@@ -1,4 +1,4 @@
-package com.mrmannwood
+package com.mrmannwood.hexlauncher
 
 fun String.levenshteinDistance(other: String) : Int = TextUtil.dist(this, other)
 

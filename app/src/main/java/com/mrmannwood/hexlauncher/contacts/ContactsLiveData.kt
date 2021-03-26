@@ -1,4 +1,4 @@
-package com.mrmannwood.contacts
+package com.mrmannwood.hexlauncher.contacts
 
 import android.app.Application
 import android.provider.ContactsContract
@@ -6,7 +6,7 @@ import androidx.annotation.MainThread
 import androidx.core.content.ContentResolverCompat
 import androidx.core.os.CancellationSignal
 import androidx.lifecycle.LiveData
-import com.mrmannwood.executor.AppExecutors
+import com.mrmannwood.hexlauncher.executor.AppExecutors
 
 class ContactsLiveData(application: Application) : LiveData<List<ContactData>>() {
 

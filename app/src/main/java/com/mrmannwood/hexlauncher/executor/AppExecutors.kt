@@ -1,4 +1,4 @@
-package com.mrmannwood.executor
+package com.mrmannwood.hexlauncher.executor
 
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors

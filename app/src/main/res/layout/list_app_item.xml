@@ -6,10 +6,10 @@
         <import type="android.view.View"/>
         <variable
             name="appInfo"
-            type="com.mrmannwood.launcher.AppInfo" />
+            type="com.mrmannwood.hexlauncher.launcher.AppInfo" />
         <variable
             name="adapter"
-            type="com.mrmannwood.launcher.LauncherFragmentDatabindingAdapter" />
+            type="com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter" />
     </data>
 
     <RelativeLayout
@@ -17,7 +17,7 @@
         android:layout_height="75dp"
         android:visibility="@{appInfo == null ? View.INVISIBLE : View.VISIBLE}">
 
-        <com.mrmannwood.view.HexagonView
+        <com.mrmannwood.hexlauncher.view.HexagonView
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:layout_gravity="center"

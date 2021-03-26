@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
@@ -20,7 +21,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.HandleBackPressed
-import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
 import com.mrmannwood.qwertyMistakes
 import com.mrmannwood.view.KeyboardEditText
@@ -127,11 +127,13 @@ class LauncherFragment : Fragment(), HandleBackPressed {
                                     appInfo.startApplication(vdb.root.context)
                                 }
                             }
-                            vdb.root.setOnLongClickListener {
-                                performActionAndEnd {
-                                    startActivity(IconDetailsActivity.buildIntent(requireActivity(), appInfo.appInfo))
+                            vdb.root.setOnCreateContextMenuListener { menu, _, _ ->
+                                menu.add(R.string.menu_item_uninstall_app_title).setOnMenuItemClickListener {
+                                    startActivity(Intent(Intent.ACTION_DELETE).apply {
+                                        data = Uri.parse("package:${appInfo.appInfo.packageName}")
+                                    })
+                                    true
                                 }
-                                true
                             }
                         }
                     }

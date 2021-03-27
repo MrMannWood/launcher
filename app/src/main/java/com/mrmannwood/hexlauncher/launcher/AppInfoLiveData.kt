@@ -101,26 +101,6 @@ class AppInfoLiveData private constructor(
         }
     }
 
-//    private fun makeAdaptive(drawable: Drawable) : AdaptiveIconDrawable {
-//        return if (drawable is AdaptiveIconDrawable) {
-//            drawable
-//        } else {
-//            val scale = inflateMutableAdaptiveIconWrapper().let {
-//                it.setBounds(0, 0, 1, 1)
-//                IconNormalizer.getInstance(context).getScale(drawable, RectF(), it.iconMask, booleanArrayOf(false))
-//            }
-//
-//            inflateMutableAdaptiveIconWrapper().init {
-//                val fsd = foreground as FixedScaleDrawable
-//                fsd.drawable = drawable
-//                fsd.setScale(scale)
-//
-//                val bg = background as ColorDrawable
-//                bg.color = getBackgroundColor(drawable)
-//            }
-//        }
-//    }
-
     private fun getBackgroundColor(drawable: Drawable) : Int? {
         if (drawable is AdaptiveIconDrawable) {
             val result = drawableToBitmap(drawable.background) { getDominantColor(it) }
@@ -198,13 +178,5 @@ class AppInfoLiveData private constructor(
             }
         }
         return color
-    }
-
-    private fun convertToGrayscale(drawable: Drawable): Drawable {
-//        val matrix = ColorMatrix()
-//        matrix.setSaturation(.05f)
-//        val filter = ColorMatrixColorFilter(matrix)
-//        drawable.colorFilter = filter
-        return drawable
     }
 }

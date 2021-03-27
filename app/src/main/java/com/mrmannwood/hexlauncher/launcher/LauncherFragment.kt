@@ -28,7 +28,6 @@ import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import timber.log.Timber
 import java.util.*
 
-
 class LauncherFragment : Fragment(), HandleBackPressed {
 
     private lateinit var searchView: KeyboardEditText

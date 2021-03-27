@@ -1,9 +1,12 @@
 package com.mrmannwood.hexlauncher
 
 import android.app.Application
+import android.content.Intent
+import android.content.IntentFilter
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.hexlauncher.contacts.ContactsLoader
 import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
+import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
 import timber.log.Timber
 
 class LauncherApplication : Application() {
@@ -24,11 +27,18 @@ class LauncherApplication : Application() {
         }
 
         ContactsLoader.tryCreate(this)?.loadContacts("br") { result ->
-            Timber.d("Marshall: start contacts print")
             for (contact in result) {
-                Timber.d("Marshall: $contact")
+                Timber.d("$contact")
             }
-            Timber.d("Marshall: end contacts print")
         }
+
+        registerReceiver(
+                PackageObserverBroadcastReceiver(),
+                IntentFilter().apply {
+                    addDataScheme("package")
+                    addAction(Intent.ACTION_PACKAGE_ADDED)
+                    addAction(Intent.ACTION_PACKAGE_REMOVED)
+                }
+        )
     }
 }

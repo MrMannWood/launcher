@@ -2,10 +2,7 @@ package com.mrmannwood.hexlauncher.launcher
 
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.View
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.launcher.R
 import com.mrmannwood.hexlauncher.contacts.ContactsLoader
@@ -26,8 +23,6 @@ class LauncherActivity : AppCompatActivity() {
                 .add(R.id.container, HomeFragment())
                 .commit()
         }
-
-        // makeStatusBarTranslucent()
 
         if(ContactsLoader.tryCreate(application) == null) {
             ContactsLoader.askForPermission(this, REQUEST_CODE_CONTACTS)
@@ -61,16 +56,6 @@ class LauncherActivity : AppCompatActivity() {
         } ?: false
         if (!handled) {
             super.onBackPressed()
-        }
-    }
-
-    private fun makeStatusBarTranslucent() {
-        window.let { window ->
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            window.statusBarColor = ContextCompat.getColor(this, R.color.black_translucent)
-            window.decorView.systemUiVisibility =
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         }
     }
 }

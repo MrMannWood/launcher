@@ -12,14 +12,11 @@ import android.graphics.Canvas
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.get
 import androidx.lifecycle.LiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.palette.graphics.Palette
-import com.mrmannwood.launcher.R
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import com.mrmannwood.hexlauncher.executor.AppExecutors
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
 
@@ -46,8 +43,6 @@ class AppInfoLiveData private constructor(
 
     private val pacMan: PackageManager = context.packageManager
 
-    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
-
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             triggerLoad()
@@ -70,7 +65,7 @@ class AppInfoLiveData private constructor(
     }
 
     private fun triggerLoad() {
-        executor.submit {
+        AppExecutors.backgroundExecutor.execute {
             val value: Result<List<AppInfo>> = try {
                 val packages: List<ResolveInfo> = pacMan.queryIntentActivities(
                     Intent(
@@ -139,9 +134,6 @@ class AppInfoLiveData private constructor(
         bitmap.recycle()
         return result
     }
-
-    private fun inflateMutableAdaptiveIconWrapper() : AdaptiveIconDrawable =
-        ContextCompat.getDrawable(context, R.drawable.adaptive_icon_drawable_wrapper)!!.mutate() as AdaptiveIconDrawable
 
     private fun getDominantColor(bitmap: Bitmap) : Int? {
         val result = intArrayOf(

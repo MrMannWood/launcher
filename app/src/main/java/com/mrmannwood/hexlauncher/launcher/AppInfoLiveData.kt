@@ -15,7 +15,6 @@ import android.graphics.drawable.Drawable
 import androidx.core.graphics.get
 import androidx.lifecycle.LiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.palette.graphics.Palette
 import com.mrmannwood.hexlauncher.executor.AppExecutors
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
@@ -105,14 +104,6 @@ class AppInfoLiveData private constructor(
         }
         return drawableToBitmap(drawable) { bitmap -> getDominantColor(bitmap) }
     }
-
-    private fun getBackgroundColor(bitmap: Bitmap) : Int =
-        Palette.from(bitmap).generate().let {
-            it.darkMutedSwatch?.rgb
-                ?: it.darkVibrantSwatch?.rgb
-                ?: it.dominantSwatch?.rgb
-                ?: bitmap[bitmap.width / 2, bitmap.height / 2]
-        }
 
     private fun <T> drawableToBitmap(drawable: Drawable, func: (Bitmap) -> T) : T {
         if (drawable is BitmapDrawable && drawable.bitmap != null) {

@@ -13,7 +13,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:versionCode="1"
+        android:versionName="1.0.0">
         <activity
             android:name="com.mrmannwood.hexlauncher.launcher.LauncherActivity"
             android:launchMode="singleInstance">

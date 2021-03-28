@@ -92,7 +92,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 addPreference(CheckBoxPreference(activity).apply {
                     setTitle(R.string.preferences_contacts_allow_search)
                     isChecked = prefs.getBoolean(PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH)
-                    setOnPreferenceClickListener { preference ->
+                    setOnPreferenceClickListener { _ ->
                         val hasPermission = PermissionsHelper.checkHasPermission(activity, ContactsLoader.CONTACTS_PERMISSION)
                         if (isChecked) {
                             if (!hasPermission) {

@@ -1,10 +1,7 @@
-package com.mrmannwood.hexlauncher.launcher
+package com.mrmannwood.hexlauncher.applist
 
 import android.app.Activity
-import android.app.SearchManager
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
@@ -21,6 +18,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.hexlauncher.HandleBackPressed
+import com.mrmannwood.hexlauncher.launcher.*
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
 import com.mrmannwood.hexlauncher.qwertyMistakes
@@ -28,7 +26,30 @@ import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import timber.log.Timber
 import java.util.*
 
-class LauncherFragment : Fragment(), HandleBackPressed {
+class AppListFragment : Fragment(), HandleBackPressed {
+
+    abstract class Host<T>(private val killFragment: (T?) -> Unit) {
+
+        private lateinit var onEndFunc: () -> Unit
+
+        fun setOnEnd(onEnd: () -> Unit) {
+            this.onEndFunc = onEnd
+        }
+
+        fun end() = end(null)
+
+        fun end(value: T?) {
+            onEndFunc()
+            killFragment(value)
+        }
+
+        abstract fun onAppSelected(appInfo: AppInfo)
+
+        open fun onSearchButtonPressed(searchTerm: String) { }
+        open fun onAppInfoBinding(view: View, appInfo: AppInfo) { }
+    }
+
+    private lateinit var host: Host<*>
 
     private lateinit var searchView: KeyboardEditText
     private lateinit var recyclerView: RecyclerView
@@ -40,11 +61,18 @@ class LauncherFragment : Fragment(), HandleBackPressed {
 
     private var data : List<AppInfo>? = null
 
+    fun attachHost(host: Host<*>) {
+        this.host = host
+        host.setOnEnd {
+            hideKeyboard(requireActivity())
+        }
+    }
+
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.fragment_launcher, container, false)
+    ): View = inflater.inflate(R.layout.fragment_app_list, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
@@ -60,7 +88,7 @@ class LauncherFragment : Fragment(), HandleBackPressed {
 
         searchView.handleBackPressed = object : HandleBackPressed {
             override fun handleBackPressed(): Boolean {
-                performActionAndEnd { /* no-op */ }
+                host.end(null)
                 return true
             }
         }
@@ -69,11 +97,7 @@ class LauncherFragment : Fragment(), HandleBackPressed {
             if (actionId != EditorInfo.IME_ACTION_SEARCH) {
                 false
             } else {
-                performActionAndEnd {
-                    startActivity(Intent(Intent.ACTION_WEB_SEARCH).apply {
-                        putExtra(SearchManager.QUERY, searchView.text.toString())
-                    })
-                }
+                host.onSearchButtonPressed(searchView.text.toString())
                 true
             }
         }
@@ -121,30 +145,15 @@ class LauncherFragment : Fragment(), HandleBackPressed {
                     when (appInfo) {
                         is DecoratedAppInfo.AppInfoWrapper -> {
                             (vdb as ListAppItemBinding).appInfo = appInfo.appInfo
+                            host.onAppInfoBinding(vdb.root, appInfo.appInfo)
                             vdb.adapter = LauncherFragmentDatabindingAdapter
                             vdb.root.setOnClickListener {
-                                performActionAndEnd {
-                                    appInfo.startApplication(vdb.root.context)
-                                }
-                            }
-                            vdb.root.setOnCreateContextMenuListener { menu, _, _ ->
-                                menu.add(R.string.menu_item_uninstall_app_title).setOnMenuItemClickListener {
-                                    startActivity(Intent(Intent.ACTION_DELETE).apply {
-                                        data = Uri.parse("package:${appInfo.appInfo.packageName}")
-                                    })
-                                    true
-                                }
+                                host.onAppSelected(appInfo.appInfo)
                             }
                         }
                     }
                 }
         )
-
-    private fun performActionAndEnd(action: () -> Unit) {
-        action()
-        hideKeyboard(requireActivity())
-        parentFragmentManager.popBackStack()
-    }
 
     private fun createSearchTextListener() : TextWatcher = object : TextWatcher {
 

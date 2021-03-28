@@ -1,5 +1,24 @@
 <resources>
     <string name="app_name">Hex Launcher</string>
 
+    <string name="unable_to_start_app">Unable to start app</string>
+    <string name="no_wallpaper_app_selected">No wallpaper app selected</string>
+
+    <string name="menu_item_home_settings">Settings</string>
+    <string name="menu_item_choose_wallpaper_app">Choose Wallpaper</string>
+    <string name="menu_item_open_wallpaper_activity">Choose Wallpaper</string>
+
     <string name="menu_item_uninstall_app_title">Uninstall</string>
+
+    <string name="preferences_category_wallpaper">Wallpaper</string>
+    <string name="preferences_wallpaper_choose_app">Set Wallpaper App</string>
+    <string name="preferences_wallpaper_choose_image">Change Wallpaper</string>
+
+    <string name="preferences_category_contacts">Contacts</string>
+    <string name="preferences_contacts_allow_search">Allow search to query contacts</string>
+    <string name="preferences_contacts_dialog_title">Revoke Contacts Permissions?</string>
+    <string name="preferences_contacts_dialog_message">To protect your privacy, you should revoke unused permissions. Do you want to revoke the contacts permission, as it is no longer needed?</string>
+    <string name="preferences_contacts_dialog_button_positive">Yes</string>
+    <string name="preferences_contacts_dialog_button_negative">No</string>
+
 </resources>

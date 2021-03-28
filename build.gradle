@@ -3,6 +3,7 @@ buildscript {
     ext.kotlin_version = "1.4.31"
     ext.lifecycle_version = "2.2.0"
     ext.arch_version = "2.1.0"
+    ext.preference_version = "1.1.1"
 
     repositories {
         mavenCentral()

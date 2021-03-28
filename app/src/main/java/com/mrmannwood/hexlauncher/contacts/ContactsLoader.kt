@@ -1,13 +1,13 @@
 package com.mrmannwood.hexlauncher.contacts
 
 import android.Manifest
-import android.app.Activity
 import android.app.Application
 import android.content.ContentResolver
-import android.content.pm.PackageManager
 import android.provider.ContactsContract
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContentResolverCompat
+import com.mrmannwood.hexlauncher.permissions.PermissionsHelper
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys
+import com.mrmannwood.hexlauncher.settings.Preferences
 import timber.log.Timber
 
 class ContactsLoader private constructor(private val contentResolver: ContentResolver) {
@@ -15,22 +15,21 @@ class ContactsLoader private constructor(private val contentResolver: ContentRes
     companion object {
         private var instance: ContactsLoader? = null
 
-        fun tryCreate(app: Application) : ContactsLoader? {
-            var loader = instance
-            return loader
-                ?: if (app.checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-                    null
-                } else {
-                    loader = ContactsLoader(app.contentResolver)
-                    instance = loader
-                    loader
-                }
+        const val CONTACTS_PERMISSION = Manifest.permission.READ_CONTACTS
 
+        private fun canAccessContacts(app: Application) : Boolean {
+            return Preferences.getPrefs(app).getBoolean(PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH)
+                    && PermissionsHelper.checkHasPermission(app, CONTACTS_PERMISSION)
         }
 
-        fun askForPermission(activity: Activity, requestCode: Int) {
-            if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-                activity.requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS), requestCode)
+        fun tryCreate(app: Application) : ContactsLoader? {
+            var loader = instance
+            return loader ?: if (!canAccessContacts(app)) {
+                null
+            } else {
+                loader = ContactsLoader(app.contentResolver)
+                instance = loader
+                loader
             }
         }
     }

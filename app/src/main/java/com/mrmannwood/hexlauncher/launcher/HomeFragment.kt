@@ -7,6 +7,8 @@ import android.view.*
 import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
+import com.mrmannwood.hexlauncher.applist.AppListFragment
+import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.launcher.R
 import kotlin.math.abs
 
@@ -27,6 +29,12 @@ class HomeFragment : Fragment() {
                 return gestureDetector.onTouchEvent(me)
             }
         })
+        view.setOnCreateContextMenuListener { menu, _, _ ->
+            menu.add(R.string.menu_item_home_settings).setOnMenuItemClickListener {
+                startActivity(Intent(requireActivity(), SettingsActivity::class.java))
+                true
+            }
+        }
     }
 
     private fun createGestureDetector(context: Context) = GestureDetectorCompat(
@@ -77,12 +85,17 @@ class HomeFragment : Fragment() {
             fun onSwipeRight() {
                 Toast.makeText(requireContext(), "Right", Toast.LENGTH_SHORT).show()
             }
+
+            override fun onLongPress(e: MotionEvent) {
+                super.onLongPress(e)
+                requireView().showContextMenu(e.x, e.y)
+            }
         })
 
     private fun showLauncherFragment() {
         parentFragmentManager.beginTransaction()
-            .replace(R.id.container, LauncherFragment())
-            .addToBackStack("LauncherFragment")
+            .replace(R.id.container, AppListFragment())
+            .addToBackStack("AppListFragment")
             .commit()
     }
 

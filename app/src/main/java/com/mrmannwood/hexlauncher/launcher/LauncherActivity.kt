@@ -1,48 +1,33 @@
 package com.mrmannwood.hexlauncher.launcher
 
-import android.content.pm.PackageManager
+import android.app.SearchManager
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.mrmannwood.hexlauncher.HandleBackPressed
+import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.launcher.R
-import com.mrmannwood.hexlauncher.contacts.ContactsLoader
 
 class LauncherActivity : AppCompatActivity() {
-
-    companion object {
-        private const val REQUEST_CODE_CONTACTS = 1
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
         supportActionBar?.hide()
 
+        supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
+            when (fragment) {
+                is AppListFragment -> fragment.attachHost(appListFragmentHost)
+            }
+        }
+
         if (supportFragmentManager.findFragmentById(R.id.container) == null) {
             supportFragmentManager.beginTransaction()
                 .add(R.id.container, HomeFragment())
                 .commit()
-        }
-
-        if(ContactsLoader.tryCreate(application) == null) {
-            ContactsLoader.askForPermission(this, REQUEST_CODE_CONTACTS)
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            REQUEST_CODE_CONTACTS -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //TODO
-                } else {
-                    //TODO
-                }
-            }
         }
     }
 
@@ -56,6 +41,38 @@ class LauncherActivity : AppCompatActivity() {
         } ?: false
         if (!handled) {
             super.onBackPressed()
+        }
+    }
+
+    private val appListFragmentHost = object : AppListFragment.Host<Void>(
+        killFragment = { _ -> supportFragmentManager.popBackStack() }
+    ) {
+
+        override fun onSearchButtonPressed(searchTerm: String) {
+            startActivity(Intent(Intent.ACTION_WEB_SEARCH).apply {
+                putExtra(SearchManager.QUERY, searchTerm)
+            })
+            end()
+        }
+
+        override fun onAppSelected(appInfo: AppInfo) {
+            packageManager.getLaunchIntentForPackage(appInfo.packageName)?.let { intent ->
+                startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                end()
+            } ?: run {
+                Toast.makeText(this@LauncherActivity, R.string.unable_to_start_app, Toast.LENGTH_LONG).show()
+            }
+        }
+
+        override fun onAppInfoBinding(view: View, appInfo: AppInfo) {
+            view.setOnCreateContextMenuListener { menu, _, _ ->
+                menu.add(R.string.menu_item_uninstall_app_title).setOnMenuItemClickListener {
+                    startActivity(Intent(Intent.ACTION_DELETE).apply {
+                        data = Uri.parse("package:${appInfo.packageName}")
+                    })
+                    true
+                }
+            }
         }
     }
 }

@@ -17,6 +17,7 @@ class LauncherActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
         supportActionBar?.hide()
+        makeFullScreen()
 
         supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
             when (fragment) {
@@ -41,6 +42,15 @@ class LauncherActivity : AppCompatActivity() {
         } ?: false
         if (!handled) {
             super.onBackPressed()
+        }
+    }
+
+    private fun makeFullScreen() {
+        window.apply {
+            getColor(R.color.black_translucent).let { color ->
+                statusBarColor = color
+                navigationBarColor = color
+            }
         }
     }
 

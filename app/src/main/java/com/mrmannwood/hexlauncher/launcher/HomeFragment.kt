@@ -8,11 +8,20 @@ import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
 import com.mrmannwood.hexlauncher.applist.AppListFragment
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys
+import com.mrmannwood.hexlauncher.settings.Preferences
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.launcher.R
 import kotlin.math.abs
 
 class HomeFragment : Fragment() {
+
+    private val prefs by lazy {
+        Preferences.getPrefs(requireContext())
+    }
+
+    private lateinit var dateView: View
+    private lateinit var timeView : View
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,6 +44,14 @@ class HomeFragment : Fragment() {
                 true
             }
         }
+        dateView = view.findViewById(R.id.date)
+        timeView = view.findViewById(R.id.time)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dateView.visibility = if (prefs.getBoolean(PreferenceKeys.Home.SHOW_DATE)) View.VISIBLE else View.INVISIBLE
+        timeView.visibility = if (prefs.getBoolean(PreferenceKeys.Home.SHOW_TIME)) View.VISIBLE else View.INVISIBLE
     }
 
     private fun createGestureDetector(context: Context) = GestureDetectorCompat(

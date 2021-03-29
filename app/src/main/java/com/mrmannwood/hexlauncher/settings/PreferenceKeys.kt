@@ -8,4 +8,8 @@ object PreferenceKeys {
     object Contacts {
         const val ALLOW_CONTACT_SEARCH = "contacts_allow_search"
     }
+    object Home {
+        const val SHOW_DATE = "home_show_date"
+        const val SHOW_TIME = "home_show_time"
+    }
 }

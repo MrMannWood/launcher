@@ -21,4 +21,8 @@
     <string name="preferences_contacts_dialog_button_positive">Yes</string>
     <string name="preferences_contacts_dialog_button_negative">No</string>
 
+    <string name="preferences_category_home">Home</string>
+    <string name="preferences_category_home_show_date">Show Date</string>
+    <string name="preferences_category_home_show_time">Show Time</string>
+
 </resources>

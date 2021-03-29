@@ -3,5 +3,7 @@
 
 build/
 out/
+app/release/
+app/debug/
 
 local.properties

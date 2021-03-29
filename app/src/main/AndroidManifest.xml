@@ -3,7 +3,7 @@
     package="com.mrmannwood.launcher">
 
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
-<!--    <uses-permission android:name="android.permission.READ_CONTACTS" />-->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
     <application

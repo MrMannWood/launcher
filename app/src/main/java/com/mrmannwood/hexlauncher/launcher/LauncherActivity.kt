@@ -5,8 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.launcher.R
@@ -17,6 +20,7 @@ class LauncherActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
         supportActionBar?.hide()
+        makeFullScreen()
 
         supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
             when (fragment) {
@@ -41,6 +45,15 @@ class LauncherActivity : AppCompatActivity() {
         } ?: false
         if (!handled) {
             super.onBackPressed()
+        }
+    }
+
+    private fun makeFullScreen() {
+        window.apply {
+            getColor(R.color.black_translucent).let { color ->
+                statusBarColor = color
+                navigationBarColor = color
+            }
         }
     }
 

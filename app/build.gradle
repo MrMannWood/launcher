@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId "com.mrmannwood.hexlauncher"
-        minSdkVersion 28
+        minSdkVersion 30
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"

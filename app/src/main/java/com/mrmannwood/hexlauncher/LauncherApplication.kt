@@ -3,6 +3,7 @@ package com.mrmannwood.hexlauncher
 import android.app.Application
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.StrictMode
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.hexlauncher.contacts.ContactsLoader
 import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
@@ -14,7 +15,9 @@ class LauncherApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
+            DebugBuildModeConfiguration.onApplicationCreate()
+        } else {
+            ReleaseBuildModeConfiguration.onApplicationCreate()
         }
 
         AppInfoLiveData.get(this).observeForever { result ->
@@ -40,5 +43,22 @@ class LauncherApplication : Application() {
                     addAction(Intent.ACTION_PACKAGE_REMOVED)
                 }
         )
+    }
+
+    private interface BuildModeConfiguration {
+        fun onApplicationCreate()
+    }
+
+    private object DebugBuildModeConfiguration : BuildModeConfiguration {
+        override fun onApplicationCreate() {
+            Timber.plant(Timber.DebugTree())
+
+            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().detectAll().build())
+            StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder().detectAll().build())
+        }
+    }
+
+    private object ReleaseBuildModeConfiguration : BuildModeConfiguration {
+        override fun onApplicationCreate() { }
     }
 }

@@ -1,35 +1,31 @@
 package com.mrmannwood.hexlauncher.settings
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
-import android.preference.Preference
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.edit
+import androidx.fragment.app.activityViewModels
 import androidx.preference.*
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
-import com.mrmannwood.hexlauncher.contacts.ContactsLoader
 import com.mrmannwood.hexlauncher.permissions.PermissionsHelper
+import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
-
-    private val onWallpaperPackageChangedCallbacks = mutableListOf<() -> Unit>()
-
-    private val prefs by lazy {
-        Preferences.getPrefs(requireContext())
-    }
 
     private val wallpaperActivityResultContracts = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
     ) { result ->
         result.data.onAppListResult(
                 onSuccess = { appName, packageName ->
-                    Preferences.getPrefs(requireContext()).apply {
+                    prefs.edit {
                         putString(PreferenceKeys.Wallpaper.APP_NAME, appName)
                         putString(PreferenceKeys.Wallpaper.PACKAGE_NAME, packageName)
                     }
@@ -38,14 +34,63 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     Toast.makeText(requireContext(), R.string.no_wallpaper_app_selected, Toast.LENGTH_LONG).show()
                 }
         )
-        onWallpaperPackageChangedCallbacks.forEach { it() }
     }
 
     private val requestContactsPermissionContract = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) {
-            Preferences.getPrefs(requireContext()).setBoolean(PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH, true)
-        } else {
-            Preferences.getPrefs(requireContext()).remove(PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH)
+        prefs.edit {
+            putBoolean(PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH, isGranted)
+        }
+    }
+
+    private val settingsViewModel : SettingsViewModel by activityViewModels()
+    private lateinit var prefs : SharedPreferences
+
+    private lateinit var wallpaperAppPreference: CheckBoxPreference
+    private lateinit var wallpaperPreference: CheckBoxPreference
+    private lateinit var contactsPreference: CheckBoxPreference
+
+    private var wallpaperAppPackageName: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        settingsViewModel.preferencesLiveData.observe(this) { sp -> prefs = sp }
+        settingsViewModel.wallpaperPackageLiveData.observe(this) { app ->
+            wallpaperAppPackageName = app
+        }
+        settingsViewModel.wallpaperAppNameLiveData.observe(this) {
+            it?.let { appName ->
+                wallpaperAppPreference.summary = appName
+                wallpaperAppPreference.isChecked = true
+                wallpaperPreference.isVisible = true
+            } ?: run {
+                wallpaperAppPreference.summary = ""
+                wallpaperAppPreference.isChecked = false
+                wallpaperPreference.isVisible = false
+            }
+        }
+        settingsViewModel.contactsPermissionLiveData.observe(this) { permissionsResult ->
+            when (permissionsResult) {
+                is PermissionsLiveData.PermissionsResult.PrefGrantedPermissionGranted -> { /* checked */  }
+                is PermissionsLiveData.PermissionsResult.PrefGrantedPermissionDenied -> {
+                    requestContactsPermissionContract.launch(
+                            settingsViewModel.contactsPermissionLiveData.permission)
+                }
+                is PermissionsLiveData.PermissionsResult.PrefDeniedPermissionGranted -> {
+                    AlertDialog.Builder(requireActivity())
+                            .setTitle(R.string.preferences_contacts_dialog_title)
+                            .setMessage(R.string.preferences_contacts_dialog_message)
+                            .setPositiveButton(R.string.preferences_contacts_dialog_button_positive) { _, _ ->
+                                startActivity(
+                                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                            data = Uri.fromParts("package", requireActivity().packageName, null)
+                                        }
+                                )
+                            }
+                            .setNegativeButton(R.string.preferences_contacts_dialog_button_negative) { _, _ -> }
+                            .show()
+                }
+                is PermissionsLiveData.PermissionsResult.PrefDeniedPermissionDenied -> { /* unchecked */ }
+            }
         }
     }
 
@@ -58,38 +103,25 @@ class SettingsFragment : PreferenceFragmentCompat() {
             screen.addPreference(this)
             setTitle(R.string.preferences_category_wallpaper)
             addPreference(CheckBoxPreference(activity).apply {
+                wallpaperAppPreference = this
                 setTitle(R.string.preferences_wallpaper_choose_app)
-                val init = {
-                    prefs.getString(PreferenceKeys.Wallpaper.APP_NAME)?.let {
-                        summary = it
-                        isChecked = true
-                    } ?: run {
-                        isChecked = false
-                    }
-                }
-                init()
                 setOnPreferenceClickListener {
                     wallpaperActivityResultContracts.launch(Intent(activity, AppListActivity::class.java))
-                    isChecked = prefs.checkExists(PreferenceKeys.Wallpaper.APP_NAME)
                     true
                 }
-                onWallpaperPackageChangedCallbacks.add(init)
             })
             addPreference(CheckBoxPreference(activity).apply {
+                wallpaperPreference = this
                 setTitle(R.string.preferences_wallpaper_choose_image)
-                val init = {
-                    isChecked = true
-                    isVisible = prefs.getString(PreferenceKeys.Wallpaper.PACKAGE_NAME) != null
-                }
-                init()
+                isChecked = true
+                isVisible = false
                 setOnPreferenceClickListener {
                     isChecked = true
-                    startActivity(
-                            activity.packageManager.getLaunchIntentForPackage(prefs.getString(PreferenceKeys.Wallpaper.PACKAGE_NAME)!!)
-                    )
+                    wallpaperAppPackageName?.let { app ->
+                        startActivity(activity.packageManager.getLaunchIntentForPackage(app))
+                    }
                     true
                 }
-                onWallpaperPackageChangedCallbacks.add(init)
             })
         }
 
@@ -114,30 +146,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             contactsCategory.apply {
                 addPreference(CheckBoxPreference(activity).apply {
+                    contactsPreference = this
                     setTitle(R.string.preferences_contacts_allow_search)
-                    isChecked = prefs.getBoolean(PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH)
-                    setOnPreferenceClickListener { _ ->
-                        val hasPermission = PermissionsHelper.checkHasPermission(activity, ContactsLoader.CONTACTS_PERMISSION)
-                        if (isChecked) {
-                            if (!hasPermission) {
-                                requestContactsPermissionContract.launch(ContactsLoader.CONTACTS_PERMISSION)
-                            }
-                        } else if (hasPermission) {
-                            AlertDialog.Builder(activity)
-                                    .setTitle(R.string.preferences_contacts_dialog_title)
-                                    .setMessage(R.string.preferences_contacts_dialog_message)
-                                    .setPositiveButton(R.string.preferences_contacts_dialog_button_positive) { _, _ ->
-                                        startActivity(
-                                                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                                    data = Uri.fromParts("package", activity.packageName, null)
-                                                }
-                                        )
-                                    }
-                                    .setNegativeButton(R.string.preferences_contacts_dialog_button_negative) { _, _ -> }
-                                    .show()
-                        }
-                        true
-                    }
+                    key = PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH
                 })
             }
         }

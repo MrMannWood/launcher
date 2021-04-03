@@ -5,9 +5,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.StrictMode
 import com.mrmannwood.launcher.BuildConfig
-import com.mrmannwood.hexlauncher.contacts.ContactsLoader
 import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
+import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
 import timber.log.Timber
 
 class LauncherApplication : Application() {
@@ -20,18 +20,14 @@ class LauncherApplication : Application() {
             ReleaseBuildModeConfiguration.onApplicationCreate()
         }
 
+        PreferencesLiveData.create(this)
+
         AppInfoLiveData.get(this).observeForever { result ->
             result.onSuccess { apps ->
-                Timber.i("App info changed, got ${apps.size} aps")
+                Timber.i("App info changed, got ${apps.size} apps")
             }
             result.onFailure { error ->
                 Timber.e(error, "App Info changed, got error")
-            }
-        }
-
-        ContactsLoader.tryCreate(this)?.loadContacts("br") { result ->
-            for (contact in result) {
-                Timber.d("$contact")
             }
         }
 

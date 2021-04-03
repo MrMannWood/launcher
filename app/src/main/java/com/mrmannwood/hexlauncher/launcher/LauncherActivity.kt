@@ -2,17 +2,17 @@ package com.mrmannwood.hexlauncher.launcher
 
 import android.app.SearchManager
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.mrmannwood.hexlauncher.HandleBackPressed
-import com.mrmannwood.hexlauncher.applist.AppListFragment
-import com.mrmannwood.hexlauncher.contacts.ContactData
+import com.mrmannwood.hexlauncher.applist.AppListHostViewModel
 import com.mrmannwood.launcher.R
 
 class LauncherActivity : AppCompatActivity() {
+
+    private val appListHostViewModel : AppListHostViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,9 +20,29 @@ class LauncherActivity : AppCompatActivity() {
         supportActionBar?.hide()
         makeFullScreen()
 
-        supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
-            when (fragment) {
-                is AppListFragment -> fragment.attachHost(appListFragmentHost)
+        appListHostViewModel.apply {
+            supportsAppMenu.value = true
+            supportsContactSearch.value = true
+            contactSelected.observe(this@LauncherActivity) { contact ->
+                startActivity(Intent(Intent.ACTION_VIEW, contact.uri))
+                endRequested.value = true
+            }
+            appSelected.observe(this@LauncherActivity) { appInfo ->
+                packageManager.getLaunchIntentForPackage(appInfo.packageName)?.let { intent ->
+                    startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                    endRequested.value = true
+                } ?: run {
+                    Toast.makeText(this@LauncherActivity, R.string.unable_to_start_app, Toast.LENGTH_LONG).show()
+                }
+            }
+            searchButtonSelected.observe(this@LauncherActivity) { searchTerm ->
+                startActivity(Intent(Intent.ACTION_WEB_SEARCH).apply {
+                    putExtra(SearchManager.QUERY, searchTerm)
+                })
+                endRequested.value = true
+            }
+            endRequested.observe(this@LauncherActivity) {
+                supportFragmentManager.popBackStack()
             }
         }
 
@@ -51,45 +71,6 @@ class LauncherActivity : AppCompatActivity() {
             getColor(R.color.black_translucent).let { color ->
                 statusBarColor = color
                 navigationBarColor = color
-            }
-        }
-    }
-
-    private val appListFragmentHost = object : AppListFragment.Host<Void>(
-        killFragment = { _ -> supportFragmentManager.popBackStack() }
-    ) {
-
-        override fun showContacts(): Boolean = true
-
-        override fun onContactClicked(contact: ContactData) {
-            startActivity(Intent(Intent.ACTION_VIEW, contact.uri))
-            end()
-        }
-
-        override fun onSearchButtonPressed(searchTerm: String) {
-            startActivity(Intent(Intent.ACTION_WEB_SEARCH).apply {
-                putExtra(SearchManager.QUERY, searchTerm)
-            })
-            end()
-        }
-
-        override fun onAppSelected(appInfo: AppInfo) {
-            packageManager.getLaunchIntentForPackage(appInfo.packageName)?.let { intent ->
-                startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                end()
-            } ?: run {
-                Toast.makeText(this@LauncherActivity, R.string.unable_to_start_app, Toast.LENGTH_LONG).show()
-            }
-        }
-
-        override fun onAppInfoBinding(view: View, appInfo: AppInfo) {
-            view.setOnCreateContextMenuListener { menu, _, _ ->
-                menu.add(R.string.menu_item_uninstall_app_title).setOnMenuItemClickListener {
-                    startActivity(Intent(Intent.ACTION_DELETE).apply {
-                        data = Uri.parse("package:${appInfo.packageName}")
-                    })
-                    true
-                }
             }
         }
     }

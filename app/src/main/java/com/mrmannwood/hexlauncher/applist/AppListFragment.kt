@@ -3,6 +3,7 @@ package com.mrmannwood.hexlauncher.applist
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
@@ -17,6 +18,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,31 +35,6 @@ import java.util.*
 
 class AppListFragment : Fragment(), HandleBackPressed {
 
-    abstract class Host<T>(private val killFragment: (T?) -> Unit) {
-
-        private lateinit var onEndFunc: () -> Unit
-
-        fun setOnEnd(onEnd: () -> Unit) {
-            this.onEndFunc = onEnd
-        }
-
-        fun end() = end(null)
-
-        fun end(value: T?) {
-            onEndFunc()
-            killFragment(value)
-        }
-
-        abstract fun onAppSelected(appInfo: AppInfo)
-        abstract fun showContacts(): Boolean // TODO this really doesn't belong here
-        open fun onContactClicked(contact: ContactData) { }
-
-        open fun onSearchButtonPressed(searchTerm: String) { }
-        open fun onAppInfoBinding(view: View, appInfo: AppInfo) { }
-    }
-
-    private lateinit var host: Host<*>
-
     private lateinit var searchView: KeyboardEditText
     private lateinit var appListView: RecyclerView
     private lateinit var appListAdapter: Adapter<AppInfo>
@@ -68,15 +45,9 @@ class AppListFragment : Fragment(), HandleBackPressed {
     private var numColumnsInAppList: Int = 0
 
     private val viewModel : LauncherViewModel by activityViewModels()
+    private val hostViewModel : AppListHostViewModel by activityViewModels()
 
     private var apps : List<AppInfo>? = null
-
-    fun attachHost(host: Host<*>) {
-        this.host = host
-        host.setOnEnd {
-            hideKeyboard(requireActivity())
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,7 +71,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
         searchView = view.findViewById(R.id.search)
         searchView.handleBackPressed = object : HandleBackPressed {
             override fun handleBackPressed(): Boolean {
-                host.end(null)
+                hostViewModel.endRequested.value = true
                 return true
             }
         }
@@ -109,7 +80,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
             if (actionId != EditorInfo.IME_ACTION_SEARCH) {
                 false
             } else {
-                host.onSearchButtonPressed(searchView.text.toString())
+                hostViewModel.searchButtonSelected.value = searchView.text.toString()
                 true
             }
         }
@@ -147,17 +118,14 @@ class AppListFragment : Fragment(), HandleBackPressed {
                 Toast.makeText(requireContext(), R.string.error_app_load, Toast.LENGTH_LONG).show()
             }
         })
-        if (host.showContacts()) {
-            viewModel.contacts.observe(viewLifecycleOwner) {
-                it.getOrNull()?.let { contacts ->
-                    contactsAdapter.setData(contacts.take(2))
-                }
-                it.exceptionOrNull()?.let {
-                    contactsAdapter.setData(listOf())
-                    Toast.makeText(requireContext(), R.string.error_contact_load, Toast.LENGTH_LONG).show()
-                }
+        hostViewModel.supportsContactSearch.observe(viewLifecycleOwner) { supportsContactSearch ->
+            if (supportsContactSearch) {
+                viewModel.contacts.observe(viewLifecycleOwner, contactsObserver)
+            } else {
+                viewModel.contacts.removeObserver(contactsObserver)
             }
         }
+        hostViewModel.supportsAppMenu
     }
 
     private fun createAppListLayoutManager() : GridLayoutManager {
@@ -180,9 +148,18 @@ class AppListFragment : Fragment(), HandleBackPressed {
                             appInfo = appData
                             adapter = LauncherFragmentDatabindingAdapter
                         }
-                        host.onAppInfoBinding(vdb.root, appData)
+                        if (true == hostViewModel.supportsAppMenu.value) {
+                            vdb.root.setOnCreateContextMenuListener { menu, _, _ ->
+                                menu.add(R.string.menu_item_uninstall_app_title).setOnMenuItemClickListener {
+                                    startActivity(Intent(Intent.ACTION_DELETE).apply {
+                                        data = Uri.parse("package:${appData.packageName}")
+                                    })
+                                    true
+                                }
+                            }
+                        }
                         vdb.root.setOnClickListener {
-                            host.onAppSelected(appData)
+                            hostViewModel.appSelected.value = appData
                         }
                     }
             )
@@ -201,7 +178,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
                             contact = contactData
                         }
                         vdb.root.setOnClickListener {
-                            host.onContactClicked(contactData)
+                            hostViewModel.contactSelected.value = contactData
                         }
                     }
             )
@@ -269,6 +246,16 @@ class AppListFragment : Fragment(), HandleBackPressed {
                                 .take(numColumnsInAppList)
                     }
             appListAdapter.setData(filteredApps)
+        }
+    }
+
+    private val contactsObserver = Observer<Result<List<ContactData>>> {
+        it.getOrNull()?.let { contacts ->
+            contactsAdapter.setData(contacts.take(2))
+        }
+        it.exceptionOrNull()?.let {
+            contactsAdapter.setData(listOf())
+            Toast.makeText(requireContext(), R.string.error_contact_load, Toast.LENGTH_LONG).show()
         }
     }
 }

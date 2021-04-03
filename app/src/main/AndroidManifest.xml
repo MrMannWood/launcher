@@ -13,8 +13,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:versionCode="2"
-        android:versionName="1.0.1">
+        android:versionCode="3"
+        android:versionName="1.0.2">
         <activity
             android:name="com.mrmannwood.hexlauncher.launcher.LauncherActivity"
             android:launchMode="singleInstance">

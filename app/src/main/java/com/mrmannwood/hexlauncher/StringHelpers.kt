@@ -1,7 +1,5 @@
 package com.mrmannwood.hexlauncher
 
-fun String.levenshteinDistance(other: String) : Int = TextUtil.dist(this, other)
-
 fun String.qwertyMistakes(other: String): Int {
     if (equals(other)) {
         return 0

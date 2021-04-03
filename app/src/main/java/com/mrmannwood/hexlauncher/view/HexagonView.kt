@@ -15,13 +15,6 @@ class HexagonView @JvmOverloads constructor(
 
     private val hexagonPath = Path()
 
-    init {
-    }
-
-    fun setRadius(radius: Float) {
-        calculatePath(radius)
-    }
-
     private fun calculatePath(radius: Float) {
         val halfRadius = radius / 2f
         val triangleHeight = (sqrt(3.0) * halfRadius).toFloat()

@@ -27,4 +27,7 @@
 
     <string name="settings_title">Settings</string>
 
+    <string name="error_app_load">An error occurred while loading your apps</string>
+    <string name="error_contact_load">An error occurred while loading your contacts</string>
+
 </resources>

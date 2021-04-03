@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
+import com.mrmannwood.hexlauncher.contacts.ContactData
 import com.mrmannwood.launcher.R
 
 class LauncherActivity : AppCompatActivity() {
@@ -57,6 +58,13 @@ class LauncherActivity : AppCompatActivity() {
     private val appListFragmentHost = object : AppListFragment.Host<Void>(
         killFragment = { _ -> supportFragmentManager.popBackStack() }
     ) {
+
+        override fun showContacts(): Boolean = true
+
+        override fun onContactClicked(contact: ContactData) {
+            startActivity(Intent(Intent.ACTION_VIEW, contact.uri))
+            end()
+        }
 
         override fun onSearchButtonPressed(searchTerm: String) {
             startActivity(Intent(Intent.ACTION_WEB_SEARCH).apply {

@@ -5,8 +5,6 @@
     <string name="no_wallpaper_app_selected">No wallpaper app selected</string>
 
     <string name="menu_item_home_settings">Settings</string>
-    <string name="menu_item_choose_wallpaper_app">Choose Wallpaper</string>
-    <string name="menu_item_open_wallpaper_activity">Choose Wallpaper</string>
 
     <string name="menu_item_uninstall_app_title">Uninstall</string>
 

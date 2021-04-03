@@ -13,7 +13,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.preference.*
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
-import com.mrmannwood.hexlauncher.permissions.PermissionsHelper
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R

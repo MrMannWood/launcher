@@ -25,4 +25,6 @@
     <string name="preferences_category_home_show_date">Show Date</string>
     <string name="preferences_category_home_show_time">Show Time</string>
 
+    <string name="settings_title">Settings</string>
+
 </resources>

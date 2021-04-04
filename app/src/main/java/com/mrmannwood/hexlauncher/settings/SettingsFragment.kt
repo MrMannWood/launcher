@@ -44,9 +44,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private val settingsViewModel : SettingsViewModel by activityViewModels()
     private lateinit var prefs : SharedPreferences
 
-    private lateinit var wallpaperAppPreference: CheckBoxPreference
-    private lateinit var wallpaperPreference: CheckBoxPreference
-    private lateinit var contactsPreference: CheckBoxPreference
+    private lateinit var wallpaperAppPreference: Preference
+    private lateinit var wallpaperPreference: Preference
 
     private var wallpaperAppPackageName: String? = null
 
@@ -59,11 +58,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         settingsViewModel.wallpaperAppNameLiveData.observe(this) {
             it?.let { appName ->
                 wallpaperAppPreference.summary = appName
-                wallpaperAppPreference.isChecked = true
                 wallpaperPreference.isVisible = true
             } ?: run {
                 wallpaperAppPreference.summary = ""
-                wallpaperAppPreference.isChecked = false
                 wallpaperPreference.isVisible = false
             }
         }
@@ -101,7 +98,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
             setTitle(R.string.preferences_category_wallpaper)
-            addPreference(CheckBoxPreference(activity).apply {
+            addPreference(Preference(activity).apply {
                 wallpaperAppPreference = this
                 setTitle(R.string.preferences_wallpaper_choose_app)
                 setOnPreferenceClickListener {
@@ -109,13 +106,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     true
                 }
             })
-            addPreference(CheckBoxPreference(activity).apply {
+            addPreference(Preference(activity).apply {
                 wallpaperPreference = this
                 setTitle(R.string.preferences_wallpaper_choose_image)
-                isChecked = true
                 isVisible = false
                 setOnPreferenceClickListener {
-                    isChecked = true
                     wallpaperAppPackageName?.let { app ->
                         startActivity(activity.packageManager.getLaunchIntentForPackage(app))
                     }
@@ -127,11 +122,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
             setTitle(R.string.preferences_category_home)
-            addPreference(CheckBoxPreference(activity).apply {
+            addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_category_home_show_date)
                 key = PreferenceKeys.Home.SHOW_DATE
             })
-            addPreference(CheckBoxPreference(activity).apply {
+            addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_category_home_show_time)
                 key = PreferenceKeys.Home.SHOW_TIME
             })
@@ -144,8 +139,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 screen.addPreference(this)
             }
             contactsCategory.apply {
-                addPreference(CheckBoxPreference(activity).apply {
-                    contactsPreference = this
+                addPreference(SwitchPreference(activity).apply {
                     setTitle(R.string.preferences_contacts_allow_search)
                     key = PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH
                 })

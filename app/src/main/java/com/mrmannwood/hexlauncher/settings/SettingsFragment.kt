@@ -31,7 +31,39 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     }
                 },
                 onFailure = {
-                    Toast.makeText(requireContext(), R.string.no_wallpaper_app_selected, Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), R.string.no_app_selected, Toast.LENGTH_LONG).show()
+                }
+        )
+    }
+
+    private val preferenceSwipeRightResultContract = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        result.data.onAppListResult(
+                onSuccess = { appName, packageName ->
+                    prefs.edit {
+                        putString(PreferenceKeys.Gestures.SwipeRight.APP_NAME, appName)
+                        putString(PreferenceKeys.Gestures.SwipeRight.PACKAGE_NAME, packageName)
+                    }
+                },
+                onFailure = {
+                    Toast.makeText(requireContext(), R.string.no_app_selected, Toast.LENGTH_LONG).show()
+                }
+        )
+    }
+
+    private val preferenceSwipeLeftResultContract = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        result.data.onAppListResult(
+                onSuccess = { appName, packageName ->
+                    prefs.edit {
+                        putString(PreferenceKeys.Gestures.SwipeLeft.APP_NAME, appName)
+                        putString(PreferenceKeys.Gestures.SwipeLeft.PACKAGE_NAME, packageName)
+                    }
+                },
+                onFailure = {
+                    Toast.makeText(requireContext(), R.string.no_app_selected, Toast.LENGTH_LONG).show()
                 }
         )
     }
@@ -47,22 +79,33 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var wallpaperAppPreference: Preference
     private lateinit var wallpaperPreference: Preference
+    private lateinit var swipeRightAppPreference: Preference
+    private lateinit var swipeLeftAppPreference: Preference
 
     private var wallpaperAppPackageName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         settingsViewModel.preferencesLiveData.observe(this) { sp -> prefs = sp }
-        settingsViewModel.wallpaperPackageLiveData.observe(this) { app ->
-            wallpaperAppPackageName = app
+        settingsViewModel.wallpaperLiveData.observe(this) { result ->
+            val packageName = result[PreferenceKeys.Wallpaper.PACKAGE_NAME] as? String
+            val appName = result[PreferenceKeys.Wallpaper.APP_NAME] as? String
+            wallpaperAppPackageName = packageName
+            wallpaperAppPreference.summary = appName ?: ""
+            wallpaperPreference.isVisible = appName != null
         }
-        settingsViewModel.wallpaperAppNameLiveData.observe(this) {
-            it?.let { appName ->
-                wallpaperAppPreference.summary = appName
-                wallpaperPreference.isVisible = true
-            } ?: run {
-                wallpaperAppPreference.summary = ""
-                wallpaperPreference.isVisible = false
+        settingsViewModel.swipeRightLiveData.observe(this) { appName ->
+            if (appName != null) {
+                swipeRightAppPreference.summary = appName
+            } else {
+                swipeRightAppPreference.summary = ""
+            }
+        }
+        settingsViewModel.swipeLeftLiveData.observe(this) { appName ->
+            if (appName != null) {
+                swipeLeftAppPreference.summary = appName
+            } else {
+                swipeLeftAppPreference.summary = ""
             }
         }
         settingsViewModel.contactsPermissionLiveData.observe(this) { permissionsResult ->
@@ -130,6 +173,27 @@ class SettingsFragment : PreferenceFragmentCompat() {
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_category_home_show_time)
                 key = PreferenceKeys.Home.SHOW_TIME
+            })
+        }
+
+        PreferenceCategory(activity).apply {
+            screen.addPreference(this)
+            setTitle(R.string.preferences_category_gestures)
+            addPreference(Preference(activity).apply {
+                swipeRightAppPreference = this
+                setTitle(R.string.preferences_gestures_swipe_right)
+                setOnPreferenceClickListener {
+                    preferenceSwipeRightResultContract.launch(Intent(activity, AppListActivity::class.java))
+                    true
+                }
+            })
+            addPreference(Preference(activity).apply {
+                swipeLeftAppPreference = this
+                setTitle(R.string.preferences_gestures_swipe_left)
+                setOnPreferenceClickListener {
+                    preferenceSwipeLeftResultContract.launch(Intent(activity, AppListActivity::class.java))
+                    true
+                }
             })
         }
 

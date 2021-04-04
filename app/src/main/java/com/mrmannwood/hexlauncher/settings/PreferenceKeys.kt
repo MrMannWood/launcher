@@ -12,4 +12,14 @@ object PreferenceKeys {
         const val SHOW_DATE = "home_show_date"
         const val SHOW_TIME = "home_show_time"
     }
+    object Gestures {
+        object SwipeRight {
+            const val APP_NAME = "gestures_swipe_right_app_name"
+            const val PACKAGE_NAME = "gestures_swipe_right_package_name"
+        }
+        object SwipeLeft {
+            const val APP_NAME = "gestures_swipe_left_app_name"
+            const val PACKAGE_NAME = "gestures_swipe_left_package_name"
+        }
+    }
 }

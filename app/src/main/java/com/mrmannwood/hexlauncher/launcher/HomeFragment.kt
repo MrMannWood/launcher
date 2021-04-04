@@ -2,6 +2,7 @@ package com.mrmannwood.hexlauncher.launcher
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -12,6 +13,8 @@ import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.launcher.R
+import timber.log.Timber
+import java.lang.Exception
 import kotlin.math.abs
 
 class HomeFragment : Fragment() {
@@ -20,6 +23,8 @@ class HomeFragment : Fragment() {
 
     private lateinit var dateView: View
     private lateinit var timeView : View
+    private var swipeRightPackage : String? = null
+    private var swipeLeftPackage : String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,6 +55,12 @@ class HomeFragment : Fragment() {
         }
         viewModel.showTimeLiveData.observe(viewLifecycleOwner) { showTime ->
             timeView.visibility = if (showTime == true) View.VISIBLE else View.INVISIBLE
+        }
+        viewModel.swipeRightLiveData.observe(viewLifecycleOwner) { packageName ->
+            swipeRightPackage = packageName
+        }
+        viewModel.swipeLeftLiveData.observe(viewLifecycleOwner) { packageName ->
+            swipeLeftPackage = packageName
         }
     }
 
@@ -90,16 +101,14 @@ class HomeFragment : Fragment() {
                 showLauncherFragment()
             }
 
-            fun onSwipeDown() {
-                Toast.makeText(requireContext(), "Down", Toast.LENGTH_SHORT).show()
-            }
+            fun onSwipeDown() {}
 
             fun onSwipeLeft() {
-                Toast.makeText(requireContext(), "Left", Toast.LENGTH_SHORT).show()
+                tryLaunchPackage(swipeLeftPackage)
             }
 
             fun onSwipeRight() {
-                Toast.makeText(requireContext(), "Right", Toast.LENGTH_SHORT).show()
+                tryLaunchPackage(swipeRightPackage)
             }
 
             override fun onLongPress(e: MotionEvent) {
@@ -115,11 +124,20 @@ class HomeFragment : Fragment() {
             .commit()
     }
 
-    private fun launchAssistant() {
-        startActivity(Intent(Intent.ACTION_VOICE_COMMAND).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
-
-    private fun launchPhone() {
-        startActivity(Intent(Intent.ACTION_DIAL).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    private fun tryLaunchPackage(packageName: String?) {
+        packageName?.let { packageName ->
+            requireActivity().packageManager.getLaunchIntentForPackage(packageName)?.let { intent ->
+                try {
+                    startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                } catch (e: Exception) {
+                    Timber.e(e, "Unable to open package: $packageName")
+                    Toast.makeText(requireContext(), R.string.unable_to_start_app, Toast.LENGTH_SHORT).show()
+                }
+            } ?: {
+                Toast.makeText(requireContext(), R.string.unable_to_start_app, Toast.LENGTH_SHORT).show()
+            }
+        } ?: run {
+            Toast.makeText(requireContext(), R.string.gesture_no_action_selected, Toast.LENGTH_SHORT).show()
+        }
     }
 }

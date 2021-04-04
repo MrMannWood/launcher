@@ -3,7 +3,8 @@
     <string name="app_name">Hex Launcher</string>
 
     <string name="unable_to_start_app">Unable to start app</string>
-    <string name="no_wallpaper_app_selected">No wallpaper app selected</string>
+    <string name="no_app_selected">No app selected</string>
+    <string name="gesture_no_action_selected">No action bound to gesture</string>
 
     <string name="menu_item_home_settings">Settings</string>
 
@@ -23,6 +24,10 @@
     <string name="preferences_category_home">Home</string>
     <string name="preferences_category_home_show_date">Show Date</string>
     <string name="preferences_category_home_show_time">Show Time</string>
+
+    <string name="preferences_category_gestures">Gestures</string>
+    <string name="preferences_gestures_swipe_right">Swipe Right</string>
+    <string name="preferences_gestures_swipe_left">Swipe Left</string>
 
     <string name="preferences_privacy_policy">Privacy Policy</string>
 

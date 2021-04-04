@@ -23,6 +23,9 @@
     <string name="preferences_category_home_show_date">Show Date</string>
     <string name="preferences_category_home_show_time">Show Time</string>
 
+    <string name="preferences_version_name">App Version: %s</string>
+    <string name="preferences_version_build_type">Build Type: %s</string>
+
     <string name="settings_title">Settings</string>
 
     <string name="error_app_load">An error occurred while loading your apps</string>

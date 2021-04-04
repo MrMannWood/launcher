@@ -145,6 +145,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 })
             }
         }
+
+        PreferenceCategory(activity).apply {
+            screen.addPreference(this)
+            addPreference(Preference(activity).apply {
+                title = getString(R.string.preferences_version_name, getString(R.string.app_version))
+            })
+            addPreference(Preference(activity).apply {
+                title = getString(R.string.preferences_version_build_type, BuildConfig.BUILD_TYPE)
+            })
+        }
+
         preferenceScreen = screen
     }
 }

@@ -2,9 +2,7 @@ package com.mrmannwood.hexlauncher.applist
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.activityViewModels
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.launcher.R
@@ -33,38 +31,15 @@ class AppListActivity : AppCompatActivity() {
         }
     }
 
-    private val hostViewModel : AppListHostViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_list)
-
-        hostViewModel.apply {
-            supportsAppMenu.value = false
-            supportsContactSearch.value = false
-            contactSelected.observe(this@AppListActivity) {
-                throw UnsupportedOperationException("Cannot search contacts from AppListActivity")
-            }
-            appSelected.observe(this@AppListActivity) { appInfo ->
-                endRequested.value = appInfo
-            }
-            searchButtonSelected.observe(this@AppListActivity) { /* no-op */ }
-            endRequested.observe(this@AppListActivity) {
-                when (it) {
-                    is AppInfo ->{
-                        setResult(
-                                android.app.Activity.RESULT_OK,
-                                Intent().apply { setAppInfo(it) }
-                        )
-                    }
-                    else -> {
-                        setResult(android.app.Activity.RESULT_CANCELED)
-                    }
-                }
-                finish()
+        supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
+            when (fragment) {
+                is AppListFragment -> fragment.attachHost(appListFragmentHost)
+                else -> throw IllegalStateException("This activity can only host AppListFragment")
             }
         }
-
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, AppListFragment())
             .commit()
@@ -81,5 +56,27 @@ class AppListActivity : AppCompatActivity() {
         if (!handled) {
             super.onBackPressed()
         }
+    }
+
+    private val appListFragmentHost = object : AppListFragment.Host<AppInfo>(
+        killFragment = { appInfo ->
+            appInfo?.let {
+                setResult(
+                    android.app.Activity.RESULT_OK,
+                    Intent().apply {
+                        setAppInfo(appInfo)
+                    }
+                )
+            } ?: run {
+                setResult(android.app.Activity.RESULT_CANCELED)
+            }
+            finish()
+        }
+    ) {
+        override fun onAppSelected(appInfo: AppInfo) {
+            end(appInfo)
+        }
+
+        override fun showContacts(): Boolean = false
     }
 }

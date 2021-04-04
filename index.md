@@ -28,4 +28,5 @@ If you have questions about this Privacy Policy please contact intentionalhexlau
 
 
 Effective as of April 4, 2020
+
 Updated April 4, 2020

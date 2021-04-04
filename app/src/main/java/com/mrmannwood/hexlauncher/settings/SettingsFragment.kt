@@ -13,6 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.preference.*
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
+import com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
@@ -144,6 +145,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     key = PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH
                 })
             }
+        }
+
+        PreferenceCategory(activity).apply {
+            screen.addPreference(this)
+            addPreference(Preference(activity).apply {
+                setTitle(R.string.preferences_privacy_policy)
+                setOnPreferenceClickListener {
+                    startActivity(Intent(activity, PrivacyPolicyActivity::class.java))
+                    true
+                }
+            })
         }
 
         PreferenceCategory(activity).apply {

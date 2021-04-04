@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Hex Launcher</string>
 
@@ -22,6 +23,8 @@
     <string name="preferences_category_home">Home</string>
     <string name="preferences_category_home_show_date">Show Date</string>
     <string name="preferences_category_home_show_time">Show Time</string>
+
+    <string name="preferences_privacy_policy">Privacy Policy</string>
 
     <string name="preferences_version_name">App Version: %s</string>
     <string name="preferences_version_build_type">Build Type: %s</string>

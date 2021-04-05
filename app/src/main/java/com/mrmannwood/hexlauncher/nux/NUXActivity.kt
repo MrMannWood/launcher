@@ -16,7 +16,6 @@ import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.view.makeFullScreen
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
-import java.lang.IllegalArgumentException
 
 class NUXActivity : AppCompatActivity() {
 
@@ -46,17 +45,17 @@ class NUXActivity : AppCompatActivity() {
 
         viewPager = findViewById<ViewPager2>(R.id.pager).apply {
             adapter = object : FragmentStateAdapter(this@NUXActivity) {
-                override fun getItemCount(): Int = 3
 
-                override fun createFragment(position: Int): Fragment =
-                    when(position) {
-                        0 -> WelcomeFragment()
-                        1 -> SwipeTutorialFragment()
-                        2 -> SetAsHomeFragment()
-                        else -> {
-                            throw IllegalArgumentException("Too many pages: $position")
-                        }
-                    }
+                private val fragments = listOf(
+                    { WelcomeFragment() },
+                    { SwipeTutorialFragment() },
+                    { SettingsTutorialFragment() },
+                    { SetAsHomeFragment() }
+                )
+
+                override fun getItemCount(): Int = fragments.size
+
+                override fun createFragment(position: Int): Fragment = fragments[position]()
             }
         }
         tabLayout = findViewById(R.id.tab_layout)

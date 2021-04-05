@@ -7,7 +7,7 @@ import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.launcher.R
 
-class AppListActivity : AppCompatActivity() {
+class AppListActivity : AppCompatActivity(), AppListFragment.AppListHostActivity {
 
     companion object {
         private const val KEY_PACKAGE_NAME = "package_name"
@@ -33,12 +33,6 @@ class AppListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_list)
-        supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
-            when (fragment) {
-                is AppListFragment -> fragment.attachHost(appListFragmentHost)
-                else -> throw IllegalStateException("This activity can only host AppListFragment")
-            }
-        }
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, AppListFragment())
             .commit()
@@ -55,6 +49,10 @@ class AppListActivity : AppCompatActivity() {
         if (!handled) {
             super.onBackPressed()
         }
+    }
+
+    override fun getAppListHost(): AppListFragment.Host<*> {
+        return appListFragmentHost
     }
 
     private val appListFragmentHost = object : AppListFragment.Host<AppInfo>(

@@ -58,7 +58,10 @@ class AppListFragment : Fragment(), HandleBackPressed {
         open fun onAppInfoBinding(view: View, appInfo: AppInfo) { }
     }
 
-    private lateinit var host: Host<*>
+    // TODO this is really hacky, and should be replaced with ViewModel
+    interface AppListHostActivity {
+        fun getAppListHost() : Host<*>
+    }
 
     private lateinit var searchView: KeyboardEditText
     private lateinit var appListView: RecyclerView
@@ -73,11 +76,8 @@ class AppListFragment : Fragment(), HandleBackPressed {
 
     private var apps : List<AppInfo>? = null
 
-    fun attachHost(host: Host<*>) {
-        this.host = host
-        host.setOnEnd {
-            hideKeyboard(requireActivity())
-        }
+    private fun getAppListHost() : Host<*> {
+        return (requireActivity() as AppListHostActivity).getAppListHost()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,6 +92,9 @@ class AppListFragment : Fragment(), HandleBackPressed {
     ): View = inflater.inflate(R.layout.fragment_app_list, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        getAppListHost().setOnEnd {
+            hideKeyboard(requireActivity())
+        }
 
         appListAdapter = createAppListAdapter()
         appListView = view.findViewById<RecyclerView>(R.id.app_list).apply {
@@ -102,7 +105,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
         searchView = view.findViewById(R.id.search)
         searchView.handleBackPressed = object : HandleBackPressed {
             override fun handleBackPressed(): Boolean {
-                host.end(null)
+                getAppListHost().end(null)
                 return true
             }
         }
@@ -111,7 +114,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
             if (actionId != EditorInfo.IME_ACTION_SEARCH) {
                 false
             } else {
-                host.onSearchButtonPressed(searchView.text.toString())
+                getAppListHost().onSearchButtonPressed(searchView.text.toString())
                 true
             }
         }
@@ -149,7 +152,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
                 Toast.makeText(requireContext(), R.string.error_app_load, Toast.LENGTH_LONG).show()
             }
         })
-        if (host.showContacts()) {
+        if (getAppListHost().showContacts()) {
             viewModel.contacts.observe(viewLifecycleOwner) {
                 it.getOrNull()?.let { contacts ->
                     contactsAdapter.setData(contacts.take(2))
@@ -182,9 +185,9 @@ class AppListFragment : Fragment(), HandleBackPressed {
                             appInfo = appData
                             adapter = LauncherFragmentDatabindingAdapter
                         }
-                        host.onAppInfoBinding(vdb.root, appData)
+                        getAppListHost().onAppInfoBinding(vdb.root, appData)
                         vdb.root.setOnClickListener {
-                            host.onAppSelected(appData)
+                            getAppListHost().onAppSelected(appData)
                         }
                     }
             )
@@ -203,7 +206,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
                             contact = contactData
                         }
                         vdb.root.setOnClickListener {
-                            host.onContactClicked(contactData)
+                            getAppListHost().onContactClicked(contactData)
                         }
                     }
             )

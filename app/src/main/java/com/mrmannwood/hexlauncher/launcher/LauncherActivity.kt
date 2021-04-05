@@ -23,7 +23,7 @@ import com.mrmannwood.hexlauncher.view.makeFullScreen
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 
-class LauncherActivity : AppCompatActivity() {
+class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivity {
 
     companion object {
         private const val APP_UPDATE_REQUEST_CODE = Short.MAX_VALUE - 100
@@ -81,12 +81,6 @@ class LauncherActivity : AppCompatActivity() {
             }
         }
 
-        supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
-            when (fragment) {
-                is AppListFragment -> fragment.attachHost(appListFragmentHost)
-            }
-        }
-
         if (supportFragmentManager.findFragmentById(R.id.container) == null) {
             supportFragmentManager.beginTransaction()
                 .add(R.id.container, HomeFragment())
@@ -118,6 +112,10 @@ class LauncherActivity : AppCompatActivity() {
         if (!handled) {
             super.onBackPressed()
         }
+    }
+
+    override fun getAppListHost() : AppListFragment.Host<*> {
+        return appListFragmentHost
     }
 
     private fun checkShouldShowNux(prefs: SharedPreferences) : Boolean {

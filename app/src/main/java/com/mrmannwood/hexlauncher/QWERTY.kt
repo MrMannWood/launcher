@@ -23,6 +23,7 @@ val QWERTY = mapOf(
     'z' to listOf('a', 's', 'd', 'x'),
     'x' to listOf('s', 'd', 'f', 'z', 'c'),
     'c' to listOf('d', 'f', 'g', 'x', 'v'),
+    'v' to listOf('c', 'f', 'g', 'h', 'b'),
     'b' to listOf('g', 'h', 'j', 'v', 'n'),
     'n' to listOf('h', 'j', 'k', 'b', 'm'),
     'm' to listOf('j', 'k', 'l', 'n')

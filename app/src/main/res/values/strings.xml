@@ -4,7 +4,7 @@
 
     <string name="unable_to_start_app">Unable to start app</string>
     <string name="no_app_selected">No app selected</string>
-    <string name="gesture_no_action_selected">No action bound to gesture</string>
+    <string name="gesture_no_action_selected">Gestures can be bound in Settings</string>
 
     <string name="menu_item_home_settings">Settings</string>
 
@@ -29,10 +29,12 @@
 
     <string name="preferences_category_app_list">Apps</string>
     <string name="preferences_app_list_show_all_apps">Show All Apps</string>
+    <string name="preferences_app_list_show_all_apps_summary">Recommend off. This defeats the purpose.</string>
 
     <string name="preferences_category_gestures">Gestures</string>
     <string name="preferences_gestures_swipe_right">Swipe Right</string>
     <string name="preferences_gestures_swipe_left">Swipe Left</string>
+    <string name="preferences_gestures_unset">Not Set</string>
 
     <string name="preferences_category_legal">Legal</string>
     <string name="preferences_privacy_policy">Privacy Policy</string>
@@ -81,6 +83,8 @@
     <string name="app_list_search_edit_text_content_description">Search box</string>
     <string name="home_time_content_description">Time</string>
     <string name="home_date_content_description">Date</string>
+    <string name="home_apps_still_loading">Apps are still loading</string>
+    <string name="home_unable_to_load_apps">Unable to load apps</string>
 
     <string name="contact_image_content_description">Contact image for %s</string>
 

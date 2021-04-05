@@ -22,7 +22,7 @@ class LauncherApplication : Application() {
 
         PreferencesLiveData.create(this).observeForever { }
 
-        AppInfoLiveData.get(this).observeForever { result ->
+        AppInfoLiveData.createAndGet(this).observeForever { result ->
             result.onSuccess { apps ->
                 Timber.i("App info changed, got ${apps.size} apps")
             }

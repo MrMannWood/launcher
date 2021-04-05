@@ -7,6 +7,7 @@ import com.mrmannwood.hexlauncher.settings.PreferenceLiveData.Extractor.BooleanE
 
 
 class HomeViewModel : ViewModel() {
+    val appListLiveData = AppInfoLiveData.get()
     val showDateLiveData = PreferenceLiveData(PreferenceKeys.Home.SHOW_DATE, BooleanExtractor)
     val showTimeLiveData = PreferenceLiveData(PreferenceKeys.Home.SHOW_TIME, BooleanExtractor)
     val swipeRightLiveData = PreferenceLiveData(PreferenceKeys.Gestures.SwipeRight.PACKAGE_NAME, PreferenceLiveData.Extractor.StringExtractor)

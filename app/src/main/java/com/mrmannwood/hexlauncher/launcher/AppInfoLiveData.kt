@@ -25,19 +25,16 @@ class AppInfoLiveData private constructor(
 
     companion object {
 
-        private var instance: AppInfoLiveData? = null
+        private lateinit var instance: AppInfoLiveData
 
-        @Synchronized fun get(application: Application) : AppInfoLiveData {
-            var liveData = instance
-            return if (liveData == null) {
-                liveData = AppInfoLiveData(application)
-                instance = liveData
-                liveData
-            } else {
-                liveData
-            }
+        fun createAndGet(application: Application) : AppInfoLiveData {
+            instance = AppInfoLiveData(application)
+            return instance
         }
 
+        fun get() : AppInfoLiveData {
+            return instance
+        }
     }
 
     private val pacMan: PackageManager = context.packageManager

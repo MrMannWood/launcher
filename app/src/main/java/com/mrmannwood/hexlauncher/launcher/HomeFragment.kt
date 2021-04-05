@@ -19,10 +19,13 @@ class HomeFragment : Fragment(), HandleBackPressed {
 
     private val viewModel: HomeViewModel by activityViewModels()
 
+    private lateinit var appLoadProgressBar: View
     private lateinit var dateView: View
     private lateinit var timeView : View
     private var swipeRightPackage : String? = null
     private var swipeLeftPackage : String? = null
+
+    private var appsAreLoaded : Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,6 +48,7 @@ class HomeFragment : Fragment(), HandleBackPressed {
                 true
             }
         }
+        appLoadProgressBar = view.findViewById(R.id.app_load_progress_bar_container)
         dateView = view.findViewById(R.id.date)
         timeView = view.findViewById(R.id.time)
 
@@ -60,6 +64,13 @@ class HomeFragment : Fragment(), HandleBackPressed {
         viewModel.swipeLeftLiveData.observe(viewLifecycleOwner) { packageName ->
             swipeLeftPackage = packageName
         }
+        viewModel.appListLiveData.observe(viewLifecycleOwner) { result ->
+            appLoadProgressBar.visibility = View.GONE
+            appsAreLoaded = result.isSuccess
+            result.exceptionOrNull()?.let {
+                Toast.makeText(requireContext(), R.string.home_unable_to_load_apps, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     override fun handleBackPressed(): Boolean = true /* consume, this is a launcher*/
@@ -68,7 +79,11 @@ class HomeFragment : Fragment(), HandleBackPressed {
         context,
         LauncherGestureDetectorListener(object : LauncherGestureDetectorListener.GestureListener {
             override fun onSwipeUp() {
-                showLauncherFragment()
+                if (appsAreLoaded) {
+                    showLauncherFragment()
+                } else {
+                    Toast.makeText(requireContext(), R.string.home_apps_still_loading, Toast.LENGTH_SHORT).show()
+                }
             }
 
             override fun onSwipeDown() { }

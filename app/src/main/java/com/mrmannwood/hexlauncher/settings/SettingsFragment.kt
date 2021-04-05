@@ -115,14 +115,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
             if (appName != null) {
                 swipeRightAppPreference.summary = appName
             } else {
-                swipeRightAppPreference.summary = ""
+                swipeRightAppPreference.setSummary(R.string.preferences_gestures_unset)
             }
         }
         settingsViewModel.swipeLeftLiveData.observe(this) { appName ->
             if (appName != null) {
                 swipeLeftAppPreference.summary = appName
             } else {
-                swipeLeftAppPreference.summary = ""
+                swipeLeftAppPreference.setSummary(R.string.preferences_gestures_unset)
             }
         }
         settingsViewModel.contactsPermissionLiveData.observe(this) { permissionsResult ->
@@ -205,6 +205,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             setTitle(R.string.preferences_category_app_list)
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_app_list_show_all_apps)
+                setSummary(R.string.preferences_app_list_show_all_apps_summary)
                 key = PreferenceKeys.AppList.SHOW_ALL_APPS
             })
         }

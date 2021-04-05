@@ -28,6 +28,17 @@
             android:theme="@style/PreferenceScreen" />
         <activity android:name="com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity" />
         <service android:name="com.mrmannwood.hexlauncher.appupdate.AppUpdateService" />
+        <activity
+            android:name="com.mrmannwood.hexlauncher.launcher.FakeLauncherActivity"
+            android:enabled="false">
+            <!-- see RoleManagerHelper-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

@@ -86,6 +86,7 @@ class LauncherActivity : AppCompatActivity() {
         appUpdateActivityHelper.onResume(this)
     }
 
+    @SuppressWarnings( "deprecation" )
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         appUpdateActivityHelper.onActivityResult(this, requestCode, resultCode, data)

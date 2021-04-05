@@ -9,16 +9,26 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
+import androidx.core.role.RoleManagerCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.preference.*
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
 import com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
+import com.mrmannwood.hexlauncher.role.RoleManagerHelper
+import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.ROLE_HELD
+import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.ROLE_NOT_AVAILABLE
+import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.ROLE_NOT_HELD
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
+
+    private val setHomeLauncherResultContract = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { _ -> updateHomeRolePreference(requireActivity()) }
 
     private val wallpaperActivityResultContracts = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -77,6 +87,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private val settingsViewModel : SettingsViewModel by activityViewModels()
     private lateinit var prefs : SharedPreferences
 
+    private lateinit var homeRolePreference: Preference
     private lateinit var wallpaperAppPreference: Preference
     private lateinit var wallpaperPreference: Preference
     private lateinit var swipeRightAppPreference: Preference
@@ -87,12 +98,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         settingsViewModel.preferencesLiveData.observe(this) { sp -> prefs = sp }
-        settingsViewModel.wallpaperLiveData.observe(this) { result ->
-            val packageName = result[PreferenceKeys.Wallpaper.PACKAGE_NAME] as? String
-            val appName = result[PreferenceKeys.Wallpaper.APP_NAME] as? String
-            wallpaperAppPackageName = packageName
-            wallpaperAppPreference.summary = appName ?: ""
-            wallpaperPreference.isVisible = appName != null
+        settingsViewModel.wallpaperPackageLiveData.observe(this) { app ->
+            wallpaperAppPackageName = app
+        }
+        settingsViewModel.wallpaperAppNameLiveData.observe(this) {
+            it?.let { appName ->
+                wallpaperAppPreference.summary = appName
+                wallpaperPreference.isVisible = true
+            } ?: run {
+                wallpaperAppPreference.summary = ""
+                wallpaperPreference.isVisible = false
+            }
         }
         settingsViewModel.swipeRightLiveData.observe(this) { appName ->
             if (appName != null) {
@@ -138,6 +154,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val activity = requireActivity()
 
         val screen = preferenceManager.createPreferenceScreen(activity)
+
+        Preference(activity).apply {
+            screen.addPreference(this)
+            homeRolePreference = this
+        }
+
+        updateHomeRolePreference(activity)
 
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
@@ -238,5 +261,23 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         preferenceScreen = screen
+    }
+
+    private fun updateHomeRolePreference(activity: FragmentActivity) {
+        when (RoleManagerHelper.INSTANCE.getRoleStatus(activity, RoleManagerCompat.ROLE_HOME)) {
+            ROLE_HELD -> { homeRolePreference.isVisible = false }
+            ROLE_NOT_AVAILABLE -> { homeRolePreference.isVisible = false }
+            ROLE_NOT_HELD -> {
+                homeRolePreference.apply {
+                    setTitle(R.string.preferences_role_set_home)
+                    setOnPreferenceClickListener {
+                        val (intent, func) = RoleManagerHelper.INSTANCE.getRoleSetIntent(activity, RoleManagerCompat.ROLE_HOME)
+                        setHomeLauncherResultContract.launch(intent)
+                        func()
+                        true
+                    }
+                }
+            }
+        }
     }
 }

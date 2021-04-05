@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.launcher.R
@@ -15,7 +16,7 @@ import timber.log.Timber
 import java.lang.Exception
 import kotlin.math.abs
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), HandleBackPressed {
 
     private val viewModel: HomeViewModel by activityViewModels()
 
@@ -61,6 +62,8 @@ class HomeFragment : Fragment() {
             swipeLeftPackage = packageName
         }
     }
+
+    override fun handleBackPressed(): Boolean = true /* consume, this is a launcher*/
 
     private fun createGestureDetector(context: Context) = GestureDetectorCompat(
         context,

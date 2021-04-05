@@ -10,6 +10,8 @@
 
     <string name="menu_item_uninstall_app_title">Uninstall</string>
 
+    <string name="preferences_role_set_home">Set Hex Launcher as Home app</string>
+
     <string name="preferences_category_wallpaper">Wallpaper</string>
     <string name="preferences_wallpaper_choose_app">Set Wallpaper App</string>
     <string name="preferences_wallpaper_choose_image">Change Wallpaper</string>
@@ -20,7 +22,6 @@
     <string name="preferences_contacts_dialog_message">To protect your privacy, you should revoke unused permissions. Do you want to revoke the contacts permission, as it is no longer needed?</string>
     <string name="preferences_contacts_dialog_button_positive">Yes</string>
     <string name="preferences_contacts_dialog_button_negative">No</string>
-
 
     <string name="preferences_category_home">Home</string>
     <string name="preferences_category_home_show_date">Show Date</string>

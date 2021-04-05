@@ -13,7 +13,6 @@ import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.launcher.R
 import timber.log.Timber
-import java.lang.Exception
 import kotlin.math.abs
 
 class HomeFragment : Fragment(), HandleBackPressed {

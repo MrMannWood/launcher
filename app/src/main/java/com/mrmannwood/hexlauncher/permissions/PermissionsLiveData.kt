@@ -3,7 +3,8 @@ package com.mrmannwood.hexlauncher.permissions
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import com.mrmannwood.hexlauncher.settings.PreferenceLiveData
 import com.mrmannwood.hexlauncher.settings.PreferenceLiveData.Extractor.BooleanExtractor
 import com.mrmannwood.launcher.BuildConfig

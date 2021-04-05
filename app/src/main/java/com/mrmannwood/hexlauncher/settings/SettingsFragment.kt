@@ -12,15 +12,16 @@ import androidx.core.content.edit
 import androidx.core.role.RoleManagerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
-import androidx.preference.*
+import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
 import com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
-import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.ROLE_HELD
-import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.ROLE_NOT_AVAILABLE
-import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.ROLE_NOT_HELD
+import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 

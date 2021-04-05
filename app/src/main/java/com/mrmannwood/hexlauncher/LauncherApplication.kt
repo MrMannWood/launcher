@@ -4,10 +4,10 @@ import android.app.Application
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.StrictMode
-import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
 import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
+import com.mrmannwood.launcher.BuildConfig
 import timber.log.Timber
 
 class LauncherApplication : Application() {

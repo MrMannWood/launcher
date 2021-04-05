@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.launcher.R
-import java.lang.IllegalStateException
 
 class AppListActivity : AppCompatActivity() {
 

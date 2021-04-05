@@ -19,7 +19,6 @@ import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import timber.log.Timber
 import java.io.ByteArrayInputStream
-import java.lang.Exception
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 

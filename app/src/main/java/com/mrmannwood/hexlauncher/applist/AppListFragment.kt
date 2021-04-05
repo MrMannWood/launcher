@@ -2,7 +2,6 @@ package com.mrmannwood.hexlauncher.applist
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
@@ -22,11 +21,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.contacts.ContactData
-import com.mrmannwood.hexlauncher.launcher.*
-import com.mrmannwood.launcher.R
-import com.mrmannwood.launcher.databinding.ListAppItemBinding
+import com.mrmannwood.hexlauncher.launcher.Adapter
+import com.mrmannwood.hexlauncher.launcher.AppInfo
+import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
+import com.mrmannwood.hexlauncher.launcher.LauncherViewModel
 import com.mrmannwood.hexlauncher.qwertyMistakes
 import com.mrmannwood.hexlauncher.view.KeyboardEditText
+import com.mrmannwood.launcher.R
+import com.mrmannwood.launcher.databinding.ListAppItemBinding
 import com.mrmannwood.launcher.databinding.ListItemContactBinding
 import timber.log.Timber
 import java.util.*

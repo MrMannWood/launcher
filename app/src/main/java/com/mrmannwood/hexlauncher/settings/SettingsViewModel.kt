@@ -3,7 +3,6 @@ package com.mrmannwood.hexlauncher.settings
 import android.Manifest
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MediatorLiveData
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.hexlauncher.settings.PreferenceLiveData.Extractor.StringExtractor
 

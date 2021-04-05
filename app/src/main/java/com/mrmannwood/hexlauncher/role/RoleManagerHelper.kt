@@ -10,7 +10,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.role.RoleManagerCompat
 import com.mrmannwood.hexlauncher.launcher.FakeLauncherActivity
-import java.util.ArrayList
+import java.util.*
 
 sealed class RoleManagerHelper {
 

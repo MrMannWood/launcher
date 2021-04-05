@@ -22,11 +22,7 @@ class PermissionsLiveData(
     private val permissionsLiveData = object : LiveData<Boolean>() {
         override fun onActive() {
             super.onActive()
-            if (BuildConfig.DEBUG) {
-                postValue(ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
-            } else {
-                postValue(false)
-            }
+            postValue(ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
         }
     }
 

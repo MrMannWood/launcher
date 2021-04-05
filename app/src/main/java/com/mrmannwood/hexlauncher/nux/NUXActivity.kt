@@ -72,7 +72,8 @@ class NUXActivity : AppCompatActivity() {
 
     private fun checkFirstRun(prefs: SharedPreferences) : Boolean {
         val lastRunVersion = prefs.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null)
-        return if (BuildConfig.VERSION_NAME == lastRunVersion) {
+        return if (/* BuildConfig.VERSION_NAME == */ null != lastRunVersion) {
+            // todo make this smarter, so new nuxes can be shown as necessary
             true
         } else {
             prefs.edit {

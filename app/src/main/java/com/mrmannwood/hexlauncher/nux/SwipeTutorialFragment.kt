@@ -2,10 +2,15 @@ package com.mrmannwood.hexlauncher.nux
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
+import android.content.Context
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
+import com.mrmannwood.hexlauncher.gesture.LauncherGestureDetectorListener
 import com.mrmannwood.launcher.R
 
 class SwipeTutorialFragment : Fragment(R.layout.fragment_nux_swipe_tutorial) {
@@ -33,5 +38,29 @@ class SwipeTutorialFragment : Fragment(R.layout.fragment_nux_swipe_tutorial) {
             })
             start()
         }
+
+        view.setOnTouchListener(object : View.OnTouchListener {
+
+            val gestureDetector = GestureDetectorCompat(
+                view.context,
+                LauncherGestureDetectorListener(object : LauncherGestureDetectorListener.GestureListener {
+                    override fun onSwipeUp() {
+                        Toast.makeText(view.context, R.string.nux_swipe_tutorial_user_swiped_up, Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onSwipeDown() { }
+
+                    override fun onSwipeRight() { }
+
+                    override fun onSwipeLeft() { }
+
+                    override fun onLongPress(x: Float, y: Float) { }
+                })
+            )
+
+            override fun onTouch(view: View, me: MotionEvent): Boolean {
+                return gestureDetector.onTouchEvent(me)
+            }
+        })
     }
 }

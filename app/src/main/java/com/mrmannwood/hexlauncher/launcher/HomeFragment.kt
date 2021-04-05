@@ -10,10 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
+import com.mrmannwood.hexlauncher.gesture.LauncherGestureDetectorListener
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.launcher.R
 import timber.log.Timber
-import kotlin.math.abs
 
 class HomeFragment : Fragment(), HandleBackPressed {
 
@@ -66,56 +66,26 @@ class HomeFragment : Fragment(), HandleBackPressed {
 
     private fun createGestureDetector(context: Context) = GestureDetectorCompat(
         context,
-        object : GestureDetector.SimpleOnGestureListener() {
-            override fun onDown(e: MotionEvent?): Boolean {
-                return true;
-            }
-
-            override fun onFling(
-                e1: MotionEvent?,
-                e2: MotionEvent?,
-                velocityX: Float,
-                velocityY: Float
-            ): Boolean {
-                if (abs(velocityX) > abs(velocityY)) {
-                    // horizontal
-                    if (velocityX < 0) {
-                        onSwipeLeft()
-                    } else {
-                        onSwipeRight()
-                    }
-                    return true
-                } else if (abs(velocityY) > abs(velocityX)) {
-                    //vertical
-                    if (velocityY < 0) {
-                        onSwipeUp()
-                    } else {
-                        onSwipeDown()
-                    }
-                    return true
-                }
-                return super.onFling(e1, e2, velocityX, velocityY)
-            }
-
-            fun onSwipeUp() {
+        LauncherGestureDetectorListener(object : LauncherGestureDetectorListener.GestureListener {
+            override fun onSwipeUp() {
                 showLauncherFragment()
             }
 
-            fun onSwipeDown() {}
+            override fun onSwipeDown() { }
 
-            fun onSwipeLeft() {
-                tryLaunchPackage(swipeLeftPackage)
-            }
-
-            fun onSwipeRight() {
+            override fun onSwipeRight() {
                 tryLaunchPackage(swipeRightPackage)
             }
 
-            override fun onLongPress(e: MotionEvent) {
-                super.onLongPress(e)
-                requireView().showContextMenu(e.x, e.y)
+            override fun onSwipeLeft() {
+                tryLaunchPackage(swipeLeftPackage)
+            }
+
+            override fun onLongPress(x: Float, y: Float) {
+                requireView().showContextMenu(x, y)
             }
         })
+    )
 
     private fun showLauncherFragment() {
         parentFragmentManager.beginTransaction()

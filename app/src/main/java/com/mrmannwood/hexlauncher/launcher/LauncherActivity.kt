@@ -2,19 +2,25 @@ package com.mrmannwood.hexlauncher.launcher
 
 import android.app.SearchManager
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.appupdate.AppUpdateActivityHelper
 import com.mrmannwood.hexlauncher.appupdate.AppUpdateService
 import com.mrmannwood.hexlauncher.contacts.ContactData
+import com.mrmannwood.hexlauncher.nux.NUXActivity
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.hexlauncher.view.makeFullScreen
+import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 
 class LauncherActivity : AppCompatActivity() {
@@ -61,11 +67,19 @@ class LauncherActivity : AppCompatActivity() {
         }
     )
 
+    private val viewModel by viewModels<LauncherActivityViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
         supportActionBar?.hide()
         makeFullScreen()
+
+        viewModel.preferencesLiveData.observe(this) { prefs ->
+            if (checkShouldShowNux(prefs)) {
+                startActivity(Intent(this@LauncherActivity, NUXActivity::class.java))
+            }
+        }
 
         supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
             when (fragment) {
@@ -106,6 +120,18 @@ class LauncherActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkShouldShowNux(prefs: SharedPreferences) : Boolean {
+        return prefs.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null)?.let { _ ->
+            // todo make this smarter, so new nuxes can be shown as necessary
+            false
+        } ?: run {
+            prefs.edit {
+                putString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, BuildConfig.VERSION_NAME)
+            }
+            true
+        }
+    }
+
     private val appListFragmentHost = object : AppListFragment.Host<Void>(
         killFragment = { _ -> supportFragmentManager.popBackStack() }
     ) {
@@ -135,6 +161,7 @@ class LauncherActivity : AppCompatActivity() {
 
         override fun onAppInfoBinding(view: View, appInfo: AppInfo) {
             view.setOnCreateContextMenuListener { menu, _, _ ->
+                menu.setHeaderTitle(appInfo.label)
                 menu.add(R.string.menu_item_uninstall_app_title).setOnMenuItemClickListener {
                     startActivity(Intent(Intent.ACTION_DELETE).apply {
                         data = Uri.parse("package:${appInfo.packageName}")

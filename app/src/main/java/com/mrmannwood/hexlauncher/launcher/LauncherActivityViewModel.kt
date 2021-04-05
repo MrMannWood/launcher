@@ -1,8 +1,8 @@
-package com.mrmannwood.hexlauncher.nux
+package com.mrmannwood.hexlauncher.launcher
 
 import androidx.lifecycle.ViewModel
 import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
 
-class NUXViewModel : ViewModel() {
+class LauncherActivityViewModel : ViewModel() {
     val preferencesLiveData = PreferencesLiveData.get()
 }

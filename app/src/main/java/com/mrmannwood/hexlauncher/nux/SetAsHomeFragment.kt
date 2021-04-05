@@ -12,7 +12,7 @@ class SetAsHomeFragment : Fragment(R.layout.fragment_nux_set_home) {
 
     private val setHomeLauncherResultContract = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { _ -> (requireActivity() as NUXActivity).startLauncher() }
+    ) { _ -> requireActivity().finish() }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -27,9 +27,7 @@ class SetAsHomeFragment : Fragment(R.layout.fragment_nux_set_home) {
             }
         }
         view.findViewById<View>(R.id.try_it_out).apply {
-            setOnClickListener {
-                (requireActivity() as NUXActivity).startLauncher()
-            }
+            setOnClickListener { requireActivity().finish() }
         }
     }
 

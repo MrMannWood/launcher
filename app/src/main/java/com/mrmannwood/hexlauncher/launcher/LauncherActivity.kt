@@ -6,13 +6,59 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
+import com.mrmannwood.hexlauncher.appupdate.AppUpdateActivityHelper
+import com.mrmannwood.hexlauncher.appupdate.AppUpdateService
 import com.mrmannwood.hexlauncher.contacts.ContactData
+import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.launcher.R
 
 class LauncherActivity : AppCompatActivity() {
+
+    companion object {
+        private const val APP_UPDATE_REQUEST_CODE = Short.MAX_VALUE - 100
+    }
+
+    private val appUpdateActivityHelper = AppUpdateActivityHelper(
+        APP_UPDATE_REQUEST_CODE,
+        object : AppUpdateService.InstallListener {
+            override fun onAppInstalled(completeInstall: () -> Unit) {
+                AlertDialog.Builder(this@LauncherActivity)
+                    .setTitle(R.string.app_update_installed_title)
+                    .setMessage(R.string.app_update_installed_message)
+                    .setPositiveButton(R.string.app_update_installed_positive) { _, _ ->
+                        completeInstall()
+                    }
+                    .setNegativeButton(R.string.app_update_installed_negative) { _, _ -> }
+                    .show()
+            }
+
+            override fun onInstallCancelled(retryInstall: () -> Unit) {
+                AlertDialog.Builder(this@LauncherActivity)
+                    .setTitle(R.string.app_update_cancelled_title)
+                    .setMessage(R.string.app_update_cancelled_message)
+                    .setPositiveButton(R.string.app_update_cancelled_positive) { _, _ ->
+                        startActivity(Intent(this@LauncherActivity, SettingsActivity::class.java))
+                    }
+                    .setNegativeButton(R.string.app_update_cancelled_negative) {  _, _ -> }
+                    .show()
+            }
+
+            override fun onInstallFailed(retryInstall: () -> Unit) {
+                AlertDialog.Builder(this@LauncherActivity)
+                    .setTitle(R.string.app_update_failed_title)
+                    .setMessage(R.string.app_update_failed_message)
+                    .setPositiveButton(R.string.app_update_failed_positive) { _, _ ->
+                        retryInstall()
+                    }
+                    .setNegativeButton(R.string.app_update_failed_negative) { _, _ -> }
+                    .show()
+            }
+        }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +77,18 @@ class LauncherActivity : AppCompatActivity() {
                 .add(R.id.container, HomeFragment())
                 .commit()
         }
+
+        appUpdateActivityHelper.onCreate(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        appUpdateActivityHelper.onResume(this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        appUpdateActivityHelper.onActivityResult(this, requestCode, resultCode, data)
     }
 
     override fun onBackPressed() {

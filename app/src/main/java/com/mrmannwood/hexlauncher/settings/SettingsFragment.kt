@@ -210,9 +210,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 })
             }
         }
-
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
+            setTitle(R.string.preferences_category_legal)
             addPreference(Preference(activity).apply {
                 setTitle(R.string.preferences_privacy_policy)
                 setOnPreferenceClickListener {
@@ -224,6 +224,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
+            setTitle(R.string.preferences_category_version_info)
+            addPreference(SwitchPreference(activity).apply {
+                setTitle(R.string.preferences_allow_auto_update_check)
+                key = PreferenceKeys.AutoUpdate.ALLOW_AUTO_UPDATE
+            })
             addPreference(Preference(activity).apply {
                 title = getString(R.string.preferences_version_name, getString(R.string.app_version))
             })

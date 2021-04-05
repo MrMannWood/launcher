@@ -22,4 +22,7 @@ object PreferenceKeys {
             const val PACKAGE_NAME = "gestures_swipe_left_package_name"
         }
     }
+    object AutoUpdate {
+        const val ALLOW_AUTO_UPDATE = "update_allow_auto"
+    }
 }

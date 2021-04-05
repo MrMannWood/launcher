@@ -21,6 +21,7 @@
     <string name="preferences_contacts_dialog_button_positive">Yes</string>
     <string name="preferences_contacts_dialog_button_negative">No</string>
 
+
     <string name="preferences_category_home">Home</string>
     <string name="preferences_category_home_show_date">Show Date</string>
     <string name="preferences_category_home_show_time">Show Time</string>
@@ -29,8 +30,11 @@
     <string name="preferences_gestures_swipe_right">Swipe Right</string>
     <string name="preferences_gestures_swipe_left">Swipe Left</string>
 
+    <string name="preferences_category_legal">Legal</string>
     <string name="preferences_privacy_policy">Privacy Policy</string>
 
+    <string name="preferences_category_version_info">Version Info</string>
+    <string name="preferences_allow_auto_update_check">Check for updates automatically</string>
     <string name="preferences_version_name">App Version: %s</string>
     <string name="preferences_version_build_type">Build Type: %s</string>
 
@@ -38,5 +42,20 @@
 
     <string name="error_app_load">An error occurred while loading your apps</string>
     <string name="error_contact_load">An error occurred while loading your contacts</string>
+
+    <string name="app_update_installed_title">App Update is Ready</string>
+    <string name="app_update_installed_message">Would you like to apply the update now?</string>
+    <string name="app_update_installed_positive">Yes</string>
+    <string name="app_update_installed_negative">No</string>
+
+    <string name="app_update_cancelled_title">App Update was Cancelled</string>
+    <string name="app_update_cancelled_message">Do you want to turn off auto-update checking?</string>
+    <string name="app_update_cancelled_positive">Yes</string>
+    <string name="app_update_cancelled_negative">No</string>
+
+    <string name="app_update_failed_title">App Update Failed</string>
+    <string name="app_update_failed_message">Would you like to try again?</string>
+    <string name="app_update_failed_positive">Yes</string>
+    <string name="app_update_failed_negative">No</string>
 
 </resources>

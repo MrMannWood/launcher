@@ -26,7 +26,8 @@
         <activity
             android:name="com.mrmannwood.hexlauncher.settings.SettingsActivity"
             android:theme="@style/PreferenceScreen" />
-        <activity android:name="com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity"/>
+        <activity android:name="com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity" />
+        <service android:name="com.mrmannwood.hexlauncher.appupdate.AppUpdateService" />
     </application>
 
 </manifest>

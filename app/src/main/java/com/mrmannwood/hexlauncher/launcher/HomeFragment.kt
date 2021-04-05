@@ -2,7 +2,6 @@ package com.mrmannwood.hexlauncher.launcher
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -10,7 +9,6 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.mrmannwood.hexlauncher.applist.AppListFragment
-import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.launcher.R
 import timber.log.Timber

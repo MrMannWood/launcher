@@ -24,8 +24,11 @@
     <string name="preferences_contacts_dialog_button_negative">No</string>
 
     <string name="preferences_category_home">Home</string>
-    <string name="preferences_category_home_show_date">Show Date</string>
-    <string name="preferences_category_home_show_time">Show Time</string>
+    <string name="preferences_home_show_date">Show Date</string>
+    <string name="preferences_home_show_time">Show Time</string>
+
+    <string name="preferences_category_app_list">Apps</string>
+    <string name="preferences_app_list_show_all_apps">Show All Apps</string>
 
     <string name="preferences_category_gestures">Gestures</string>
     <string name="preferences_gestures_swipe_right">Swipe Right</string>

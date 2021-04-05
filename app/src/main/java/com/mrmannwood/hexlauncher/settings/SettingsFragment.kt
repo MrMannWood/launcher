@@ -191,12 +191,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
             screen.addPreference(this)
             setTitle(R.string.preferences_category_home)
             addPreference(SwitchPreference(activity).apply {
-                setTitle(R.string.preferences_category_home_show_date)
+                setTitle(R.string.preferences_home_show_date)
                 key = PreferenceKeys.Home.SHOW_DATE
             })
             addPreference(SwitchPreference(activity).apply {
-                setTitle(R.string.preferences_category_home_show_time)
+                setTitle(R.string.preferences_home_show_time)
                 key = PreferenceKeys.Home.SHOW_TIME
+            })
+        }
+
+        PreferenceCategory(activity).apply {
+            screen.addPreference(this)
+            setTitle(R.string.preferences_category_app_list)
+            addPreference(SwitchPreference(activity).apply {
+                setTitle(R.string.preferences_app_list_show_all_apps)
+                key = PreferenceKeys.AppList.SHOW_ALL_APPS
             })
         }
 

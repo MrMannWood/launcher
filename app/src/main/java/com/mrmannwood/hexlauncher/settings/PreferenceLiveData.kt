@@ -1,6 +1,7 @@
 package com.mrmannwood.hexlauncher.settings
 
 import android.content.SharedPreferences
+import android.os.Looper
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -42,6 +43,14 @@ class PreferenceLiveData<T>(
         isActive.set(false)
         sharedPreferences?.unregisterOnSharedPreferenceChangeListener(listener)
         PreferencesLiveData.get().removeObserver(observer)
+    }
+
+    override fun postValue(value: T?) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            super.setValue(value)
+        } else {
+            super.postValue(value)
+        }
     }
 
     sealed class Extractor<T> {

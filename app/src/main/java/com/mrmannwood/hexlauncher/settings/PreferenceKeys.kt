@@ -12,6 +12,9 @@ object PreferenceKeys {
         const val SHOW_DATE = "home_show_date"
         const val SHOW_TIME = "home_show_time"
     }
+    object AppList {
+        const val SHOW_ALL_APPS = "app_list_show_all"
+    }
     object Gestures {
         object SwipeRight {
             const val APP_NAME = "gestures_swipe_right_app_name"

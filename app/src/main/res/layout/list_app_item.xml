@@ -24,9 +24,10 @@
             android:scaleType="fitCenter"
             android:src="@{appInfo.backgroundColor}"
             android:layout_centerInParent="true"
+            android:contentDescription="@{adapter.getAppName(appInfo)}"
             />
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="42dp"
             android:layout_height="42dp"
             android:layout_gravity="center"
@@ -36,7 +37,7 @@
             android:visibility="@{adapter.getNonAdaptiveIconVisibility(appInfo)}"
             />
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
@@ -44,6 +45,7 @@
             android:src="@{appInfo.icon}"
             android:layout_centerInParent="true"
             android:visibility="@{adapter.getAdaptiveIconVisibility(appInfo)}"
+            android:contentDescription="@{adapter.getAppName(appInfo)}"
             />
 
     </RelativeLayout>

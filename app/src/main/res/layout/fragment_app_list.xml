@@ -18,6 +18,7 @@
         android:singleLine="true"
         android:imeOptions="actionSearch"
         android:inputType="text"
+        android:contentDescription="@string/app_list_search_edit_text_content_description"
         />
 
     <androidx.recyclerview.widget.RecyclerView

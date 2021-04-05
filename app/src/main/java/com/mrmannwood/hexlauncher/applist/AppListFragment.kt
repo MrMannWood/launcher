@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.contacts.ContactData
+import com.mrmannwood.hexlauncher.contacts.ContactsDatabindingAdapter
 import com.mrmannwood.hexlauncher.launcher.Adapter
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
@@ -67,6 +68,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
     private lateinit var appListView: RecyclerView
     private lateinit var appListAdapter: Adapter<AppInfo>
 
+    private lateinit var contactsDatabindingAdapter : ContactsDatabindingAdapter
     private lateinit var contactsListView: RecyclerView
     private lateinit var contactsAdapter: Adapter<ContactData>
 
@@ -119,6 +121,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
             }
         }
 
+        contactsDatabindingAdapter = ContactsDatabindingAdapter(resources)
         contactsAdapter = createContactsAdapter()
         contactsListView = view.findViewById<RecyclerView>(R.id.contact_list).apply {
             layoutManager = createContactsLayoutManager()
@@ -204,6 +207,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
                     bindFunc = { vdb, contactData ->
                         (vdb as ListItemContactBinding).apply {
                             contact = contactData
+                            adapter = contactsDatabindingAdapter
                         }
                         vdb.root.setOnClickListener {
                             getAppListHost().onContactClicked(contactData)

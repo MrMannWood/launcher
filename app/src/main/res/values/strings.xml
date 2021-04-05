@@ -60,13 +60,25 @@
     <string name="app_update_failed_negative">No</string>
 
     <string name="nux_welcome_message">Welcome to Hex Launcher</string>
+    <string name="nux_welcome_image_content_description">Welcome Image of stacked hexagons</string>
     <string name="nux_swipe_message">Swipe up to search</string>
     <string name="nux_swipe_tutorial_user_swiped_up">Nice Job!</string>
+    <string name="nux_swipe_phantom_finger_content_description">Phantom Finger showing swipe up action</string>
     <string name="nux_settings_message">Long press for settings</string>
     <string name="nux_settings_tutorial_settings">Settings</string>
     <string name="nux_settings_tutorial_user_clicked_settings">Nice Job!</string>
+    <string name="nux_settings_phantom_finger_content_description">Phantom Finger showing long press action</string>
     <string name="nux_set_as_home">Set as Default</string>
+    <string name="nux_set_as_home_content_description">Set as Default</string>
     <string name="nux_set_as_home_or">Or</string>
+    <string name="nux_set_as_home_or_content_description">Or</string>
     <string name="nux_try_it_out">Try it Out</string>
+    <string name="nux_try_it_out_content_description">Try it Out</string>
+
+    <string name="app_list_search_edit_text_content_description">Search box</string>
+    <string name="home_time_content_description">Time</string>
+    <string name="home_date_content_description">Date</string>
+
+    <string name="contact_image_content_description">Contact image for %s</string>
 
 </resources>

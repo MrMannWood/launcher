@@ -22,6 +22,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:src="@drawable/nux_finger_circle"
+            android:contentDescription="@string/nux_swipe_phantom_finger_content_description"
             />
 
     </RelativeLayout>

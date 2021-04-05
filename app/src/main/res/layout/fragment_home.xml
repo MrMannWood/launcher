@@ -26,6 +26,7 @@
         android:format12Hour="h:mm a"
         android:format24Hour="k:mm"
         android:visibility="invisible"
+        android:contentDescription="@string/home_time_content_description"
         />
 
     <TextClock
@@ -41,6 +42,7 @@
         android:format12Hour="EEEE, LLLL d"
         android:format24Hour="EEEE, LLLL d"
         android:visibility="invisible"
+        android:contentDescription="@string/home_date_content_description"
         />
 
 </RelativeLayout>

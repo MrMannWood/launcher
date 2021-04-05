@@ -20,7 +20,7 @@ class LauncherApplication : Application() {
             ReleaseBuildModeConfiguration.onApplicationCreate()
         }
 
-        PreferencesLiveData.create(this)
+        PreferencesLiveData.create(this).observeForever { }
 
         AppInfoLiveData.get(this).observeForever { result ->
             result.onSuccess { apps ->

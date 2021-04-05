@@ -25,4 +25,7 @@ object PreferenceKeys {
     object AutoUpdate {
         const val ALLOW_AUTO_UPDATE = "update_allow_auto"
     }
+    object Version {
+        const val LAST_RUN_VERSION_NAME = "previous_version_name"
+    }
 }

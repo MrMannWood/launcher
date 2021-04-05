@@ -17,8 +17,9 @@ class PreferencesLiveData private constructor(
 
         private lateinit var instance: PreferencesLiveData
 
-        fun create(application: Application) {
+        fun create(application: Application) : PreferencesLiveData{
             instance = PreferencesLiveData(application)
+            return instance
         }
 
         fun get() = instance

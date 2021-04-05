@@ -14,6 +14,7 @@ import com.mrmannwood.hexlauncher.appupdate.AppUpdateActivityHelper
 import com.mrmannwood.hexlauncher.appupdate.AppUpdateService
 import com.mrmannwood.hexlauncher.contacts.ContactData
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
+import com.mrmannwood.hexlauncher.view.makeFullScreen
 import com.mrmannwood.launcher.R
 
 class LauncherActivity : AppCompatActivity() {
@@ -102,15 +103,6 @@ class LauncherActivity : AppCompatActivity() {
         } ?: false
         if (!handled) {
             super.onBackPressed()
-        }
-    }
-
-    private fun makeFullScreen() {
-        window.apply {
-            getColor(R.color.black_translucent).let { color ->
-                statusBarColor = color
-                navigationBarColor = color
-            }
         }
     }
 

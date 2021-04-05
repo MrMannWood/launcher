@@ -231,19 +231,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
             })
         }
 
-        if (BuildConfig.DEBUG) {
-            // TODO contacts don't work yet
-            val contactsCategory = PreferenceCategory(activity).apply {
-                setTitle(R.string.preferences_category_contacts)
-                screen.addPreference(this)
-            }
-            contactsCategory.apply {
-                addPreference(SwitchPreference(activity).apply {
-                    setTitle(R.string.preferences_contacts_allow_search)
-                    key = PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH
-                })
-            }
+        PreferenceCategory(activity).apply {
+            screen.addPreference(this)
+            setTitle(R.string.preferences_category_contacts)
+            addPreference(SwitchPreference(activity).apply {
+                setTitle(R.string.preferences_contacts_allow_search)
+                key = PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH
+            })
         }
+
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
             setTitle(R.string.preferences_category_legal)

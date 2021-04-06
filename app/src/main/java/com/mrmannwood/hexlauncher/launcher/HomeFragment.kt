@@ -64,12 +64,9 @@ class HomeFragment : Fragment(), HandleBackPressed {
         viewModel.swipeLeftLiveData.observe(viewLifecycleOwner) { packageName ->
             swipeLeftPackage = packageName
         }
-        viewModel.appListLiveData.observe(viewLifecycleOwner) { result ->
+        viewModel.appListLiveData.observe(viewLifecycleOwner) { _ ->
             appLoadProgressBar.visibility = View.GONE
-            appsAreLoaded = result.isSuccess
-            result.exceptionOrNull()?.let {
-                Toast.makeText(requireContext(), R.string.home_unable_to_load_apps, Toast.LENGTH_LONG).show()
-            }
+            appsAreLoaded = true
         }
     }
 

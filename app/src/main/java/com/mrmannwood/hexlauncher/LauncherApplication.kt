@@ -22,13 +22,8 @@ class LauncherApplication : Application() {
 
         PreferencesLiveData.create(this).observeForever { }
 
-        AppInfoLiveData.createAndGet(this).observeForever { result ->
-            result.onSuccess { apps ->
-                Timber.i("App info changed, got ${apps.size} apps")
-            }
-            result.onFailure { error ->
-                Timber.e(error, "App Info changed, got error")
-            }
+        AppInfoLiveData.createAndGet(this).observeForever { apps ->
+            Timber.i("App info changed, got ${apps.size} apps")
         }
 
         registerReceiver(

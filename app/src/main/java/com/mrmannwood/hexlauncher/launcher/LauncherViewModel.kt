@@ -10,7 +10,7 @@ import com.mrmannwood.hexlauncher.settings.PreferenceLiveData.Extractor.BooleanE
 
 class LauncherViewModel(app: Application): AndroidViewModel(app) {
 
-    val apps: LiveData<Result<List<AppInfo>>> = AppInfoLiveData.get()
+    val apps: LiveData<List<AppInfo>> = AppInfoLiveData.get()
     val contacts = ContactsLiveData(app)
     val showAllAppsPreferenceLiveData = PreferenceLiveData(PreferenceKeys.AppList.SHOW_ALL_APPS, BooleanExtractor)
 

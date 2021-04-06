@@ -140,27 +140,15 @@ class AppListFragment : Fragment(), HandleBackPressed {
             }
             performSearch()
         }
-        viewModel.apps.observe(viewLifecycleOwner, {
-            it.getOrNull()?.let { apps ->
-                this.apps = apps
-                performSearch()
-            }
-            it.exceptionOrNull()?.let { error ->
-                Timber.e(error)
-                Toast.makeText(requireContext(), R.string.error_app_load, Toast.LENGTH_LONG).show()
-            }
+        viewModel.apps.observe(viewLifecycleOwner, { apps ->
+            this.apps = apps
+            performSearch()
         })
         if (getAppListHost().showContacts()) {
-            viewModel.contacts.observe(viewLifecycleOwner) { result ->
-                result.getOrNull()?.let { contacts ->
-                    resultListAdapter.setData(
-                            SearchResult.Contact::class,
-                            contacts.take(2).map { contact -> SearchResult.Contact(contact) })
-                }
-                result.exceptionOrNull()?.let {
-                    resultListAdapter.setData(SearchResult.Contact::class, listOf())
-                    Toast.makeText(requireContext(), R.string.error_contact_load, Toast.LENGTH_LONG).show()
-                }
+            viewModel.contacts.observe(viewLifecycleOwner) { contacts ->
+                resultListAdapter.setData(
+                        SearchResult.Contact::class,
+                        contacts.take(2).map { contact -> SearchResult.Contact(contact) })
             }
         }
     }

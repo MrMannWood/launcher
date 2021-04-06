@@ -13,15 +13,13 @@ import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.core.graphics.get
-import androidx.lifecycle.LiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.mrmannwood.hexlauncher.executor.AppExecutors
-import kotlin.Result.Companion.failure
-import kotlin.Result.Companion.success
+import com.mrmannwood.hexlauncher.coroutine.LiveDataWithCoroutineScope
+import kotlinx.coroutines.*
 
 class AppInfoLiveData private constructor(
         private val context: Application
-): LiveData<Result<List<AppInfo>>>() {
+): LiveDataWithCoroutineScope<List<AppInfo>>() {
 
     companion object {
 
@@ -61,36 +59,38 @@ class AppInfoLiveData private constructor(
     }
 
     private fun triggerLoad() {
-        AppExecutors.backgroundExecutor.execute {
-            val value: Result<List<AppInfo>> = try {
-                val packages: List<ResolveInfo> = pacMan.queryIntentActivities(
-                    Intent(
-                        Intent.ACTION_MAIN,
-                        null
-                    ).addCategory(Intent.CATEGORY_LAUNCHER), 0
-                )
+        scope?.launch {
+            val jobs = mutableListOf<Deferred<AppInfo>>()
+            for (pack in loadAppList()) {
+                jobs.add( async { loadApp(pack) })
+            }
+            val apps = jobs.map { it.await() }.toMutableList()
+            apps.sortBy { it.label }
+            postValue(apps)
+        }
+    }
 
-                val appList = mutableListOf<AppInfo>()
-                for (pack in packages) {
-                    val icon = pack.loadIcon(pacMan)
-                    val bgc = getBackgroundColor(icon)
-                    val a = AppInfo(
+    private suspend fun loadAppList() : List<ResolveInfo> =
+            withContext(Dispatchers.IO) {
+                pacMan.queryIntentActivities(
+                        Intent(
+                                Intent.ACTION_MAIN,
+                                null
+                        ).addCategory(Intent.CATEGORY_LAUNCHER), 0
+                )
+            }
+
+    private suspend fun loadApp(pack: ResolveInfo) : AppInfo =
+            withContext(Dispatchers.IO) {
+                val icon = pack.loadIcon(pacMan)
+                val bgc = getBackgroundColor(icon)
+                AppInfo(
                         packageName = pack.activityInfo.packageName,
                         icon = icon,
                         backgroundColor = bgc ?: 0xFFC1CC,
                         label = pack.loadLabel(pacMan).toString()
-                    )
-                    appList.add(a)
-                }
-                appList.sortBy { it.label }
-
-                success(appList)
-            } catch (e: Exception) {
-                failure(e)
+                )
             }
-            postValue(value)
-        }
-    }
 
     private fun getBackgroundColor(drawable: Drawable) : Int? {
         if (drawable is AdaptiveIconDrawable) {

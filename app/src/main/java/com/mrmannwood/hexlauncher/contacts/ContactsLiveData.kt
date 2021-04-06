@@ -1,138 +1,139 @@
 package com.mrmannwood.hexlauncher.contacts
 
 import android.Manifest
-import android.app.Application
 import android.content.ContentUris
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.ContactsContract
 import androidx.annotation.MainThread
-import androidx.annotation.WorkerThread
 import androidx.core.content.ContentResolverCompat
 import androidx.core.os.CancellationSignal
-import androidx.lifecycle.LiveData
+import androidx.core.os.OperationCanceledException
 import androidx.lifecycle.Observer
-import com.mrmannwood.hexlauncher.executor.AppExecutors
+import com.mrmannwood.hexlauncher.coroutine.LiveDataWithCoroutineScope
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
-import timber.log.Timber
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayInputStream
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
-class ContactsLiveData(private val application: Application) : LiveData<Result<List<ContactData>>>() {
+class ContactsLiveData(private val context: Context) : LiveDataWithCoroutineScope<List<ContactData>>() {
 
-    private val contentResolver = application.contentResolver
-    private val permissionsLiveData = PermissionsLiveData(application, PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH, Manifest.permission.READ_CONTACTS)
-    private val isActive = AtomicBoolean(false)
-    private val searchTerm = AtomicReference<String?>()
-    private val query = AtomicReference<() -> Unit> { }
+    private val contentResolver = context.contentResolver
+    private val permissionsLiveData = PermissionsLiveData(context, PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH, Manifest.permission.READ_CONTACTS)
     private var cancellationSignal: CancellationSignal? = null
+    private val searchTerm = AtomicReference<String>()
+    private val query = AtomicReference<() -> Unit>()
 
     private val permissionObserver = Observer<PermissionsLiveData.PermissionsResult> {
         if (it == PermissionsLiveData.PermissionsResult.PrefGrantedPermissionGranted) {
-            query.set { performQuery() }
-            query.get().invoke()
+            query.set {
+                scope?.launch {
+                    searchTerm.getAndSet(null)?.let { term ->
+                        postValue(queryContacts(term))
+                    }
+                }
+            }
+            query.get()?.invoke()
         } else {
-            postValue(Result.success(listOf()))
+            postValue(listOf())
         }
     }
 
-    @MainThread fun setSearchTerm(term: String) {
+    @MainThread
+    fun setSearchTerm(term: String) {
         searchTerm.set(term)
-        query.get().invoke()
+        query.get()?.invoke()
     }
 
-    @MainThread override fun onActive() {
+    override fun onActive() {
         super.onActive()
-        isActive.set(true)
         permissionsLiveData.observeForever(permissionObserver)
     }
 
-    @MainThread override fun onInactive() {
-        isActive.set(false)
+    override fun onInactive() {
         super.onInactive()
-        cancellationSignal?.cancel()
-        cancellationSignal = null
         permissionsLiveData.removeObserver(permissionObserver)
-    }
-
-    @MainThread private fun performQuery() {
-        if (!isActive.get()) {
-            return
-        }
-
         cancellationSignal?.cancel()
-        val cancellation = CancellationSignal()
-        cancellationSignal = cancellation
+        query.set(null)
+    }
 
-        AppExecutors.backgroundExecutor.execute {
-            val result : Result<List<ContactData>>? = try {
-                searchTerm.getAndSet(null)?.let { term ->
-                   if (term.isEmpty()) {
-                        Result.success(listOf())
-                    } else {
-                        ContentResolverCompat.query(
-                                contentResolver,
-                                ContactsContract.Data.CONTENT_URI,
-                                arrayOf(
-                                        ContactsContract.Data.CONTACT_ID,
-                                        ContactsContract.Data.DISPLAY_NAME_PRIMARY
-                                ),
-                                "${ContactsContract.Data.DISPLAY_NAME_PRIMARY} LIKE ?",
-                                arrayOf("%${term}%"),
-                                null,
-                                cancellationSignal
-                        ).use {
-                            val contacts = ArrayList<ContactData>(it.count)
-                            while (it.moveToNext() && !cancellation.isCanceled) {
-                                val contactId = it.getLong(it.getColumnIndex(ContactsContract.Data.CONTACT_ID))
-                                val contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId)
-                                contacts.add(
-                                        ContactData(
-                                                id = contactId,
-                                                name = it.getString(it.getColumnIndex(ContactsContract.Data.DISPLAY_NAME)),
-                                                uri = contactUri,
-                                                image = getImageForContact(contactUri),
-                                        )
-                                )
-                            }
-                            Result.success(contacts)
+    private suspend fun queryContacts(term: String) : List<ContactData>? {
+        return withContext(Dispatchers.Main) {
+            cancellationSignal?.cancel()
+            val cancellation = CancellationSignal()
+            cancellationSignal = cancellation
+
+            queryContacts(cancellation, term)
+        }
+    }
+
+    private suspend fun queryContacts(cancellationSignal: CancellationSignal, term: String) : List<ContactData>? {
+        return withContext(Dispatchers.IO) {
+            if (term.isEmpty()) {
+                listOf()
+            } else {
+                try {
+                    ContentResolverCompat.query(
+                            contentResolver,
+                            ContactsContract.Data.CONTENT_URI,
+                            arrayOf(
+                                    ContactsContract.Data.CONTACT_ID,
+                                    ContactsContract.Data.DISPLAY_NAME_PRIMARY
+                            ),
+                            "${ContactsContract.Data.DISPLAY_NAME_PRIMARY} LIKE ?",
+                            arrayOf("%${term}%"),
+                            null,
+                            cancellationSignal
+                    ).use {
+                        val contacts = ArrayList<ContactData>(it.count)
+                        while (it.moveToNext() && !cancellationSignal.isCanceled) {
+                            val contactId = it.getLong(it.getColumnIndex(ContactsContract.Data.CONTACT_ID))
+                            val contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId)
+                            contacts.add(
+                                    ContactData(
+                                            id = contactId,
+                                            name = it.getString(it.getColumnIndex(ContactsContract.Data.DISPLAY_NAME)),
+                                            uri = contactUri,
+                                            image = getImageForContact(contactUri),
+                                    )
+                            )
                         }
+                        contacts
                     }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Unable to load contacts")
-                Result.failure(e)
-            }
-            if (!cancellation.isCanceled) {
-                result?.let {
-                    postValue(it)
+                } catch (e: OperationCanceledException) {
+                    null
                 }
             }
         }
     }
 
-    @WorkerThread
-    fun getImageForContact(contactUri: Uri) : Drawable? =
-            contentResolver.query(
-                    Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY),
-                    arrayOf(ContactsContract.Contacts.Photo.PHOTO),
-                    null,
-                    null,
-                    null
-            )?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    cursor.getBlob(0)?.let {
-                        BitmapDrawable(
-                                application.resources,
-                                BitmapFactory.decodeStream(ByteArrayInputStream(it))
-                        )
+    private suspend fun getImageForContact(contactUri: Uri) : Drawable? =
+            withContext(Dispatchers.IO) {
+                contentResolver.query(
+                        Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY),
+                        arrayOf(ContactsContract.Contacts.Photo.PHOTO),
+                        null,
+                        null,
+                        null
+                )?.use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        cursor.getBlob(0)?.let {
+                            BitmapDrawable(
+                                    context.resources,
+                                    BitmapFactory.decodeStream(ByteArrayInputStream(it))
+                            )
+                        }
+                    } else {
+                        null
                     }
-                } else {
-                    null
                 }
             }
 }

@@ -14,6 +14,7 @@
 
     <string name="preferences_category_wallpaper">Wallpaper</string>
     <string name="preferences_wallpaper_choose_app">Set Wallpaper App</string>
+    <string name="preferences_wallpaper_choose_app_chooser_title">Choose App - Wallpaper</string>
     <string name="preferences_wallpaper_choose_image">Change Wallpaper</string>
 
     <string name="preferences_category_contacts">Contacts</string>
@@ -33,7 +34,9 @@
 
     <string name="preferences_category_gestures">Gestures</string>
     <string name="preferences_gestures_swipe_right">Swipe Right</string>
+    <string name="preferences_gestures_swipe_right_chooser_title">Choose App - Swipe Right</string>
     <string name="preferences_gestures_swipe_left">Swipe Left</string>
+    <string name="preferences_gestures_swipe_left_chooser_title">Choose App - Swipe Left</string>
     <string name="preferences_gestures_unset">Not Set</string>
 
     <string name="preferences_category_legal">Legal</string>

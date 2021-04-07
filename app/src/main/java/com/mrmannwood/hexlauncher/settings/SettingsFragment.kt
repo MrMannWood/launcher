@@ -17,6 +17,7 @@ import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import com.mrmannwood.hexlauncher.applist.AppListActivity
+import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
 import com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
@@ -170,7 +171,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 wallpaperAppPreference = this
                 setTitle(R.string.preferences_wallpaper_choose_app)
                 setOnPreferenceClickListener {
-                    wallpaperActivityResultContracts.launch(Intent(activity, AppListActivity::class.java))
+                    wallpaperActivityResultContracts.launch(
+                            Intent(activity, AppListActivity::class.java)
+                                    .decorateForAppListLaunch(R.string.preferences_wallpaper_choose_app_chooser_title))
                     true
                 }
             })
@@ -217,7 +220,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 swipeRightAppPreference = this
                 setTitle(R.string.preferences_gestures_swipe_right)
                 setOnPreferenceClickListener {
-                    preferenceSwipeRightResultContract.launch(Intent(activity, AppListActivity::class.java))
+                    preferenceSwipeRightResultContract.launch(
+                            Intent(activity, AppListActivity::class.java)
+                                    .decorateForAppListLaunch(R.string.preferences_gestures_swipe_right_chooser_title))
                     true
                 }
             })
@@ -225,7 +230,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 swipeLeftAppPreference = this
                 setTitle(R.string.preferences_gestures_swipe_left)
                 setOnPreferenceClickListener {
-                    preferenceSwipeLeftResultContract.launch(Intent(activity, AppListActivity::class.java))
+                    preferenceSwipeLeftResultContract.launch(
+                            Intent(activity, AppListActivity::class.java)
+                                    .decorateForAppListLaunch(R.string.preferences_gestures_swipe_left_chooser_title))
                     true
                 }
             })

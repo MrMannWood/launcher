@@ -42,7 +42,8 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true">
+            android:layout_alignParentEnd="true"
+            android:contentDescription="@{adapter.getContactPictureContentDescription(contact)}">
 
             <com.mrmannwood.hexlauncher.view.HexagonView
                 android:id="@+id/hex_background"
@@ -59,9 +60,21 @@
                 android:layout_height="75dp"
                 android:layout_centerInParent="true"
                 android:scaleType="fitCenter"
-                android:src="@{contact.image}"
-                android:contentDescription="@{adapter.getContactPictureContentDescription(contact)}"
+                android:src="@{adapter.getContactImageSource(contact)}"
                 />
+
+            <TextView
+                android:id="@+id/contact_letter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="@{adapter.getContactLetterVisibility(contact)}"
+                android:text="@{adapter.getContactLetter(contact)}"
+                android:textColor="@color/white"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                />
+
         </RelativeLayout>
 
     </RelativeLayout>

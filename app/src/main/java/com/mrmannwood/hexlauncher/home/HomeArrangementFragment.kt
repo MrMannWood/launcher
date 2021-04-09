@@ -1,6 +1,5 @@
 package com.mrmannwood.hexlauncher.home
 
-import android.app.WallpaperManager
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View

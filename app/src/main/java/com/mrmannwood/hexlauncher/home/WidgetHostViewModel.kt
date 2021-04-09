@@ -3,23 +3,32 @@ package com.mrmannwood.hexlauncher.home
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets.Gravity
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets.Color
 import com.mrmannwood.hexlauncher.settings.PreferenceLiveData
+import com.mrmannwood.hexlauncher.settings.PreferenceLiveData.Extractor.IntExtractor
 
 class WidgetHostViewModel : ViewModel() {
-    val dateWidgetLiveData = MediatorLiveData<Pair<Int?, Int?>>().apply {
-        addSource(PreferenceLiveData(PreferenceKeys.Home.Widgets.DATE, PreferenceLiveData.Extractor.IntExtractor)) { slot ->
-            value = Pair(slot, value?.second)
+    val dateWidgetLiveData = MediatorLiveData<Triple<Int?, Int?, Int?>>().apply {
+        addSource(PreferenceLiveData(PreferenceKeys.Home.Widgets.DATE, IntExtractor)) { slot ->
+            value = Triple(slot, value?.second, value?.third)
         }
-        addSource(PreferenceLiveData(PreferenceKeys.Home.Widgets.Gravity.key(PreferenceKeys.Home.Widgets.DATE), PreferenceLiveData.Extractor.IntExtractor)) { gravity ->
-            value = Pair(value?.first, gravity)
+        addSource(PreferenceLiveData(Gravity.key(PreferenceKeys.Home.Widgets.DATE), IntExtractor)) { gravity ->
+            value = Triple(value?.first, gravity, value?.third)
+        }
+        addSource(PreferenceLiveData(Color.key(PreferenceKeys.Home.Widgets.DATE), IntExtractor)) { color ->
+            value = Triple(value?.first, value?.second, color)
         }
     }
-    val timeWidgetLiveData = MediatorLiveData<Pair<Int?, Int?>>().apply {
-        addSource(PreferenceLiveData(PreferenceKeys.Home.Widgets.TIME, PreferenceLiveData.Extractor.IntExtractor)) { slot ->
-            value = Pair(slot, value?.second)
+    val timeWidgetLiveData = MediatorLiveData<Triple<Int?, Int?, Int?>>().apply {
+        addSource(PreferenceLiveData(PreferenceKeys.Home.Widgets.TIME, IntExtractor)) { slot ->
+            value = Triple(slot, value?.second, value?.third)
         }
-        addSource(PreferenceLiveData(PreferenceKeys.Home.Widgets.Gravity.key(PreferenceKeys.Home.Widgets.TIME), PreferenceLiveData.Extractor.IntExtractor)) { gravity ->
-            value = Pair(value?.first, gravity)
+        addSource(PreferenceLiveData(Gravity.key(PreferenceKeys.Home.Widgets.TIME), IntExtractor)) { gravity ->
+            value = Triple(value?.first, gravity, value?.third)
+        }
+        addSource(PreferenceLiveData(Color.key(PreferenceKeys.Home.Widgets.TIME), IntExtractor)) { color ->
+            value = Triple(value?.first, value?.second, color)
         }
     }
 }

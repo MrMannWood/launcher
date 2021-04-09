@@ -20,6 +20,9 @@ object PreferenceKeys {
                 const val MIDDLE = 2
                 const val BOTTOM = 3
             }
+            object Color {
+                fun key(widget: String) = "${widget}_color"
+            }
         }
     }
     object AppList {

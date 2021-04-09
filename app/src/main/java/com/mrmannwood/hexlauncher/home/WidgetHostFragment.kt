@@ -1,8 +1,10 @@
 package com.mrmannwood.hexlauncher.home
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -64,22 +66,23 @@ abstract class WidgetHostFragment : Fragment() {
     private inner class WidgetLiveDataObserver(
             private val widgetName: String,
             @LayoutRes private  val widgetLayout: Int
-    ) : Observer<Pair<Int?, Int?>> {
+    ) : Observer<Triple<Int?, Int?, Int?>> {
 
         private var widgetView : View? = null
 
-        override fun onChanged(value: Pair<Int?, Int?>) {
+        override fun onChanged(value: Triple<Int?, Int?, Int?>) {
             val slot = value.first
             val gravity = value.second
+            val color = value.third ?: Color.WHITE
             if (slot == null || gravity == null) {
                 hide()
             } else {
-                show(slot, gravity)
+                show(slot, gravity, color)
                 onWidgetLoaded(widgetName, slot)
             }
         }
 
-        private fun show(slot: Int, gravity: Int) {
+        private fun show(slot: Int, gravity: Int, color: Int) {
             var view = widgetView
             if (view != null) {
                 (view.parent as? ViewGroup)?.removeView(view)
@@ -97,6 +100,9 @@ abstract class WidgetHostFragment : Fragment() {
                         else -> throw IllegalArgumentException("Unknown gravity: $gravity")
                     }.toInt()
             )
+            if (view is TextView) {
+                view.setTextColor(color)
+            }
             slots[slot].addView(view)
         }
 

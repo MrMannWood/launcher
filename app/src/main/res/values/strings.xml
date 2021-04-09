@@ -91,4 +91,6 @@
 
     <string name="contact_image_content_description">Contact image for %s</string>
 
+    <string name="home_arrangement_hide_button_text">Do not Display</string>
+
 </resources>

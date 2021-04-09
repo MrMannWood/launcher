@@ -19,6 +19,8 @@ import androidx.preference.SwitchPreference
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
+import com.mrmannwood.hexlauncher.home.HomeArrangementActivity
+import com.mrmannwood.hexlauncher.home.HomeArrangementActivity.Companion.decorateForHomeArrangement
 import com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
@@ -87,7 +89,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private val settingsViewModel : SettingsViewModel by activityViewModels()
-    private lateinit var prefs : SharedPreferences
+    private val prefs = PreferencesLiveData.get().getSharedPreferences()
 
     private lateinit var homeRolePreference: Preference
     private lateinit var wallpaperAppPreference: Preference
@@ -99,7 +101,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        settingsViewModel.preferencesLiveData.observe(this) { sp -> prefs = sp }
         settingsViewModel.wallpaperPackageLiveData.observe(this) { app ->
             wallpaperAppPackageName = app
         }
@@ -190,16 +191,38 @@ class SettingsFragment : PreferenceFragmentCompat() {
             })
         }
 
+        val widgets = PreferenceKeys.Home.Slots.all.map { slot ->
+            prefs.getString(slot, null)
+        }.filterNotNull()
+
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
             setTitle(R.string.preferences_category_home)
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_home_show_date)
-                key = PreferenceKeys.Home.SHOW_DATE
+                isChecked = widgets.contains(PreferenceKeys.Home.Widgets.DATE)
+                setOnPreferenceClickListener {
+                    startActivity(
+                            Intent(
+                                    activity,
+                                    HomeArrangementActivity::class.java
+                            ).decorateForHomeArrangement(PreferenceKeys.Home.Widgets.DATE)
+                    )
+                    true
+                }
             })
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_home_show_time)
-                key = PreferenceKeys.Home.SHOW_TIME
+                isChecked = widgets.contains(PreferenceKeys.Home.Widgets.TIME)
+                setOnPreferenceClickListener {
+                    startActivity(
+                            Intent(
+                                    activity,
+                                    HomeArrangementActivity::class.java
+                            ).decorateForHomeArrangement(PreferenceKeys.Home.Widgets.TIME)
+                    )
+                    true
+                }
             })
         }
 

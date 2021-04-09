@@ -1,4 +1,4 @@
-package com.mrmannwood.hexlauncher.launcher
+package com.mrmannwood.hexlauncher.home
 
 import android.content.Context
 import android.content.Intent
@@ -15,7 +15,7 @@ import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.launcher.R
 import timber.log.Timber
 
-class HomeFragment : Fragment(), HandleBackPressed {
+class HomeFragment : Fragment(R.layout.fragment_home), HandleBackPressed {
 
     private val viewModel: HomeViewModel by activityViewModels()
 
@@ -26,12 +26,6 @@ class HomeFragment : Fragment(), HandleBackPressed {
     private var swipeLeftPackage : String? = null
 
     private var appsAreLoaded : Boolean = false
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.fragment_home, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         view.setOnTouchListener(object : View.OnTouchListener {
@@ -52,11 +46,11 @@ class HomeFragment : Fragment(), HandleBackPressed {
         dateView = view.findViewById(R.id.date)
         timeView = view.findViewById(R.id.time)
 
-        viewModel.showDateLiveData.observe(viewLifecycleOwner) { showDate ->
-            dateView.visibility = if (showDate == true) View.VISIBLE else View.INVISIBLE
+        viewModel.slot1LiveData.observe(viewLifecycleOwner) { slot1 ->
+//            dateView.visibility = if (showDate == true) View.VISIBLE else View.INVISIBLE
         }
-        viewModel.showTimeLiveData.observe(viewLifecycleOwner) { showTime ->
-            timeView.visibility = if (showTime == true) View.VISIBLE else View.INVISIBLE
+        viewModel.slot2LiveData.observe(viewLifecycleOwner) { slot2 ->
+//            timeView.visibility = if (showTime == true) View.VISIBLE else View.INVISIBLE
         }
         viewModel.swipeRightLiveData.observe(viewLifecycleOwner) { packageName ->
             swipeRightPackage = packageName

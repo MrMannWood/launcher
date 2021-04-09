@@ -16,6 +16,7 @@ import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.appupdate.AppUpdateActivityHelper
 import com.mrmannwood.hexlauncher.appupdate.AppUpdateService
 import com.mrmannwood.hexlauncher.contacts.ContactData
+import com.mrmannwood.hexlauncher.home.HomeFragment
 import com.mrmannwood.hexlauncher.nux.NUXActivity
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.SettingsActivity

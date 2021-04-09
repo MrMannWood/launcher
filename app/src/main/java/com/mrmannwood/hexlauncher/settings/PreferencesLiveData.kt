@@ -25,13 +25,34 @@ class PreferencesLiveData private constructor(
         fun get() = instance
     }
 
+    @Volatile private var prefs : SharedPreferences? = null
+
     override fun onActive() {
         super.onActive()
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
-                postValue(PreferenceManager.getDefaultSharedPreferences(application))
+                postValue(getSharedPreferences())
             }
         }
     }
 
+    fun getSharedPreferences() : SharedPreferences {
+        val preferences = prefs
+        if (preferences != null) {
+            return preferences
+        }
+        synchronized(this) {
+            var preferences = prefs
+            if (preferences != null) {
+                return preferences
+            }
+            preferences = makeSharedPrefs()
+            prefs = preferences
+            return preferences
+        }
+    }
+
+    private fun makeSharedPrefs() : SharedPreferences {
+        return PreferenceManager.getDefaultSharedPreferences(application)
+    }
 }

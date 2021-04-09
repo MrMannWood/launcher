@@ -3,8 +3,6 @@
     android:id="@+id/time"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_above="@id/center"
-    android:layout_gravity="center"
     android:gravity="center_horizontal"
     android:textColor="@android:color/white"
     android:textSize="25sp"

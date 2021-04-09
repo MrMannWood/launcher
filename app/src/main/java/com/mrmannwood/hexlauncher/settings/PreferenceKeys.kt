@@ -10,10 +10,16 @@ object PreferenceKeys {
     }
     object Home {
         object Widgets {
-            const val DATE = "date"
-            const val TIME = "time"
+            const val DATE = "home_widget_date"
+            const val TIME = "home_widget_time"
 
-            val all = listOf(DATE, TIME)
+            object Gravity {
+                fun key(widget: String) = "${widget}_gravity"
+
+                const val TOP = 1
+                const val MIDDLE = 2
+                const val BOTTOM = 3
+            }
         }
     }
     object AppList {

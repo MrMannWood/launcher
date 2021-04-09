@@ -3,8 +3,6 @@
     android:id="@+id/date"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_above="@id/time"
-    android:layout_gravity="center"
     android:gravity="center_horizontal"
     android:textColor="@android:color/white"
     android:textSize="25sp"

@@ -2,18 +2,16 @@ package com.mrmannwood.hexlauncher.home
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.mrmannwood.hexlauncher.settings.PreferenceKeys
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
 import com.mrmannwood.launcher.R
-import com.mrmannwood.launcher.databinding.FragmentHomeArrangementBinding
+import com.mrmannwood.launcher.databinding.FragmentHomeBinding
 
-class HomeArrangementFragment : Fragment() {
+class HomeArrangementFragment : WidgetHostFragment() {
 
     companion object {
         private const val WIDGET_KEY = "widget"
@@ -28,21 +26,17 @@ class HomeArrangementFragment : Fragment() {
     }
 
     private val viewModel: HomeArrangementViewModel by activityViewModels()
-    private lateinit var databinder : FragmentHomeArrangementBinding
     private var sharedPrefs : SharedPreferences? = null
+    private val widgetLocations = mutableMapOf<Int, String>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        databinder = DataBindingUtil.inflate(inflater, R.layout.fragment_home_arrangement, container, false)
-        databinder.adapter = HomeViewDatabindingAdapter(requireActivity().application)
-        databinder.description = HomeViewDescription.ArrangementDescription(isLoading = true)
-        return databinder.root
+    override fun makeDescription(isLoading: Boolean): HomeViewDescription {
+        return HomeViewDescription.ArrangementDescription(isLoading)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onViewCreated(databinder: FragmentHomeBinding, savedInstanceState: Bundle?) {
         viewModel.preferencesLiveData.observe(viewLifecycleOwner) { prefs ->
             sharedPrefs = prefs
-            databinder.description = HomeViewDescription.ArrangementDescription(isLoading = false)
+            onLoadingComplete()
         }
 
         val widget = requireArguments().getString(WIDGET_KEY)!!
@@ -58,10 +52,17 @@ class HomeArrangementFragment : Fragment() {
 
         databinder.hideButton.setOnClickListener {
             sharedPrefs!!.apply {
-                edit { remove(widget) }
+                edit {
+                    remove(widget)
+                    remove(Widgets.Gravity.key(widget))
+                }
                 requireActivity().finish()
             }
         }
+    }
+
+    override fun onWidgetLoaded(widget: String, slot: Int) {
+        widgetLocations[slot] = widget
     }
 
     private inner class SlotListener(
@@ -69,10 +70,34 @@ class HomeArrangementFragment : Fragment() {
             val slot: Int
     ) : View.OnClickListener {
         override fun onClick(v: View?) {
-            sharedPrefs!!.apply {
-                edit { putInt(widget, slot) }
-                requireActivity().finish()
+            if (widgetLocations[slot] != null && widgetLocations[slot] != widget) {
+                Toast.makeText(requireContext(), R.string.home_arrangement_slot_already_filled_toast, Toast.LENGTH_SHORT).show()
+                return
             }
+
+            AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.home_arrangement_slot_position_title)
+                    .setItems(
+                            arrayOf(
+                                    resources.getString(R.string.home_arrangement_slot_position_top),
+                                    resources.getString(R.string.home_arrangement_slot_position_middle),
+                                    resources.getString(R.string.home_arrangement_slot_position_bottom),
+                            )
+                    ) { _, which ->
+                        val gravity = when (which) {
+                            0 -> Widgets.Gravity.TOP
+                            1 -> Widgets.Gravity.MIDDLE
+                            2 -> Widgets.Gravity.BOTTOM
+                            else -> throw IllegalArgumentException("Unknown selection: $which")
+                        }
+                        sharedPrefs!!.apply {
+                            edit {
+                                putInt(widget, slot)
+                                putInt(Widgets.Gravity.key(widget), gravity)
+                            }
+                        }
+                    }
+                    .show()
         }
     }
 }

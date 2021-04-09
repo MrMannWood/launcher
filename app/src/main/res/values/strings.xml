@@ -25,8 +25,9 @@
     <string name="preferences_contacts_dialog_button_negative">No</string>
 
     <string name="preferences_category_home">Home</string>
-    <string name="preferences_home_show_date">Show Date</string>
-    <string name="preferences_home_show_time">Show Time</string>
+    <string name="preferences_home_widgets">Widgets</string>
+    <string name="preferences_home_widgets_date_name">Date</string>
+    <string name="preferences_home_widgets_time_name">Time</string>
 
     <string name="preferences_category_app_list">Apps</string>
     <string name="preferences_app_list_show_all_apps">Show All Apps</string>

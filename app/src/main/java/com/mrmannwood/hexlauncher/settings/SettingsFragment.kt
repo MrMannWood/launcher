@@ -20,7 +20,6 @@ import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
 import com.mrmannwood.hexlauncher.home.HomeArrangementActivity
-import com.mrmannwood.hexlauncher.home.HomeArrangementActivity.Companion.decorateForHomeArrangement
 import com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
@@ -194,29 +193,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
             setTitle(R.string.preferences_category_home)
-            addPreference(SwitchPreference(activity).apply {
-                setTitle(R.string.preferences_home_show_date)
-                isChecked = prefs.getInt(PreferenceKeys.Home.Widgets.DATE, -1) != -1
+            addPreference(Preference(activity).apply {
+                setTitle(R.string.preferences_home_widgets)
                 setOnPreferenceClickListener {
-                    startActivity(
-                            Intent(
-                                    activity,
-                                    HomeArrangementActivity::class.java
-                            ).decorateForHomeArrangement(PreferenceKeys.Home.Widgets.DATE)
-                    )
-                    true
-                }
-            })
-            addPreference(SwitchPreference(activity).apply {
-                setTitle(R.string.preferences_home_show_time)
-                isChecked = prefs.getInt(PreferenceKeys.Home.Widgets.TIME, -1) != -1
-                setOnPreferenceClickListener {
-                    startActivity(
-                            Intent(
-                                    activity,
-                                    HomeArrangementActivity::class.java
-                            ).decorateForHomeArrangement(PreferenceKeys.Home.Widgets.TIME)
-                    )
+                    startActivity(Intent(activity, HomeArrangementActivity::class.java))
                     true
                 }
             })

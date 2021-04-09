@@ -105,20 +105,6 @@
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/hide_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:padding="12dp"
-            android:layout_margin="12dp"
-            android:text="@string/home_arrangement_hide_button_text"
-            android:textColor="@color/black"
-            android:background="@color/white"
-            android:visibility="@{adapter.getHideWidgetButtonVisibility(description)}"
-            />
-
     </RelativeLayout>
 
 </layout>

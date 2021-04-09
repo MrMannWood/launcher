@@ -26,7 +26,4 @@ class HomeViewDatabindingAdapter(private val app: Application) {
             ResourcesCompat.getColor(app.resources, android.R.color.transparent, null)
         }
     }
-
-    fun getHideWidgetButtonVisibility(description: HomeViewDescription) = if (description.showArrangementOptions()) View.VISIBLE else View.GONE
-
 }

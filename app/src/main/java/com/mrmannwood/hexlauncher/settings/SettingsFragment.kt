@@ -191,16 +191,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
             })
         }
 
-        val widgets = PreferenceKeys.Home.Slots.all.map { slot ->
-            prefs.getString(slot, null)
-        }.filterNotNull()
-
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
             setTitle(R.string.preferences_category_home)
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_home_show_date)
-                isChecked = widgets.contains(PreferenceKeys.Home.Widgets.DATE)
+                isChecked = prefs.getInt(PreferenceKeys.Home.Widgets.DATE, -1) != -1
                 setOnPreferenceClickListener {
                     startActivity(
                             Intent(
@@ -213,7 +209,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             })
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_home_show_time)
-                isChecked = widgets.contains(PreferenceKeys.Home.Widgets.TIME)
+                isChecked = prefs.getInt(PreferenceKeys.Home.Widgets.TIME, -1) != -1
                 setOnPreferenceClickListener {
                     startActivity(
                             Intent(

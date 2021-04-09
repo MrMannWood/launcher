@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextClock xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/time"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_above="@id/center"
+    android:layout_gravity="center"
+    android:gravity="center_horizontal"
+    android:textColor="@android:color/white"
+    android:textSize="25sp"
+    android:textStyle="bold"
+    android:format12Hour="h:mm a"
+    android:format24Hour="k:mm"
+    android:contentDescription="@string/home_time_content_description" />

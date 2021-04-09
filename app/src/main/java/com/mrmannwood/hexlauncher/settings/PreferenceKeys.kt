@@ -9,18 +9,6 @@ object PreferenceKeys {
         const val ALLOW_CONTACT_SEARCH = "contacts_allow_search"
     }
     object Home {
-        object Slots {
-            const val SLOT_1 = "home_slot_1"
-            const val SLOT_2 = "home_slot_1"
-            const val SLOT_3 = "home_slot_1"
-            const val SLOT_4 = "home_slot_1"
-            const val SLOT_5 = "home_slot_1"
-            const val SLOT_6 = "home_slot_1"
-            const val SLOT_7 = "home_slot_1"
-            const val SLOT_8 = "home_slot_1"
-
-            val all = listOf(SLOT_1, SLOT_2, SLOT_3, SLOT_4, SLOT_5, SLOT_6, SLOT_7, SLOT_8)
-        }
         object Widgets {
             const val DATE = "date"
             const val TIME = "time"

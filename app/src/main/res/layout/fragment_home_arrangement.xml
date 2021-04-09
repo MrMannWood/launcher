@@ -1,109 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/container"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <FrameLayout
-        android:id="@+id/progress_bar_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="description"
+            type="com.mrmannwood.hexlauncher.home.HomeViewDescription" />
+        <variable
+            name="adapter"
+            type="com.mrmannwood.hexlauncher.home.HomeViewDatabindingAdapter" />
+    </data>
 
-        <com.mrmannwood.hexlauncher.view.HexagonView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            android:src="@color/white_translucent"/>
+    <RelativeLayout
+        android:id="@+id/container"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <ProgressBar
+        <FrameLayout
+            android:id="@+id/progress_bar_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:layout_gravity="center"
+            android:layout_centerInParent="true"
+            android:visibility="@{adapter.getProgressBarVisibility(description)}">
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:src="@color/white_translucent"/>
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:layout_gravity="center"
+                />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/slot_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="@{adapter.getSlotsVisibility(description)}">
+
+            <FrameLayout
+                android:id="@+id/slot_0"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@{adapter.getOddSlotBackgroundColor(description)}"/>
+
+            <FrameLayout
+                android:id="@+id/slot_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@{adapter.getEvenSlotBackgroundColor(description)}" />
+
+            <FrameLayout
+                android:id="@+id/slot_2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@{adapter.getOddSlotBackgroundColor(description)}"/>
+
+            <FrameLayout
+                android:id="@+id/slot_3"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@{adapter.getEvenSlotBackgroundColor(description)}"/>
+
+            <FrameLayout
+                android:id="@+id/slot_4"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@{adapter.getOddSlotBackgroundColor(description)}"/>
+
+            <FrameLayout
+                android:id="@+id/slot_5"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@{adapter.getEvenSlotBackgroundColor(description)}"/>
+
+            <FrameLayout
+                android:id="@+id/slot_6"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@{adapter.getOddSlotBackgroundColor(description)}"/>
+
+            <FrameLayout
+                android:id="@+id/slot_7"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@{adapter.getEvenSlotBackgroundColor(description)}"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/hide_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:padding="12dp"
+            android:layout_margin="12dp"
+            android:text="@string/home_arrangement_hide_button_text"
+            android:textColor="@color/black"
+            android:background="@color/white"
+            android:visibility="@{adapter.getHideWidgetButtonVisibility(description)}"
             />
 
-    </FrameLayout>
+    </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/slot_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="invisible">
-
-        <View
-            android:id="@+id/slot_1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/white_translucent"/>
-
-        <View
-            android:id="@+id/slot_2"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/black_translucent"/>
-
-        <View
-            android:id="@+id/slot_3"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/white_translucent"/>
-
-        <View
-            android:id="@+id/slot_4"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/black_translucent"/>
-
-        <View
-            android:id="@+id/slot_5"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/white_translucent"/>
-
-        <View
-            android:id="@+id/slot_6"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/black_translucent"/>
-
-        <View
-            android:id="@+id/slot_7"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/white_translucent"/>
-
-        <View
-            android:id="@+id/slot_8"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/black_translucent"/>
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/hide_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:padding="12dp"
-        android:layout_margin="12dp"
-        android:text="@string/home_arrangement_hide_button_text"
-        android:textColor="@color/black"
-        android:background="@color/white"
-        android:visibility="invisible"
-        />
-
-</RelativeLayout>
+</layout>

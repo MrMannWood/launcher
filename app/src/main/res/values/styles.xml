@@ -14,5 +14,7 @@
     <style name="PreferenceScreen" parent="AppTheme">
         <item name="android:textColor">@color/black</item>
         <item name="android:background">@color/white</item>
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">false</item>
     </style>
 </resources>

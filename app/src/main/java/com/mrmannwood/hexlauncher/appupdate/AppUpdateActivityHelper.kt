@@ -40,7 +40,7 @@ class AppUpdateActivityHelper(
             appUpdateInstallListener.onUpdateNotProceeding()
         }
 
-        override fun taskFailed() {
+        override fun updateFailed() {
             appUpdateInstallListener.onUpdateFailed()
         }
 

@@ -33,7 +33,8 @@
         <activity android:name="com.mrmannwood.hexlauncher.home.HomeArrangementActivity"
             android:screenOrientation="portrait"/>
         <activity android:name="com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity" />
-        <service android:name="com.mrmannwood.hexlauncher.appupdate.AppUpdateService" />
+        <service android:name="com.mrmannwood.hexlauncher.appupdate.AppUpdateService"
+            android:exported="false"/>
         <activity
             android:name="com.mrmannwood.hexlauncher.launcher.FakeLauncherActivity"
             android:enabled="false">

@@ -1,53 +1,101 @@
 package com.mrmannwood.hexlauncher.appupdate
 
-import android.content.ComponentName
-import android.content.Context
+import android.app.Activity
 import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import timber.log.Timber
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import com.google.android.play.core.install.model.ActivityResult
+import com.mrmannwood.hexlauncher.appupdate.AppUpdateService.MessageForService
 
 class AppUpdateActivityHelper(
+    private val activity: AppCompatActivity,
     private val appUpdateRequestCode: Int,
-    private val appUpdateInstallListener: AppUpdateService.InstallListener
+    private val appUpdateInstallListener: AppUpdateListener
 ) {
 
-    private var appUpdateCallbacks: AppUpdateService.AppUpdateServiceCallbacks? = null
+    interface AppUpdateListener {
+        fun onUpdateNotProceeding()
+        fun onUpdateFailed()
+        fun onUpdateReadyForInstall(completeInstall: () -> Unit)
+    }
 
-    fun onCreate(activity: AppCompatActivity) {
-        val viewModel : AutoUpdateViewModel by activity.viewModels()
-        Timber.d("Marshall - onCreate")
+    init {
+        activity.lifecycle.addObserver(object : LifecycleEventObserver {
+            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+                when (event) {
+                    Lifecycle.Event.ON_CREATE -> onCreate()
+//                    Lifecycle.Event.ON_RESUME -> onResume()
+                    Lifecycle.Event.ON_DESTROY -> onDestroy()
+                }
+            }
+        })
+    }
 
-        viewModel.autoUpdatePrefLiveData.observe(activity) { allowCheck ->
-            Timber.d("Marshall - allow auto-update check? $allowCheck")
-            if (true == allowCheck) {
-                activity.bindService(
-                    Intent(activity, AppUpdateService::class.java),
-                    object : ServiceConnection {
-                        override fun onServiceConnected(name: ComponentName, service: IBinder) {
-                            Timber.d("Marshall - Connected from auto update service")
-                            val callbacks = (service as AppUpdateService.AppUpdateBinder).callbacks
-                            callbacks.setRequestCode(appUpdateRequestCode)
-                            callbacks.performUpdateCheck(activity, appUpdateInstallListener)
-                            appUpdateCallbacks = callbacks
-                        }
-                        override fun onServiceDisconnected(name: ComponentName) {
-                            Timber.d("Marshall - Disconnected from auto update service")
-                        }
-                    },
-                    Context.BIND_AUTO_CREATE
-                )
+    private val appUpdateListener = object : AppUpdateService.ActivityHandler.AppUpdateListener {
+        override fun updateNotProceeding() {
+            appUpdateInstallListener.onUpdateNotProceeding()
+        }
+
+        override fun taskFailed() {
+            appUpdateInstallListener.onUpdateFailed()
+        }
+
+        override fun updateAvailable(prompt: (Activity, Int) -> Unit) {
+            prompt(activity, appUpdateRequestCode)
+        }
+
+        override fun updateDownloaded() {
+            appUpdateInstallListener.onUpdateReadyForInstall {
+                AppUpdateService.SERVICE_HANDLER?.sendMessageToService(MessageForService.COMPLETE_UPDATE)
             }
         }
     }
 
-    fun onResume(activity: AppCompatActivity) {
-        appUpdateCallbacks?.performUpdateCheck(activity, appUpdateInstallListener)
+    fun onActivityResult(requestCode: Int, resultCode: Int) {
+        if (appUpdateRequestCode != requestCode) return
+        when (resultCode) {
+            AppCompatActivity.RESULT_CANCELED -> {
+                AppUpdateService.SERVICE_HANDLER?.sendMessageToService(MessageForService.USER_DENIED_UPDATE)
+            }
+            ActivityResult.RESULT_IN_APP_UPDATE_FAILED -> {
+                AppUpdateService.SERVICE_HANDLER?.sendMessageToService(MessageForService.UPDATE_FAILED)
+            }
+            AppCompatActivity.RESULT_OK -> {
+                AppUpdateService.SERVICE_HANDLER?.sendMessageToService(MessageForService.UPDATE_ALLOWED)
+            }
+        }
     }
 
-    fun onActivityResult(activity: AppCompatActivity, requestCode: Int, resultCode: Int, data: Intent?) {
-        appUpdateCallbacks?.onActivityResult(activity, requestCode, resultCode, data, appUpdateInstallListener)
+    private fun onCreate() {
+        val viewModel : AutoUpdateViewModel by activity.viewModels()
+        viewModel.autoUpdatePrefLiveData.observe(
+            activity,
+            object : Observer<Boolean?> {
+                override fun onChanged(allowCheck: Boolean?) {
+                    viewModel.autoUpdatePrefLiveData.removeObserver(this)
+                    if (true == allowCheck) {
+                        AppUpdateService.ACTIVITY_HANDLER.attachListener(appUpdateListener)
+                        activity.startForegroundService(
+                            Intent(
+                                activity,
+                                AppUpdateService::class.java
+                            )
+                        )
+                    }
+                }
+            }
+        )
+    }
+
+    private fun onDestroy() {
+        AppUpdateService.ACTIVITY_HANDLER.removeListener(appUpdateListener)
+    }
+
+    private fun onResume() {
+        // TODO consider checking if download is complete
     }
 }

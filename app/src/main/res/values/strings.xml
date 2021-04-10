@@ -56,6 +56,10 @@
     <string name="error_app_load">An error occurred while loading your apps</string>
     <string name="error_contact_load">An error occurred while loading your contacts</string>
 
+    <string name="app_update_notification_channel_name">Hex Launcher Update</string>
+    <string name="app_update_notification_title">Checking for Updates</string>
+    <string name="app_update_notification_text">Checking for Updates</string>
+
     <string name="app_update_installed_title">App Update is Ready</string>
     <string name="app_update_installed_message">Would you like to apply the update now?</string>
     <string name="app_update_installed_positive">Yes</string>
@@ -67,9 +71,8 @@
     <string name="app_update_cancelled_negative">No</string>
 
     <string name="app_update_failed_title">App Update Failed</string>
-    <string name="app_update_failed_message">Would you like to try again?</string>
-    <string name="app_update_failed_positive">Yes</string>
-    <string name="app_update_failed_negative">No</string>
+    <string name="app_update_failed_message">Failed to install update</string>
+    <string name="app_update_failed_neutral">OK</string>
 
     <string name="nux_welcome_message">Welcome to Hex Launcher</string>
     <string name="nux_welcome_image_content_description">Welcome Image of stacked hexagons</string>

@@ -23,6 +23,7 @@ import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.hexlauncher.view.makeFullScreen
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
+import timber.log.Timber
 
 class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivity {
 
@@ -31,20 +32,10 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
     }
 
     private val appUpdateActivityHelper = AppUpdateActivityHelper(
+        this,
         APP_UPDATE_REQUEST_CODE,
-        object : AppUpdateService.InstallListener {
-            override fun onAppInstalled(completeInstall: () -> Unit) {
-                AlertDialog.Builder(this@LauncherActivity)
-                    .setTitle(R.string.app_update_installed_title)
-                    .setMessage(R.string.app_update_installed_message)
-                    .setPositiveButton(R.string.app_update_installed_positive) { _, _ ->
-                        completeInstall()
-                    }
-                    .setNegativeButton(R.string.app_update_installed_negative) { _, _ -> }
-                    .show()
-            }
-
-            override fun onInstallCancelled(retryInstall: () -> Unit) {
+        object : AppUpdateActivityHelper.AppUpdateListener {
+            override fun onUpdateNotProceeding() {
                 AlertDialog.Builder(this@LauncherActivity)
                     .setTitle(R.string.app_update_cancelled_title)
                     .setMessage(R.string.app_update_cancelled_message)
@@ -55,14 +46,23 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
                     .show()
             }
 
-            override fun onInstallFailed(retryInstall: () -> Unit) {
+            override fun onUpdateFailed() {
+                Timber.d("UPDATE FAILED")
                 AlertDialog.Builder(this@LauncherActivity)
                     .setTitle(R.string.app_update_failed_title)
                     .setMessage(R.string.app_update_failed_message)
-                    .setPositiveButton(R.string.app_update_failed_positive) { _, _ ->
-                        retryInstall()
+                    .setNeutralButton(R.string.app_update_failed_neutral) { _, _ -> }
+                    .show()
+            }
+
+            override fun onUpdateReadyForInstall(completeInstall: () -> Unit) {
+                AlertDialog.Builder(this@LauncherActivity)
+                    .setTitle(R.string.app_update_installed_title)
+                    .setMessage(R.string.app_update_installed_message)
+                    .setPositiveButton(R.string.app_update_installed_positive) { _, _ ->
+                        completeInstall()
                     }
-                    .setNegativeButton(R.string.app_update_failed_negative) { _, _ -> }
+                    .setNegativeButton(R.string.app_update_installed_negative) { _, _ -> }
                     .show()
             }
         }
@@ -87,19 +87,12 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
                 .add(R.id.container, HomeFragment())
                 .commit()
         }
-
-        appUpdateActivityHelper.onCreate(this)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        appUpdateActivityHelper.onResume(this)
     }
 
     @SuppressWarnings( "deprecation" )
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        appUpdateActivityHelper.onActivityResult(this, requestCode, resultCode, data)
+        appUpdateActivityHelper.onActivityResult(requestCode, resultCode)
     }
 
     override fun onBackPressed() {

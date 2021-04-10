@@ -76,6 +76,7 @@ abstract class WidgetHostFragment : Fragment() {
             val color = value.third ?: Color.WHITE
             if (slot == null || gravity == null) {
                 hide()
+                onWidgetLoaded(widgetName, -1)
             } else {
                 show(slot, gravity, color)
                 onWidgetLoaded(widgetName, slot)

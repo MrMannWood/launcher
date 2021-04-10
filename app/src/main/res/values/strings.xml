@@ -95,6 +95,7 @@
 
     <string name="contact_image_content_description">Contact image for %s</string>
 
+    <string name="home_arrangement_activity_title">Customize</string>
     <string name="home_arrangement_slot_already_filled_toast">Cannot put multiple widgets in one slot</string>
     <string name="home_arrangement_slot_position_title">Position</string>
     <string name="home_arrangement_slot_position_top">Top</string>

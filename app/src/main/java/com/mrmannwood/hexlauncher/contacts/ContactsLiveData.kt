@@ -37,7 +37,9 @@ class ContactsLiveData(private val context: Context) : LiveDataWithCoroutineScop
             query.set {
                 scope?.launch {
                     searchTerm.getAndSet(null)?.let { term ->
-                        postValue(queryContacts(term))
+                        queryContacts(term)?.let { contacts ->
+                            postValue(contacts)
+                        }
                     }
                 }
             }

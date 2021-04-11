@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -154,6 +155,12 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
         override fun onAppInfoBinding(view: View, appInfo: AppInfo) {
             view.setOnCreateContextMenuListener { menu, _, _ ->
                 menu.setHeaderTitle(appInfo.label)
+                menu.add(R.string.menu_item_app_details).setOnMenuItemClickListener {
+                    startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.parse("package:${appInfo.packageName}")
+                    })
+                    true
+                }
                 menu.add(R.string.menu_item_uninstall_app_title).setOnMenuItemClickListener {
                     startActivity(Intent(Intent.ACTION_DELETE).apply {
                         data = Uri.parse("package:${appInfo.packageName}")

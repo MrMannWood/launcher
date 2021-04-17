@@ -109,10 +109,10 @@ class HomeArrangementActivity : AppCompatActivity() {
                         getString(R.string.color_name_white),
                         getString(R.string.color_name_black),
                     ),
-                    when (sharedPrefs.getInt(Widgets.Color.key(widget), 0)) {
+                    when (sharedPrefs.getInt(Widgets.Color.key(widget), Color.WHITE)) {
                         Color.WHITE -> 0
                         Color.BLACK -> 1
-                        else -> throw IllegalArgumentException("Unknown color")
+                        else -> throw IllegalArgumentException("Unknown color: ${sharedPrefs.getInt(Widgets.Color.key(widget), Color.WHITE)}")
                     }
                 ) { _, choice ->
                     val color = when (choice) {

@@ -18,7 +18,7 @@ import com.mrmannwood.hexlauncher.coroutine.LiveDataWithCoroutineScope
 import kotlinx.coroutines.*
 
 class AppInfoLiveData private constructor(
-        private val context: Application
+        private val app: Application
 ): LiveDataWithCoroutineScope<List<AppInfo>>() {
 
     companion object {
@@ -35,8 +35,6 @@ class AppInfoLiveData private constructor(
         }
     }
 
-    private val pacMan: PackageManager = context.packageManager
-
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             triggerLoad()
@@ -47,7 +45,7 @@ class AppInfoLiveData private constructor(
         super.onActive()
         triggerLoad()
 
-        LocalBroadcastManager.getInstance(context).registerReceiver(
+        LocalBroadcastManager.getInstance(app).registerReceiver(
             broadcastReceiver,
             IntentFilter(PackageObserverBroadcastReceiver.PACKAGES_CHANGED)
         )
@@ -55,8 +53,10 @@ class AppInfoLiveData private constructor(
 
     override fun onInactive() {
         super.onInactive()
-        LocalBroadcastManager.getInstance(context).unregisterReceiver(broadcastReceiver)
+        LocalBroadcastManager.getInstance(app).unregisterReceiver(broadcastReceiver)
     }
+
+    private fun getPackageManager() : PackageManager = app.packageManager
 
     private fun triggerLoad() {
         scope?.launch {
@@ -72,23 +72,32 @@ class AppInfoLiveData private constructor(
 
     private suspend fun loadAppList() : List<ResolveInfo> =
             withContext(Dispatchers.IO) {
-                pacMan.queryIntentActivities(
-                        Intent(
+                lateinit var exception : Exception
+                for(i in 0 until 10) {
+                    try {
+                        return@withContext getPackageManager().queryIntentActivities(
+                            Intent(
                                 Intent.ACTION_MAIN,
                                 null
-                        ).addCategory(Intent.CATEGORY_LAUNCHER), 0
-                )
+                            ).addCategory(Intent.CATEGORY_LAUNCHER), 0
+                        )
+                    } catch (e: Exception) {
+                        exception = e
+                        delay(100) // try waiting, maybe the pacman will come back to life
+                    }
+                }
+                throw RuntimeException("Cannot load packages", exception)
             }
 
     private suspend fun loadApp(pack: ResolveInfo) : AppInfo =
             withContext(Dispatchers.IO) {
-                val icon = pack.loadIcon(pacMan)
+                val icon = pack.loadIcon(getPackageManager())
                 val bgc = getBackgroundColor(icon)
                 AppInfo(
                         packageName = pack.activityInfo.packageName,
                         icon = icon,
                         backgroundColor = bgc ?: 0xFFC1CC,
-                        label = pack.loadLabel(pacMan).toString()
+                        label = pack.loadLabel(getPackageManager()).toString()
                 )
             }
 

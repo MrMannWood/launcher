@@ -11,14 +11,13 @@ import android.widget.ArrayAdapter
 import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.edit
 import androidx.core.graphics.drawable.DrawableCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
-import com.mrmannwood.hexlauncher.view.makeFullScreen
 import com.mrmannwood.launcher.R
 
 class HomeArrangementActivity : AppCompatActivity() {
@@ -35,7 +34,6 @@ class HomeArrangementActivity : AppCompatActivity() {
                 forceOverflowIconColor(this, Color.WHITE)
             }
         )
-        makeFullScreen()
 
         viewModel.preferencesLiveData.observe(this) { prefs ->
             sharedPrefs = prefs
@@ -85,7 +83,7 @@ class HomeArrangementActivity : AppCompatActivity() {
         super.onCreateOptionsMenu(menu)
         menu.add(R.string.home_arrangement_widget_menu_item_show).setOnMenuItemClickListener {
             val widget = viewModel.widgetLiveData.value ?: return@setOnMenuItemClickListener false
-            AlertDialog.Builder(this@HomeArrangementActivity)
+            MaterialAlertDialogBuilder(this@HomeArrangementActivity)
                 .setTitle(R.string.home_arrangement_widget_show_hide_title)
                 .setMessage(R.string.home_arrangement_widget_show_hide_message)
                 .setPositiveButton(R.string.home_arrangement_widget_show_hide_positive) { _, _ -> }
@@ -102,7 +100,7 @@ class HomeArrangementActivity : AppCompatActivity() {
         }
         menu.add(R.string.home_arrangement_widget_color_title).setOnMenuItemClickListener {
             val widget = viewModel.widgetLiveData.value ?: return@setOnMenuItemClickListener false
-            AlertDialog.Builder(this@HomeArrangementActivity)
+            MaterialAlertDialogBuilder(this@HomeArrangementActivity)
                 .setTitle(R.string.home_arrangement_widget_color_title)
                 .setSingleChoiceItems(
                     arrayOf(

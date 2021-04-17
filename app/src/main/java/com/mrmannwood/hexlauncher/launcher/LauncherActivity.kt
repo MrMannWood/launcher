@@ -9,19 +9,17 @@ import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.appupdate.AppUpdateActivityHelper
-import com.mrmannwood.hexlauncher.appupdate.AppUpdateService
 import com.mrmannwood.hexlauncher.contacts.ContactData
 import com.mrmannwood.hexlauncher.home.HomeFragment
 import com.mrmannwood.hexlauncher.nux.NUXActivity
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
-import com.mrmannwood.hexlauncher.view.makeFullScreen
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 import timber.log.Timber
@@ -37,7 +35,7 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
         APP_UPDATE_REQUEST_CODE,
         object : AppUpdateActivityHelper.AppUpdateListener {
             override fun onUpdateNotProceeding() {
-                AlertDialog.Builder(this@LauncherActivity)
+                MaterialAlertDialogBuilder(this@LauncherActivity)
                     .setTitle(R.string.app_update_cancelled_title)
                     .setMessage(R.string.app_update_cancelled_message)
                     .setPositiveButton(R.string.app_update_cancelled_positive) { _, _ ->
@@ -49,7 +47,7 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
 
             override fun onUpdateFailed() {
                 Timber.d("UPDATE FAILED")
-                AlertDialog.Builder(this@LauncherActivity)
+                MaterialAlertDialogBuilder(this@LauncherActivity)
                     .setTitle(R.string.app_update_failed_title)
                     .setMessage(R.string.app_update_failed_message)
                     .setNeutralButton(R.string.app_update_failed_neutral) { _, _ -> }
@@ -57,7 +55,7 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
             }
 
             override fun onUpdateReadyForInstall(completeInstall: () -> Unit) {
-                AlertDialog.Builder(this@LauncherActivity)
+                MaterialAlertDialogBuilder(this@LauncherActivity)
                     .setTitle(R.string.app_update_installed_title)
                     .setMessage(R.string.app_update_installed_message)
                     .setPositiveButton(R.string.app_update_installed_positive) { _, _ ->
@@ -75,7 +73,6 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
         supportActionBar?.hide()
-        makeFullScreen()
 
         viewModel.preferencesLiveData.observe(this) { prefs ->
             if (checkShouldShowNux(prefs)) {

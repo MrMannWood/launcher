@@ -7,7 +7,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.mrmannwood.hexlauncher.view.makeFullScreen
 import com.mrmannwood.launcher.R
 
 class NUXActivity : AppCompatActivity() {
@@ -19,7 +18,6 @@ class NUXActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nux)
         supportActionBar?.hide()
-        makeFullScreen()
 
         viewPager = findViewById<ViewPager2>(R.id.pager).apply {
             adapter = object : FragmentStateAdapter(this@NUXActivity) {

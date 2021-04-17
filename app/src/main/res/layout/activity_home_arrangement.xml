@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
-        android:background="@color/black_translucent"
+        android:background="@color/secondary_translucent"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatSpinner
@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:backgroundTint="@color/white"/>
+            android:backgroundTint="@color/colorOnPrimary"/>
 
     </androidx.appcompat.widget.Toolbar>
 

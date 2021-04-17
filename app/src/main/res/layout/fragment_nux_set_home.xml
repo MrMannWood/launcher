@@ -12,7 +12,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginBottom="24dp"
         android:text="@string/nux_set_as_home_or"
-        android:textColor="@color/white"
+        android:textColor="@color/colorOnPrimary"
         android:textSize="16sp"
         android:contentDescription="@string/nux_set_as_home_or_content_description"
         />
@@ -29,7 +29,7 @@
         <com.mrmannwood.hexlauncher.view.HexagonView
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:src="@color/black"
+            android:src="@color/colorPrimary"
             android:layout_gravity="center"/>
 
         <TextView
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/nux_set_as_home"
-            android:textColor="@color/white"
+            android:textColor="@color/colorOnPrimary"
             android:textSize="16sp"
             />
 
@@ -55,7 +55,7 @@
         <com.mrmannwood.hexlauncher.view.HexagonView
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:src="@color/white"
+            android:src="@color/colorSecondary"
             android:layout_gravity="center"/>
 
         <TextView
@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/nux_try_it_out"
-            android:textColor="@color/black"
+            android:textColor="@color/colorOnSecondary"
             android:textSize="16sp"
             />
 

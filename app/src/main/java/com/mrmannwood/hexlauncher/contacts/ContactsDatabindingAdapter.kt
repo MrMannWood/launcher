@@ -10,14 +10,14 @@ class ContactsDatabindingAdapter (
     private val resources: Resources
 ) {
 
-    private val blackDrawable by lazy {
-        ColorDrawable(ResourcesCompat.getColor(resources, R.color.black, null))
+    private val noContactImageDrawable by lazy {
+        ColorDrawable(ResourcesCompat.getColor(resources, R.color.colorSecondary, null))
     }
 
     fun getContactPictureContentDescription(contact: ContactData) =
         resources.getString(R.string.contact_image_content_description, contact.name)
 
-    fun getContactImageSource(contact: ContactData) = contact.image ?: blackDrawable
+    fun getContactImageSource(contact: ContactData) = contact.image ?: noContactImageDrawable
 
     fun getContactLetterVisibility(contact: ContactData) = if (contact.image == null) View.VISIBLE else View.GONE
 

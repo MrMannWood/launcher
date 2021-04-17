@@ -1,2 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+
+    <color name="colorPrimary">#FF000000</color>
+    <color name="colorPrimaryVariant">#FF000000</color>
+    <color name="colorOnPrimary">#FFFFFFFF</color>
+
+    <color name="colorSecondary">#FFFFFFFF</color>
+    <color name="colorSecondaryVariant">#FFFFFFFF</color>
+    <color name="colorOnSecondary">#FF000000</color>
+
+    <color name="primary_translucent">#AA000000</color>
+    <color name="secondary_translucent">#AAFFFFFF</color>
+</resources>

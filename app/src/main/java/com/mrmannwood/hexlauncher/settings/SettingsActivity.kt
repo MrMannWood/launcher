@@ -1,5 +1,6 @@
 package com.mrmannwood.hexlauncher.settings
 
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Html
 import androidx.appcompat.app.AppCompatActivity
@@ -11,7 +12,8 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
 
         supportActionBar?.apply {
-            title = Html.fromHtml("<font color='#000000'>${getString(R.string.settings_title)}</font>", Html.FROM_HTML_MODE_LEGACY)
+            println("<font color='#${Integer.toHexString(Color.WHITE)}'>${getString(R.string.settings_title)}</font>")
+            title = Html.fromHtml("<font color='#${Integer.toHexString(Color.WHITE)}'>${getString(R.string.settings_title)}</font>", Html.FROM_HTML_MODE_LEGACY)
         }
 
         supportFragmentManager.beginTransaction()

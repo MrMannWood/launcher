@@ -1,18 +1,17 @@
 package com.mrmannwood.hexlauncher.settings
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.core.role.RoleManagerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.preference.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
@@ -132,7 +131,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             settingsViewModel.contactsPermissionLiveData.permission)
                 }
                 is PermissionsLiveData.PermissionsResult.PrefDeniedPermissionGranted -> {
-                    AlertDialog.Builder(requireActivity())
+                    MaterialAlertDialogBuilder(requireActivity())
                             .setTitle(R.string.preferences_contacts_dialog_title)
                             .setMessage(R.string.preferences_contacts_dialog_message)
                             .setPositiveButton(R.string.preferences_contacts_dialog_button_positive) { _, _ ->

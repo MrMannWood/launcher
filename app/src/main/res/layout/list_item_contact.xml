@@ -24,7 +24,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:paddingEnd="80dp"
-            android:background="@color/black_translucent"
+            android:background="@color/secondary_translucent"
             android:gravity="center_vertical|end">
 
             <TextView
@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{contact.name}"
-                android:textColor="@color/white"
+                android:textColor="@color/colorOnSecondary"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 />
@@ -51,7 +51,7 @@
                 android:layout_height="80dp"
                 android:layout_centerInParent="true"
                 android:scaleType="fitCenter"
-                android:src="@color/white"
+                android:src="@color/colorPrimary"
                 />
 
             <com.mrmannwood.hexlauncher.view.HexagonView
@@ -70,7 +70,7 @@
                 android:layout_centerInParent="true"
                 android:visibility="@{adapter.getContactLetterVisibility(contact)}"
                 android:text="@{adapter.getContactLetter(contact)}"
-                android:textColor="@color/white"
+                android:textColor="@color/colorOnPrimary"
                 android:textSize="26sp"
                 android:textStyle="bold"
                 />

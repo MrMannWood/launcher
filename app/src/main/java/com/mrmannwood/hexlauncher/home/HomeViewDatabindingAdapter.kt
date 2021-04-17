@@ -13,7 +13,7 @@ class HomeViewDatabindingAdapter(private val app: Application) {
 
     fun getOddSlotBackgroundColor(description: HomeViewDescription) : Int {
         return if (description.showArrangementOptions()) {
-            ResourcesCompat.getColor(app.resources, R.color.white_translucent, null)
+            ResourcesCompat.getColor(app.resources, R.color.primary_translucent, null)
         } else {
             ResourcesCompat.getColor(app.resources, android.R.color.transparent, null)
         }
@@ -21,7 +21,7 @@ class HomeViewDatabindingAdapter(private val app: Application) {
 
     fun getEvenSlotBackgroundColor(description: HomeViewDescription) : Int {
         return if (description.showArrangementOptions()) {
-            ResourcesCompat.getColor(app.resources, R.color.black_translucent, null)
+            ResourcesCompat.getColor(app.resources, R.color.secondary_translucent, null)
         } else {
             ResourcesCompat.getColor(app.resources, android.R.color.transparent, null)
         }

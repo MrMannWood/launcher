@@ -63,43 +63,35 @@ class PreferenceLiveData<T>(
             }
         }
 
-        object BooleanExtractor : Extractor<Boolean?>() {
-            override fun getValue(sharedPreferences: SharedPreferences, key: String): Boolean? {
+        abstract class PrimitiveExtractor<T>: Extractor<T?>() {
+            override fun getValue(sharedPreferences: SharedPreferences, key: String): T? {
                 return if (sharedPreferences.contains(key)) {
-                    sharedPreferences.getBoolean(key, false)
+                    extract(sharedPreferences, key)
                 } else {
                     null
                 }
             }
+            abstract fun extract(sharedPreferences: SharedPreferences, key: String) : T
         }
 
-        object IntExtractor : Extractor<Int?>() {
-            override fun getValue(sharedPreferences: SharedPreferences, key: String): Int? {
-                return return if (sharedPreferences.contains(key)) {
-                    sharedPreferences.getInt(key, 0)
-                } else {
-                    null
-                }
+        object BooleanExtractor : PrimitiveExtractor<Boolean>() {
+            override fun extract(sharedPreferences: SharedPreferences, key: String): Boolean {
+              return sharedPreferences.getBoolean(key, false)
             }
         }
-
-        object FloatExtractor : Extractor<Float?>() {
-            override fun getValue(sharedPreferences: SharedPreferences, key: String): Float? {
-                return return if (sharedPreferences.contains(key)) {
-                    sharedPreferences.getFloat(key, 0f)
-                } else {
-                    null
-                }
+        object IntExtractor : PrimitiveExtractor<Int>() {
+            override fun extract(sharedPreferences: SharedPreferences, key: String): Int {
+                return sharedPreferences.getInt(key, 0)
             }
         }
-
-        object LongExtractor : Extractor<Long?>() {
-            override fun getValue(sharedPreferences: SharedPreferences, key: String): Long? {
-                return return if (sharedPreferences.contains(key)) {
-                    sharedPreferences.getLong(key, 0)
-                } else {
-                    null
-                }
+        object FloatExtractor : PrimitiveExtractor<Float>() {
+            override fun extract(sharedPreferences: SharedPreferences, key: String): Float {
+                return sharedPreferences.getFloat(key, 0f)
+            }
+        }
+        object LongExtractor : PrimitiveExtractor<Long>() {
+            override fun extract(sharedPreferences: SharedPreferences, key: String): Long {
+                return sharedPreferences.getLong(key, 0L)
             }
         }
     }

@@ -94,7 +94,7 @@
     <string name="nux_try_it_out">Try it Out</string>
     <string name="nux_try_it_out_content_description">Try it Out</string>
 
-    <string name="app_list_search_edit_text_content_description">Search box</string>
+    <string name="app_list_search_edit_text_hint">Search</string>
     <string name="home_time_content_description">Time</string>
     <string name="home_date_content_description">Date</string>
     <string name="home_apps_still_loading">Apps are still loading</string>

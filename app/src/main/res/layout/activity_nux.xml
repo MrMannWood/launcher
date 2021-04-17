@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/secondary_translucent">
+    android:background="@color/primary_translucent">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/pager"
@@ -15,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:background="@android:color/transparent"
         app:tabBackground="@drawable/tab_nav_dot_selector"
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp"/>

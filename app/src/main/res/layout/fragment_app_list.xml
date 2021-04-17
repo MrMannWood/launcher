@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:contentDescription="@string/app_list_results_content_description"
         />
 
     <com.mrmannwood.hexlauncher.view.KeyboardEditText

@@ -4,9 +4,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.edit
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.role.RoleManagerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
@@ -298,6 +300,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         preferenceScreen = screen
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setDivider(
+            ResourcesCompat.getDrawable(resources, R.drawable.preference_divider, requireActivity().theme)
+        )
     }
 
     private fun disableExperimentalPrefs() {

@@ -23,7 +23,7 @@
         android:background="@drawable/rounded_corners"
         android:textCursorDrawable="@null"
         android:textColor="@color/colorOnPrimary"
-        android:textColorHint="@color/colorOnPrimary"
+        android:textColorHint="@android:color/transparent"
         android:singleLine="true"
         android:imeOptions="actionSearch"
         android:inputType="text"

@@ -51,7 +51,6 @@
     <string name="preferences_experimental_show">Enable Experimental Features</string>
 
     <string name="preferences_category_version_info">Version Info</string>
-    <string name="preferences_allow_auto_update_check">Check for updates automatically</string>
     <string name="preferences_version_name">App Version: %s</string>
     <string name="preferences_version_build_type">Build Type: %s</string>
 
@@ -59,24 +58,6 @@
 
     <string name="error_app_load">An error occurred while loading your apps</string>
     <string name="error_contact_load">An error occurred while loading your contacts</string>
-
-    <string name="app_update_notification_channel_name">Hex Launcher Update</string>
-    <string name="app_update_notification_title">Checking for Updates</string>
-    <string name="app_update_notification_text">Checking for Updates</string>
-
-    <string name="app_update_installed_title">App Update is Ready</string>
-    <string name="app_update_installed_message">Would you like to apply the update now?</string>
-    <string name="app_update_installed_positive">Yes</string>
-    <string name="app_update_installed_negative">No</string>
-
-    <string name="app_update_cancelled_title">App Update was Cancelled</string>
-    <string name="app_update_cancelled_message">Do you want to turn off auto-update checking?</string>
-    <string name="app_update_cancelled_positive">Yes</string>
-    <string name="app_update_cancelled_negative">No</string>
-
-    <string name="app_update_failed_title">App Update Failed</string>
-    <string name="app_update_failed_message">Failed to install update</string>
-    <string name="app_update_failed_neutral">OK</string>
 
     <string name="nux_welcome_message">Welcome to Hex Launcher</string>
     <string name="nux_welcome_image_content_description">Welcome Image of stacked hexagons</string>

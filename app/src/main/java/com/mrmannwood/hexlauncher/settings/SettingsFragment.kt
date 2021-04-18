@@ -87,7 +87,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private val settingsViewModel : SettingsViewModel by activityViewModels()
     private val prefs = PreferencesLiveData.get().getSharedPreferences()
-    private val experimentalPrefs = mutableListOf<Preference>()
 
     private lateinit var homeRolePreference: Preference
     private lateinit var wallpaperAppPreference: Preference
@@ -259,37 +258,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
-            setTitle(R.string.preferences_category_experimental)
-            addPreference(SwitchPreference(activity).apply {
-                setTitle(R.string.preferences_experimental_show)
-                key = PreferenceKeys.Experimental.SHOW_EXPERIMENTAL_FEATURES
-                setOnPreferenceClickListener {
-                    if (prefs.getBoolean(PreferenceKeys.Experimental.SHOW_EXPERIMENTAL_FEATURES, false)) {
-                        experimentalPrefs.forEach { it.isVisible = true }
-                    } else {
-                        disableExperimentalPrefs()
-                        experimentalPrefs.forEach {
-                            if (it is TwoStatePreference) { it.isChecked = false }
-                            it.isVisible = false
-                        }
-                    }
-                    true
-                }
-            })
-            addPreference(SwitchPreference(activity).apply {
-                experimentalPrefs.add(this)
-                setTitle(R.string.preferences_allow_auto_update_check)
-                key = PreferenceKeys.AutoUpdate.ALLOW_AUTO_UPDATE
-                isVisible = prefs.getBoolean(PreferenceKeys.Experimental.SHOW_EXPERIMENTAL_FEATURES, false)
-                setOnPreferenceChangeListener { _, value ->
-                    isChecked = prefs.getBoolean(PreferenceKeys.AutoUpdate.ALLOW_AUTO_UPDATE, false)
-                    true
-                }
-            })
-        }
-
-        PreferenceCategory(activity).apply {
-            screen.addPreference(this)
             setTitle(R.string.preferences_category_version_info)
             addPreference(Preference(activity).apply {
                 title = getString(R.string.preferences_version_name, getString(R.string.app_version))
@@ -307,12 +275,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         setDivider(
             ResourcesCompat.getDrawable(resources, R.drawable.preference_divider, requireActivity().theme)
         )
-    }
-
-    private fun disableExperimentalPrefs() {
-        prefs.edit {
-            experimentalPrefs.forEach { remove(it.key) }
-        }
     }
 
     private fun updateHomeRolePreference(activity: FragmentActivity) {

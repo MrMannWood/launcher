@@ -38,12 +38,6 @@ object PreferenceKeys {
             const val PACKAGE_NAME = "gestures_swipe_left_package_name"
         }
     }
-    object AutoUpdate {
-        const val ALLOW_AUTO_UPDATE = "update_allow_auto"
-    }
-    object Experimental {
-        const val SHOW_EXPERIMENTAL_FEATURES = "experimental_show"
-    }
     object Version {
         const val LAST_RUN_VERSION_NAME = "previous_version_name"
     }

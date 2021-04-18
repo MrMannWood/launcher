@@ -11,7 +11,7 @@ class ContactsDatabindingAdapter (
 ) {
 
     private val noContactImageDrawable by lazy {
-        ColorDrawable(ResourcesCompat.getColor(resources, R.color.colorSecondary, null))
+        ColorDrawable(ResourcesCompat.getColor(resources, R.color.colorPrimary, null))
     }
 
     fun getContactPictureContentDescription(contact: ContactData) =

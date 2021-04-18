@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.launcher.R
@@ -40,15 +41,18 @@ class AppListActivity : AppCompatActivity(), AppListFragment.AppListHostActivity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_list)
-
-        val titleRes = intent.getIntExtra(KEY_TITLE, -1)
-        if (titleRes != -1) {
-            try {
-                supportActionBar?.title = getString(titleRes)
-            } catch (e: Exception) {
-                finish()
+        setSupportActionBar(
+            findViewById<Toolbar>(R.id.toolbar).apply {
+                val titleRes = intent.getIntExtra(KEY_TITLE, -1)
+                if (titleRes != -1) {
+                    try {
+                        title = getString(titleRes)
+                    } catch (e: Exception) {
+                        finish()
+                    }
+                }
             }
-        }
+        )
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, AppListFragment())

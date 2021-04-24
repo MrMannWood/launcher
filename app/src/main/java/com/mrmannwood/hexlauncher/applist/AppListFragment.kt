@@ -124,6 +124,16 @@ class AppListFragment : Fragment(), HandleBackPressed {
         startObservingLiveData()
     }
 
+    override fun onStart() {
+        super.onStart()
+        forceShowKeyboard(searchView)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        hideKeyboard(requireActivity())
+    }
+
     override fun handleBackPressed(): Boolean {
         if (TextUtils.isEmpty(searchView.text)) {
             return false
@@ -135,9 +145,6 @@ class AppListFragment : Fragment(), HandleBackPressed {
     private fun startObservingLiveData() {
         viewModel.showAllAppsPreferenceLiveData.observe(viewLifecycleOwner) {
             showAllApps = true == it
-            if (!showAllApps) {
-                forceShowKeyboard(searchView)
-            }
             performSearch()
         }
         viewModel.apps.observe(viewLifecycleOwner, { result ->
@@ -241,7 +248,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
     private fun forceShowKeyboard(view: EditText) {
         view.requestFocus()
         val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
     }
 
     private fun hideKeyboard(activity: Activity) {

@@ -22,9 +22,7 @@ class LauncherApplication : Application() {
 
         PreferencesLiveData.create(this).observeForever { }
 
-        AppInfoLiveData.createAndGet(this).observeForever { apps ->
-            Timber.i("App info changed, got ${apps.size} apps")
-        }
+        AppInfoLiveData.createAndGet(this).observeForever { }
 
         registerReceiver(
                 PackageObserverBroadcastReceiver(),

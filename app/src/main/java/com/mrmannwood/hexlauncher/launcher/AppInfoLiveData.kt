@@ -12,14 +12,16 @@ import android.graphics.Canvas
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.os.DeadObjectException
 import androidx.core.graphics.get
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.mrmannwood.hexlauncher.coroutine.LiveDataWithCoroutineScope
 import kotlinx.coroutines.*
+import timber.log.Timber
 
 class AppInfoLiveData private constructor(
         private val app: Application
-): LiveDataWithCoroutineScope<List<AppInfo>>() {
+): LiveDataWithCoroutineScope<Result<List<AppInfo>>>() {
 
     companion object {
 
@@ -60,33 +62,29 @@ class AppInfoLiveData private constructor(
 
     private fun triggerLoad() {
         scope?.launch {
-            val jobs = mutableListOf<Deferred<AppInfo>>()
-            for (pack in loadAppList()) {
-                jobs.add( async { loadApp(pack) })
+            try {
+                val jobs = mutableListOf<Deferred<AppInfo>>()
+                for (pack in loadAppList()) {
+                    jobs.add(async { loadApp(pack) })
+                }
+                val apps = jobs.map { it.await() }.toMutableList()
+                apps.sortBy { it.label }
+                postValue(Result.success(apps))
+            } catch (e: Exception) {
+                Timber.e(e, "Error loading packages")
+                postValue(Result.failure(e))
             }
-            val apps = jobs.map { it.await() }.toMutableList()
-            apps.sortBy { it.label }
-            postValue(apps)
         }
     }
 
     private suspend fun loadAppList() : List<ResolveInfo> =
             withContext(Dispatchers.IO) {
-                lateinit var exception : Exception
-                for(i in 0 until 10) {
-                    try {
-                        return@withContext getPackageManager().queryIntentActivities(
-                            Intent(
-                                Intent.ACTION_MAIN,
-                                null
-                            ).addCategory(Intent.CATEGORY_LAUNCHER), 0
-                        )
-                    } catch (e: Exception) {
-                        exception = e
-                        delay(100) // try waiting, maybe the pacman will come back to life
-                    }
-                }
-                throw RuntimeException("Cannot load packages", exception)
+                return@withContext getPackageManager().queryIntentActivities(
+                    Intent(
+                        Intent.ACTION_MAIN,
+                        null
+                    ).addCategory(Intent.CATEGORY_LAUNCHER), 0
+                )
             }
 
     private suspend fun loadApp(pack: ResolveInfo) : AppInfo =

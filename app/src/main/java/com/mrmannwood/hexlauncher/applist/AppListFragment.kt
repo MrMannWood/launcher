@@ -140,9 +140,14 @@ class AppListFragment : Fragment(), HandleBackPressed {
             }
             performSearch()
         }
-        viewModel.apps.observe(viewLifecycleOwner, { apps ->
-            this.apps = apps
-            performSearch()
+        viewModel.apps.observe(viewLifecycleOwner, { result ->
+            result.onSuccess { appList ->
+                apps = appList
+                performSearch()
+            }
+            result.onFailure {
+                Toast.makeText(requireContext(), R.string.error_app_load, Toast.LENGTH_SHORT).show()
+            }
         })
         if (getAppListHost().showContacts()) {
             viewModel.contacts.observe(viewLifecycleOwner) { contacts ->

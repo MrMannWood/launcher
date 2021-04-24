@@ -26,8 +26,4 @@ class HomeViewDatabindingAdapter(private val app: Application) {
             ResourcesCompat.getColor(app.resources, android.R.color.transparent, null)
         }
     }
-
-    fun getContentDescriptionForSlot(slot: Int) : String {
-        return app.getString(R.string.home_arrangement_content_description_slot, slot)
-    }
 }

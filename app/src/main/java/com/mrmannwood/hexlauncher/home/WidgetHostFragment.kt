@@ -1,6 +1,5 @@
 package com.mrmannwood.hexlauncher.home
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.widget.FrameLayout
@@ -10,7 +9,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
 
@@ -19,7 +17,6 @@ abstract class WidgetHostFragment : Fragment() {
     private val viewModel: WidgetHostViewModel by activityViewModels()
 
     private lateinit var databinder : FragmentHomeBinding
-    private lateinit var slots : List<FrameLayout>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         databinder = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
@@ -30,30 +27,16 @@ abstract class WidgetHostFragment : Fragment() {
 
     final override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         onViewCreated(databinder, savedInstanceState)
-        slots = listOf(
-                databinder.slot0,
-                databinder.slot1,
-                databinder.slot2,
-                databinder.slot3,
-                databinder.slot4,
-                databinder.slot5,
-                databinder.slot6,
-                databinder.slot7,
-        )
 
-        viewModel.timeWidgetLiveData.observe(
-                viewLifecycleOwner,
-                WidgetLiveDataObserver(PreferenceKeys.Home.Widgets.TIME, R.layout.widget_time)
-        )
-        viewModel.dateWidgetLiveData.observe(
-                viewLifecycleOwner,
-                WidgetLiveDataObserver(PreferenceKeys.Home.Widgets.DATE, R.layout.widget_date)
-        )
+        viewModel.widgetsLiveData.forEach { liveData -> liveData.observe(
+            viewLifecycleOwner,
+            WidgetLiveDataObserver()
+        ) }
     }
 
     open fun onViewCreated(databinder: FragmentHomeBinding, savedInstanceState: Bundle?) {}
 
-    open fun onWidgetLoaded(widget: String, slot: Int) {}
+    open fun onWidgetLoaded(widgetView: View?, widgetName: String) {}
 
     fun onLoadingComplete() {
         databinder.description = makeDescription(false)
@@ -63,48 +46,37 @@ abstract class WidgetHostFragment : Fragment() {
 
     abstract fun makeDescription(isLoading: Boolean) : HomeViewDescription
 
-    private inner class WidgetLiveDataObserver(
-            private val widgetName: String,
-            @LayoutRes private  val widgetLayout: Int
-    ) : Observer<Triple<Int?, Int?, Int?>> {
+    private inner class WidgetLiveDataObserver : Observer<WidgetHostViewModel.WidgetPlacement> {
 
         private var widgetView : View? = null
 
-        override fun onChanged(value: Triple<Int?, Int?, Int?>) {
-            val slot = value.first
-            val gravity = value.second
-            val color = value.third ?: Color.WHITE
-            if (slot == null || gravity == null) {
+        override fun onChanged(value: WidgetHostViewModel.WidgetPlacement) {
+            if (!value.loaded) return
+            if (value.yPosition == null || value.color == null) {
                 hide()
-                onWidgetLoaded(widgetName, -1)
             } else {
-                show(slot, gravity, color)
-                onWidgetLoaded(widgetName, slot)
+                val widgetView = show(value.layout, value.yPosition, value.color)
             }
+            onWidgetLoaded(widgetView, value.widget)
         }
 
-        private fun show(slot: Int, gravity: Int, color: Int) {
-            var view = widgetView
-            if (view != null) {
-                (view.parent as? ViewGroup)?.removeView(view)
-            } else {
-                view = LayoutInflater.from(requireContext()).inflate(widgetLayout, slots[slot], false)
-                widgetView = view
+        private fun show(@LayoutRes layout: Int, yPos: Float, color: Int) {
+            val view = widgetView?.let { widget ->
+                (widget.parent as? ViewGroup)?.removeView(widget)
+                widget
+            } ?: run {
+                LayoutInflater.from(requireContext()).inflate(layout, databinder.container, false)
             }
-            view!!.layoutParams = FrameLayout.LayoutParams(
+            widgetView = view
+
+            view.layoutParams = FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.CENTER_HORIZONTAL or when (gravity) {
-                        PreferenceKeys.Home.Widgets.Gravity.TOP -> Gravity.TOP
-                        PreferenceKeys.Home.Widgets.Gravity.MIDDLE -> Gravity.CENTER_VERTICAL
-                        PreferenceKeys.Home.Widgets.Gravity.BOTTOM -> Gravity.BOTTOM
-                        else -> throw IllegalArgumentException("Unknown gravity: $gravity")
-                    }.toInt()
+                    Gravity.CENTER_HORIZONTAL
             )
-            if (view is TextView) {
-                view.setTextColor(color)
-            }
-            slots[slot].addView(view)
+            view.y = yPos
+            (view as TextView).setTextColor(color)
+            databinder.container.addView(view)
         }
 
         private fun hide() {

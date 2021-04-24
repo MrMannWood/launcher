@@ -85,19 +85,9 @@
     <string name="contact_image_content_description">Contact image for %s</string>
 
     <string name="home_arrangement_activity_title">Customize</string>
-    <string name="home_arrangement_slot_already_filled_toast">Cannot put multiple widgets in one slot</string>
-    <string name="home_arrangement_slot_position_title">Position</string>
-    <string name="home_arrangement_slot_position_top">Top</string>
-    <string name="home_arrangement_slot_position_middle">Middle</string>
-    <string name="home_arrangement_slot_position_bottom">Bottom</string>
-    <string name="home_arrangement_widget_menu_title">Customize</string>
-    <string name="home_arrangement_widget_menu_item_show">Show/Hide</string>
-    <string name="home_arrangement_widget_menu_item_color">Color</string>
-    <string name="home_arrangement_widget_show_hide_title">Show/Hide</string>
-    <string name="home_arrangement_widget_show_hide_message">Do you want to show this widget?</string>
-    <string name="home_arrangement_widget_show_hide_positive">Show</string>
-    <string name="home_arrangement_widget_show_hide_negative">Hide</string>
+    <string name="home_arrangement_widgets_menu_title">Widgets</string>
+    <string name="home_arrangement_widget_color">Color</string>
+    <string name="home_arrangement_widget_hide">Hide</string>
     <string name="home_arrangement_widget_color_title">Set Widget Color</string>
-    <string name="home_arrangement_content_description_slot">Slot %d</string>
 
 </resources>

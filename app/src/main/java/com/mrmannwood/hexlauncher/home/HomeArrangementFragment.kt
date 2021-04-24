@@ -1,10 +1,14 @@
 package com.mrmannwood.hexlauncher.home
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
-import android.view.View
-import android.widget.Toast
+import android.view.*
+import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.core.content.edit
+import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
@@ -14,74 +18,196 @@ import com.mrmannwood.launcher.databinding.FragmentHomeBinding
 class HomeArrangementFragment : WidgetHostFragment() {
 
     private val viewModel: HomeArrangementViewModel by activityViewModels()
-    private var sharedPrefs : SharedPreferences? = null
-    private var currWidget : String? = null
-    private val widgetLocations = mutableMapOf<String, Int>()
+
+    private lateinit var widgetContainer: FrameLayout
+    private lateinit var sharedPrefs : SharedPreferences
+
+    private val widgets = mutableMapOf<WidgetDescription, View>()
+    private var viewBottom = 0
+    private var showParentContextMenu = false
 
     override fun makeDescription(isLoading: Boolean): HomeViewDescription {
-        return HomeViewDescription.ArrangementDescription(isLoading)
+        return HomeViewDescription.ArrangementDescription(isLoading = false)
     }
 
-    override fun onViewCreated(databinder: FragmentHomeBinding, savedInstanceState: Bundle?) {
-        viewModel.widgetLiveData.observe(viewLifecycleOwner) { widget -> currWidget = widget }
-        viewModel.preferencesLiveData.observe(viewLifecycleOwner) { prefs ->
-            sharedPrefs = prefs
-            onLoadingComplete()
+    override fun onWidgetLoaded(widgetView: View?, widgetName: String) {
+        val description = allWidgets[widgetName]!!
+        if (widgetView != null) {
+            widgets[description] = widgetView
+            onWidgetShown(description, widgetView)
+        } else {
+            removeWidget(description)
         }
-
-        databinder.slot0.setOnClickListener(SlotListener(0))
-        databinder.slot1.setOnClickListener(SlotListener(1))
-        databinder.slot2.setOnClickListener(SlotListener(2))
-        databinder.slot3.setOnClickListener(SlotListener(3))
-        databinder.slot4.setOnClickListener(SlotListener(4))
-        databinder.slot5.setOnClickListener(SlotListener(5))
-        databinder.slot6.setOnClickListener(SlotListener(6))
-        databinder.slot7.setOnClickListener(SlotListener(7))
     }
 
-    override fun onWidgetLoaded(widget: String, slot: Int) {
-        widgetLocations[widget] = slot
-    }
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onViewCreated(databinder: FragmentHomeBinding, savedInstanceState: Bundle?) {
+        sharedPrefs = viewModel.preferencesLiveData.getSharedPreferences()
 
-    private fun findWidgetInSlot(slot: Int): String? {
-        return widgetLocations.entries.find { it.value == slot }?.key
-    }
+        widgetContainer = databinder.container
+        widgetContainer.addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, _ -> viewBottom = bottom }
+        widgetContainer.setOnTouchListener(object : View.OnTouchListener {
 
-    private inner class SlotListener(
-            val slot: Int
-    ) : View.OnClickListener {
-        override fun onClick(v: View?) {
-            val widget = currWidget ?: return
-
-            val widgetInSlot = findWidgetInSlot(slot)
-            if (widgetInSlot != null && widgetInSlot != widget) {
-                Toast.makeText(requireContext(), R.string.home_arrangement_slot_already_filled_toast, Toast.LENGTH_SHORT).show()
-                return
-            }
-
-            MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.home_arrangement_slot_position_title)
-                    .setItems(
-                            arrayOf(
-                                    resources.getString(R.string.home_arrangement_slot_position_top),
-                                    resources.getString(R.string.home_arrangement_slot_position_middle),
-                                    resources.getString(R.string.home_arrangement_slot_position_bottom),
-                            )
-                    ) { _, which ->
-                        val gravity = when (which) {
-                            0 -> Widgets.Gravity.TOP
-                            1 -> Widgets.Gravity.MIDDLE
-                            2 -> Widgets.Gravity.BOTTOM
-                            else -> throw IllegalArgumentException("Unknown selection: $which")
+            private val gestureDetector = GestureDetectorCompat(
+                requireContext(),
+                object : GestureDetector.SimpleOnGestureListener() {
+                    override fun onDown(e: MotionEvent?): Boolean {
+                        return true
+                    }
+                    override fun onLongPress(e: MotionEvent) {
+                        super.onLongPress(e)
+                        findTouchedWidget(e.x, e.y)?.let { widget ->
+                            showParentContextMenu = false
+                            widget.showContextMenu(0f, 0f)
+                        } ?: run {
+                            showParentContextMenu = true
+                            widgetContainer.showContextMenu(e.x, e.y)
                         }
-                        sharedPrefs!!.apply {
-                            edit {
-                                putInt(widget, slot)
-                                putInt(Widgets.Gravity.key(widget), gravity)
+                    }
+                }
+            )
+            private var widget: View? = null
+            private var yOffset: Float = 0f
+
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                if (event.actionIndex != 0) return gestureDetector.onTouchEvent(event)
+                if (widget != null && event.y + yOffset < 0) return gestureDetector.onTouchEvent(event)
+
+                when(event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        widget = findTouchedWidget(event.x, event.y)?.also { widget ->
+                            yOffset = widget.y - event.y
+                        }
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        widget?.let { widget ->
+                            val newY = event.y + yOffset
+                            if (newY > 0 && newY < viewBottom - widget.height) {
+                                widget.y = newY
                             }
                         }
                     }
-                    .show()
+                    MotionEvent.ACTION_UP -> {
+                        widget = null
+                    }
+                }
+                return gestureDetector.onTouchEvent(event)
+            }
+
+            private fun findTouchedWidget(x: Float, y: Float) : View? {
+                for ((_, widget) in widgets) {
+                    if (x < widget.x) continue
+                    if (y < widget.y) continue
+                    if (x > widget.x + widget.width) continue
+                    if (y > widget.y + widget.height) continue
+                    return widget
+                }
+                return null
+            }
+        })
+
+        widgetContainer.setOnCreateContextMenuListener(object : View.OnCreateContextMenuListener {
+            override fun onCreateContextMenu(
+                menu: ContextMenu,
+                v: View,
+                menuInfo: ContextMenu.ContextMenuInfo?
+            ) {
+                if (!showParentContextMenu) return
+
+                menu.setHeaderTitle(R.string.home_arrangement_widgets_menu_title)
+                for (widgetDescription in allWidgets.values) {
+                    val item = menu.add(widgetDescription.name)
+                        .setOnMenuItemClickListener {
+                            if (widgets.contains(widgetDescription)) {
+                                removeWidget(widgetDescription)
+                            } else {
+                                createAndShowWidget(widgetDescription)
+                            }
+                            true
+                        }
+                    if (widgets.contains(widgetDescription)) {
+                        item.isCheckable = true
+                        item.isChecked = true
+                    }
+                }
+            }
+
+            private fun createAndShowWidget(widgetDescription: WidgetDescription) {
+                LayoutInflater.from(requireContext())
+                    .inflate(widgetDescription.layout, widgetContainer, false).apply {
+                        widgets[widgetDescription] = this
+                        tag = widgetDescription
+                        layoutParams = FrameLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            Gravity.CENTER_HORIZONTAL
+                        )
+                        widgetContainer.addView(this)
+                        onWidgetShown(widgetDescription, this)
+                    }
+            }
+        })
+    }
+
+    override fun onStop() {
+        super.onStop()
+        sharedPrefs.edit {
+            allWidgets
+                .filter { !widgets.contains(it.value) }
+                .map { it.key }
+                .forEach { widget ->
+                    remove(Widgets.Position.key(widget))
+                    remove(Widgets.Color.key(widget))
+                }
+            widgets.forEach { (widgetDescription, widgetView) ->
+                putFloat(Widgets.Position.key(widgetDescription.widget), widgetView.y)
+                putInt(Widgets.Color.key(widgetDescription.widget), (widgetView as TextView).currentTextColor)
+            }
         }
     }
+
+    private fun removeWidget(widgetDescription: WidgetDescription) {
+        widgetContainer.removeView(widgets.remove(widgetDescription))
+    }
+
+    private fun onWidgetShown(description: WidgetDescription, widget: View) {
+        widget.setOnCreateContextMenuListener { menu, _, _ ->
+            menu.setHeaderTitle(description.name)
+            menu.add(R.string.home_arrangement_widget_hide).setOnMenuItemClickListener {
+                removeWidget(description)
+                true
+            }
+            menu.add(R.string.home_arrangement_widget_color).setOnMenuItemClickListener {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.home_arrangement_widget_color_title)
+                    .setSingleChoiceItems(
+                        arrayOf(
+                            getString(R.string.color_name_white),
+                            getString(R.string.color_name_black),
+                        ),
+                        when ((widget as TextView).currentTextColor) {
+                            Color.WHITE -> 0
+                            Color.BLACK -> 1
+                            else -> throw IllegalArgumentException("Unknown color: ${widget.currentTextColor}")
+                        }
+                    ) { _, choice ->
+                        val color = when (choice) {
+                            0 -> Color.WHITE
+                            1 -> Color.BLACK
+                            else -> throw IllegalArgumentException("Unknown choice: $choice")
+                        }
+                        (widget as TextView).setTextColor(color)
+                    }
+                    .show()
+                true
+            }
+        }
+    }
+
+    private val allWidgets = mapOf(
+        Widgets.DATE to WidgetDescription(Widgets.DATE, R.string.preferences_home_widgets_date_name, R.layout.widget_date),
+        Widgets.TIME to WidgetDescription(Widgets.TIME, R.string.preferences_home_widgets_time_name, R.layout.widget_time)
+    )
+
+    private class WidgetDescription(val widget: String, val name: Int, val layout: Int)
 }

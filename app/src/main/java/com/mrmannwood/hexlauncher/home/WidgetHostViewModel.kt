@@ -1,34 +1,42 @@
 package com.mrmannwood.hexlauncher.home
 
+import android.graphics.Color
+import androidx.annotation.LayoutRes
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import com.mrmannwood.hexlauncher.settings.PreferenceKeys
-import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets.Gravity
-import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets.Color
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
 import com.mrmannwood.hexlauncher.settings.PreferenceLiveData
+import com.mrmannwood.hexlauncher.settings.PreferenceLiveData.Extractor.FloatExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceLiveData.Extractor.IntExtractor
+import com.mrmannwood.launcher.R
 
 class WidgetHostViewModel : ViewModel() {
-    val dateWidgetLiveData = MediatorLiveData<Triple<Int?, Int?, Int?>>().apply {
-        addSource(PreferenceLiveData(PreferenceKeys.Home.Widgets.DATE, IntExtractor)) { slot ->
-            value = Triple(slot, value?.second, value?.third)
-        }
-        addSource(PreferenceLiveData(Gravity.key(PreferenceKeys.Home.Widgets.DATE), IntExtractor)) { gravity ->
-            value = Triple(value?.first, gravity, value?.third)
-        }
-        addSource(PreferenceLiveData(Color.key(PreferenceKeys.Home.Widgets.DATE), IntExtractor)) { color ->
-            value = Triple(value?.first, value?.second, color)
-        }
-    }
-    val timeWidgetLiveData = MediatorLiveData<Triple<Int?, Int?, Int?>>().apply {
-        addSource(PreferenceLiveData(PreferenceKeys.Home.Widgets.TIME, IntExtractor)) { slot ->
-            value = Triple(slot, value?.second, value?.third)
-        }
-        addSource(PreferenceLiveData(Gravity.key(PreferenceKeys.Home.Widgets.TIME), IntExtractor)) { gravity ->
-            value = Triple(value?.first, gravity, value?.third)
-        }
-        addSource(PreferenceLiveData(Color.key(PreferenceKeys.Home.Widgets.TIME), IntExtractor)) { color ->
-            value = Triple(value?.first, value?.second, color)
+    val widgetsLiveData = listOf<LiveData<WidgetPlacement>>(
+        WidgetLiveData(Widgets.TIME, R.layout.widget_time),
+        WidgetLiveData(Widgets.DATE, R.layout.widget_date)
+    )
+
+    class WidgetPlacement(
+        val widget: String,
+        @LayoutRes val layout: Int,
+        val yPosition: Float?,
+        val color: Int?,
+        val loaded: Boolean
+    )
+
+    private class WidgetLiveData(widget: String, @LayoutRes layout: Int) : MediatorLiveData<WidgetPlacement>() {
+        init {
+            var posSet = false
+            var colorSet = false
+            addSource(PreferenceLiveData(Widgets.Position.key(widget), FloatExtractor)) { yPos ->
+                value = WidgetPlacement(widget, layout, yPos, value?.color, colorSet)
+                posSet = true
+            }
+            addSource(PreferenceLiveData(Widgets.Color.key(widget), IntExtractor)) { color ->
+                value = WidgetPlacement(widget, layout, value?.yPosition, color ?: Color.WHITE, posSet)
+                colorSet = true
+            }
         }
     }
 }

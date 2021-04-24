@@ -31,7 +31,7 @@ class HomeArrangementActivity : AppCompatActivity() {
         setSupportActionBar(
             findViewById<Toolbar>(R.id.toolbar).apply {
                 title = ""
-                forceOverflowIconColor(this, Color.WHITE)
+                forceOverflowIconColor(this, getColor(R.color.colorOnPrimary))
             }
         )
 

@@ -27,6 +27,12 @@
         android:contentDescription="@string/nux_set_as_home_content_description">
 
         <com.mrmannwood.hexlauncher.view.HexagonView
+            android:layout_width="210dp"
+            android:layout_height="210dp"
+            android:src="@color/colorSecondary"
+            android:layout_gravity="center"/>
+
+        <com.mrmannwood.hexlauncher.view.HexagonView
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:src="@color/colorPrimary"
@@ -51,6 +57,12 @@
         android:layout_centerHorizontal="true"
         android:layout_above="@id/center"
         android:contentDescription="@string/nux_try_it_out_content_description">
+
+        <com.mrmannwood.hexlauncher.view.HexagonView
+            android:layout_width="210dp"
+            android:layout_height="210dp"
+            android:src="@color/colorPrimary"
+            android:layout_gravity="center"/>
 
         <com.mrmannwood.hexlauncher.view.HexagonView
             android:layout_width="200dp"

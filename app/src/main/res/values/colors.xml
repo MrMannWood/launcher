@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FFFFFFFF</color>
-    <color name="colorPrimaryVariant">#FFFFFFFF</color>
-    <color name="colorOnPrimary">#FF000000</color>
+    <color name="colorPrimary">#F9F9F9</color>
+    <color name="colorPrimaryDark">#C6C6C6</color>
+    <color name="colorPrimaryVariant">#FFFFFF</color>
+    <color name="colorOnPrimary">#000000</color>
 
-    <color name="colorSecondary">#FF000000</color>
-    <color name="colorSecondaryVariant">#FF000000</color>
-    <color name="colorOnSecondary">#FFFFFFFF</color>
+    <color name="colorSecondary">#212121</color>
+    <color name="colorSecondaryDark">#000000</color>
+    <color name="colorSecondaryVariant">#484848</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
 
-    <color name="secondary_translucent">#AA000000</color>
-    <color name="primary_translucent">#AAFFFFFF</color>
+
+    <color name="primary_translucent">#AAF9F9F9</color>
+    <color name="secondary_translucent">#AA212121</color>
 
     <color name="bugglegum_pink">#FF48A5</color>
 </resources>

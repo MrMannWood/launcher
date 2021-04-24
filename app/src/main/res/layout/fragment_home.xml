@@ -29,14 +29,14 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center"
-                android:src="@color/secondary_translucent"/>
+                android:src="@color/colorPrimary"/>
 
             <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:indeterminate="true"
                 android:layout_gravity="center"
-                android:indeterminateTint="@color/colorOnSecondary"
+                android:indeterminateTint="@color/colorOnPrimary"
                 android:indeterminateTintMode="src_in"
                 />
 

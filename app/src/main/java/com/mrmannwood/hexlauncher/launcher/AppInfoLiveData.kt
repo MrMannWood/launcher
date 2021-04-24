@@ -67,7 +67,9 @@ class AppInfoLiveData private constructor(
                 for (pack in loadAppList()) {
                     jobs.add(async { loadApp(pack) })
                 }
-                val apps = jobs.map { it.await() }.toMutableList()
+                val apps = jobs.map { it.await() }
+                    .filter { it.packageName != app.packageName }
+                    .toMutableList()
                 apps.sortBy { it.label }
                 postValue(Result.success(apps))
             } catch (e: Exception) {

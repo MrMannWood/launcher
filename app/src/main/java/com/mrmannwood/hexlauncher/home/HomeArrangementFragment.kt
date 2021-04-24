@@ -196,7 +196,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
                             1 -> Color.BLACK
                             else -> throw IllegalArgumentException("Unknown choice: $choice")
                         }
-                        (widget as TextView).setTextColor(color)
+                        widget.setTextColor(color)
                     }
                     .show()
                 true

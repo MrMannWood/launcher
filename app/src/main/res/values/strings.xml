@@ -84,7 +84,6 @@
 
     <string name="contact_image_content_description">Contact image for %s</string>
 
-    <string name="home_arrangement_activity_title">Customize</string>
     <string name="home_arrangement_widgets_menu_title">Widgets</string>
     <string name="home_arrangement_widget_color">Color</string>
     <string name="home_arrangement_widget_hide">Hide</string>

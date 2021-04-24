@@ -55,7 +55,7 @@ abstract class WidgetHostFragment : Fragment() {
             if (value.yPosition == null || value.color == null) {
                 hide()
             } else {
-                val widgetView = show(value.layout, value.yPosition, value.color)
+                show(value.layout, value.yPosition, value.color)
             }
             onWidgetLoaded(widgetView, value.widget)
         }

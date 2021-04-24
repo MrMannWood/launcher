@@ -35,7 +35,6 @@
 
     <string name="preferences_category_app_list">Apps</string>
     <string name="preferences_app_list_show_all_apps">Show All Apps</string>
-    <string name="preferences_app_list_show_all_apps_summary">Recommend off. This defeats the purpose.</string>
 
     <string name="preferences_category_gestures">Gestures</string>
     <string name="preferences_gestures_swipe_right">Swipe Right</string>
@@ -77,6 +76,7 @@
 
     <string name="app_list_search_edit_text_hint">Search</string>
     <string name="app_list_results_content_description">Search result space</string>
+    <string name="all_app_list_results_content_description">List of apps</string>
     <string name="home_time_content_description">Time</string>
     <string name="home_date_content_description">Date</string>
     <string name="home_apps_still_loading">Apps are still loading</string>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="appInfo"
+            type="com.mrmannwood.hexlauncher.launcher.AppInfo" />
+        <variable
+            name="adapter"
+            type="com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="75dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="12dp">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{appInfo.backgroundColor}"
+                android:contentDescription="@{adapter.getAppName(appInfo)}"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{appInfo.icon}"
+                android:visibility="@{adapter.getNonAdaptiveIconVisibility(appInfo)}"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{appInfo.icon}"
+                android:visibility="@{adapter.getAdaptiveIconVisibility(appInfo)}"
+                android:contentDescription="@{adapter.getAppName(appInfo)}"
+                />
+
+        </FrameLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:gravity="center_horizontal"
+            android:text="@{appInfo.label}"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+    </LinearLayout>
+
+</layout>

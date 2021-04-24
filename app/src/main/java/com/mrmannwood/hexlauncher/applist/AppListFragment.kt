@@ -69,7 +69,6 @@ class AppListFragment : Fragment(), HandleBackPressed {
 
     private lateinit var contactsDatabindingAdapter : ContactsDatabindingAdapter
 
-    private var showAllApps : Boolean = false
     private var numColumnsInAppList: Int = 0
 
     private val viewModel : LauncherViewModel by activityViewModels()
@@ -82,7 +81,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        numColumnsInAppList = calculateNoOfColumnsForAppList()
+        numColumnsInAppList = calculateNoOfColumnsForAppList(resources)
     }
 
     override fun onCreateView(
@@ -143,10 +142,6 @@ class AppListFragment : Fragment(), HandleBackPressed {
     }
 
     private fun startObservingLiveData() {
-        viewModel.showAllAppsPreferenceLiveData.observe(viewLifecycleOwner) {
-            showAllApps = true == it
-            performSearch()
-        }
         viewModel.apps.observe(viewLifecycleOwner, { result ->
             result.onSuccess { appList ->
                 apps = appList
@@ -239,12 +234,6 @@ class AppListFragment : Fragment(), HandleBackPressed {
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
     }
 
-    private fun calculateNoOfColumnsForAppList(): Int {
-        val displayMetrics: DisplayMetrics = resources.displayMetrics
-        val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
-        return (screenWidthDp / 75 + 0.5).toInt()
-    }
-
     private fun forceShowKeyboard(view: EditText) {
         view.requestFocus()
         val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -262,11 +251,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
         apps?.let { data ->
             val filteredApps =
                     if (search.isEmpty()) {
-                        if (showAllApps) {
-                            data
-                        } else {
-                            Collections.emptyList()
-                        }
+                        Collections.emptyList()
                     } else {
                         val sorted = mutableMapOf<AppInfo, Int>()
                         val length = search.length

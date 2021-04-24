@@ -20,9 +20,6 @@ object PreferenceKeys {
             }
         }
     }
-    object AppList {
-        const val SHOW_ALL_APPS = "app_list_show_all"
-    }
     object Gestures {
         object SwipeRight {
             const val APP_NAME = "gestures_swipe_right_app_name"

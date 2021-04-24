@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.preference.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
@@ -203,10 +204,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
             setTitle(R.string.preferences_category_app_list)
-            addPreference(SwitchPreference(activity).apply {
+            addPreference(Preference(activity).apply {
                 setTitle(R.string.preferences_app_list_show_all_apps)
-                setSummary(R.string.preferences_app_list_show_all_apps_summary)
-                key = PreferenceKeys.AppList.SHOW_ALL_APPS
+                setOnPreferenceClickListener {
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.settings_root, AllAppsListFragment())
+                        .addToBackStack(null)
+                        .commit()
+                    true
+                }
             })
         }
 

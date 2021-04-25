@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/colorPrimary">
+
+    <View
+        android:id="@+id/swatch"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"/>
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="12dp"/>
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slider_red"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:valueFrom="0"
+        android:valueTo="255"
+        android:value="255"
+        app:labelBehavior="gone"
+        app:trackColorActive="#FF0000"
+        app:trackColorInactive="#FF4D4D"
+        app:thumbColor="#FF0000"/>
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slider_green"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:valueFrom="0"
+        android:valueTo="255"
+        android:value="255"
+        app:labelBehavior="gone"
+        app:trackColorActive="#00FF00"
+        app:trackColorInactive="#4DFF4D"
+        app:thumbColor="#00FF00"/>
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slider_blue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:valueFrom="0"
+        android:valueTo="255"
+        android:value="255"
+        app:labelBehavior="gone"
+        app:trackColorActive="#0000FF"
+        app:trackColorInactive="#4D4DFF"
+        app:thumbColor="#0000FF"/>
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="12dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_positive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="12dp"
+        android:text="@string/color_picker_button_positive"/>
+
+</LinearLayout>

@@ -10,14 +10,18 @@ import android.widget.TextView
 import androidx.core.content.edit
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mrmannwood.hexlauncher.colorpicker.ColorPickerDialog
+import com.mrmannwood.hexlauncher.colorpicker.ColorPickerViewModel
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
 
 class HomeArrangementFragment : WidgetHostFragment() {
 
-    private val viewModel: HomeArrangementViewModel by activityViewModels()
+    private val viewModel : HomeArrangementViewModel by activityViewModels()
+    private val colorPickerViewModel : ColorPickerViewModel by activityViewModels()
 
     private lateinit var widgetContainer: FrameLayout
     private lateinit var sharedPrefs : SharedPreferences
@@ -56,9 +60,10 @@ class HomeArrangementFragment : WidgetHostFragment() {
                     }
                     override fun onLongPress(e: MotionEvent) {
                         super.onLongPress(e)
+                        widget = null
                         findTouchedWidget(e.x, e.y)?.let { widget ->
                             showParentContextMenu = false
-                            widget.showContextMenu(0f, 0f)
+                            widget.showContextMenu(widget.width / 2f, widget.height / 2f)
                         } ?: run {
                             showParentContextMenu = true
                             widgetContainer.showContextMenu(e.x, e.y)
@@ -178,27 +183,23 @@ class HomeArrangementFragment : WidgetHostFragment() {
                 true
             }
             menu.add(R.string.home_arrangement_widget_color).setOnMenuItemClickListener {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.home_arrangement_widget_color_title)
-                    .setSingleChoiceItems(
-                        arrayOf(
-                            getString(R.string.color_name_white),
-                            getString(R.string.color_name_black),
-                        ),
-                        when ((widget as TextView).currentTextColor) {
-                            Color.WHITE -> 0
-                            Color.BLACK -> 1
-                            else -> throw IllegalArgumentException("Unknown color: ${widget.currentTextColor}")
+                colorPickerViewModel.colorLiveData.value = (widget as TextView).currentTextColor
+                colorPickerViewModel.completionLiveData.value = false
+
+                val colorObserver = Observer<Int> { color ->
+                    widget.setTextColor(color)
+                }
+                val completionObserver = object : Observer<Boolean> {
+                    override fun onChanged(complete: Boolean) {
+                        if (complete) {
+                            colorPickerViewModel.colorLiveData.removeObserver(colorObserver)
+                            colorPickerViewModel.completionLiveData.removeObserver(this)
                         }
-                    ) { _, choice ->
-                        val color = when (choice) {
-                            0 -> Color.WHITE
-                            1 -> Color.BLACK
-                            else -> throw IllegalArgumentException("Unknown choice: $choice")
-                        }
-                        widget.setTextColor(color)
                     }
-                    .show()
+                }
+                colorPickerViewModel.colorLiveData.observe(viewLifecycleOwner, colorObserver)
+                colorPickerViewModel.completionLiveData.observe(viewLifecycleOwner, completionObserver)
+                ColorPickerDialog().show(childFragmentManager, null)
                 true
             }
         }

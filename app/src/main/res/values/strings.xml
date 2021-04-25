@@ -2,9 +2,6 @@
 <resources>
     <string name="app_name">Hex Launcher</string>
 
-    <string name="color_name_white">White</string>
-    <string name="color_name_black">Black</string>
-
     <string name="unable_to_start_app">Unable to start app</string>
     <string name="no_app_selected">No app selected</string>
     <string name="gesture_no_action_selected">Gestures can be bound in Settings</string>
@@ -87,6 +84,7 @@
     <string name="home_arrangement_widgets_menu_title">Widgets</string>
     <string name="home_arrangement_widget_color">Color</string>
     <string name="home_arrangement_widget_hide">Hide</string>
-    <string name="home_arrangement_widget_color_title">Set Widget Color</string>
+
+    <string name="color_picker_button_positive">OK</string>
 
 </resources>

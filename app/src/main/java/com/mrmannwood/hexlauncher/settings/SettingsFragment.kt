@@ -1,5 +1,6 @@
 package com.mrmannwood.hexlauncher.settings
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -23,30 +24,21 @@ import com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
+import com.mrmannwood.hexlauncher.wallpaper.WallpaperActivity.Companion.makeWallpaperActivityIntent
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
+    private val wallpaperPickerContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
+        if (result.data?.data == null) return@registerForActivityResult
+        startActivity(requireActivity().makeWallpaperActivityIntent(result.data!!.data!!))
+    }
+
     private val setHomeLauncherResultContract = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { _ -> updateHomeRolePreference(requireActivity()) }
-
-    private val wallpaperActivityResultContracts = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        result.data.onAppListResult(
-                onSuccess = { appName, packageName ->
-                    prefs.edit {
-                        putString(PreferenceKeys.Wallpaper.APP_NAME, appName)
-                        putString(PreferenceKeys.Wallpaper.PACKAGE_NAME, packageName)
-                    }
-                },
-                onFailure = {
-                    Toast.makeText(requireContext(), R.string.no_app_selected, Toast.LENGTH_LONG).show()
-                }
-        )
-    }
 
     private val preferenceSwipeRightResultContract = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -90,27 +82,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private val prefs = PreferencesLiveData.get().getSharedPreferences()
 
     private lateinit var homeRolePreference: Preference
-    private lateinit var wallpaperAppPreference: Preference
-    private lateinit var wallpaperPreference: Preference
     private lateinit var swipeRightAppPreference: Preference
     private lateinit var swipeLeftAppPreference: Preference
 
-    private var wallpaperAppPackageName: String? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        settingsViewModel.wallpaperPackageLiveData.observe(this) { app ->
-            wallpaperAppPackageName = app
-        }
-        settingsViewModel.wallpaperAppNameLiveData.observe(this) {
-            it?.let { appName ->
-                wallpaperAppPreference.summary = appName
-                wallpaperPreference.isVisible = true
-            } ?: run {
-                wallpaperAppPreference.summary = ""
-                wallpaperPreference.isVisible = false
-            }
-        }
         settingsViewModel.swipeRightLiveData.observe(this) { appName ->
             if (appName != null) {
                 swipeRightAppPreference.summary = appName
@@ -167,23 +143,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
             screen.addPreference(this)
             setTitle(R.string.preferences_category_wallpaper)
             addPreference(Preference(activity).apply {
-                wallpaperAppPreference = this
-                setTitle(R.string.preferences_wallpaper_choose_app)
-                setOnPreferenceClickListener {
-                    wallpaperActivityResultContracts.launch(
-                            Intent(activity, AppListActivity::class.java)
-                                    .decorateForAppListLaunch(R.string.preferences_wallpaper_choose_app_chooser_title))
-                    true
-                }
-            })
-            addPreference(Preference(activity).apply {
-                wallpaperPreference = this
                 setTitle(R.string.preferences_wallpaper_choose_image)
-                isVisible = false
                 setOnPreferenceClickListener {
-                    wallpaperAppPackageName?.let { app ->
-                        startActivity(activity.packageManager.getLaunchIntentForPackage(app))
-                    }
+                    wallpaperPickerContract.launch(Intent(Intent.ACTION_PICK).apply { type = "image/*" })
                     true
                 }
             })

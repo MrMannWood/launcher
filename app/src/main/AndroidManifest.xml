@@ -3,11 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.mrmannwood.launcher">
 
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
-        tools:ignore="QueryAllPackagesPermission" />
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
 
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
     <queries>
         <intent>
             <action android:name="android.intent.action.MAIN" />
@@ -37,9 +38,12 @@
         <activity android:name="com.mrmannwood.hexlauncher.applist.AppListActivity" />
         <activity
             android:name="com.mrmannwood.hexlauncher.settings.SettingsActivity"
-            android:theme="@style/PreferenceScreen" />
+            android:theme="@style/NonFullScreenTheme" />
         <activity android:name="com.mrmannwood.hexlauncher.home.HomeArrangementActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name="com.mrmannwood.hexlauncher.wallpaper.WallpaperActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NonFullScreenTheme" />
         <activity android:name="com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity" />
         <activity
             android:name="com.mrmannwood.hexlauncher.launcher.FakeLauncherActivity"

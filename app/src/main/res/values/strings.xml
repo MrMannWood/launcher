@@ -14,8 +14,6 @@
     <string name="preferences_role_set_home">Set Hex Launcher as Home app</string>
 
     <string name="preferences_category_wallpaper">Wallpaper</string>
-    <string name="preferences_wallpaper_choose_app">Set Wallpaper App</string>
-    <string name="preferences_wallpaper_choose_app_chooser_title">Choose App - Wallpaper</string>
     <string name="preferences_wallpaper_choose_image">Change Wallpaper</string>
 
     <string name="preferences_category_contacts">Contacts</string>
@@ -86,5 +84,9 @@
     <string name="home_arrangement_widget_hide">Hide</string>
 
     <string name="color_picker_button_positive">OK</string>
+
+    <string name="wallpaper_title">Wallpaper</string>
+    <string name="wallpaper_button_set">Set Wallpaper</string>
+    <string name="wallpaper_greyscale_switch_title">Grayscale</string>
 
 </resources>

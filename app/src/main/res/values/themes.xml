@@ -28,7 +28,7 @@
         <item name="materialAlertDialogTheme">@style/AlertDialogStyle</item>
     </style>
 
-    <style name="PreferenceScreen" parent="AppTheme">
+    <style name="NonFullScreenTheme" parent="AppTheme">
         <item name="android:statusBarColor">@color/colorPrimary</item>
         <item name="android:navigationBarColor">@color/colorPrimary</item>
         <item name="android:windowShowWallpaper">false</item>

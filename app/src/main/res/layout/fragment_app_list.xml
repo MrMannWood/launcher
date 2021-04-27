@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -13,39 +12,24 @@
         android:contentDescription="@string/app_list_results_content_description"
         />
 
-    <LinearLayout
+    <com.mrmannwood.hexlauncher.view.KeyboardEditText
+        android:id="@+id/search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
         android:background="@color/colorPrimary"
-        android:layout_gravity="center_vertical">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_search"
-            android:tint="@color/colorOnPrimary"/>
-
-        <Space
-            android:layout_width="16dp"
-            android:layout_height="0dp"/>
-
-        <com.mrmannwood.hexlauncher.view.KeyboardEditText
-            android:id="@+id/search"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            android:textColor="@color/colorOnPrimary"
-            android:textSize="16sp"
-            android:background="@null"
-            />
-
-    </LinearLayout>
+        android:singleLine="true"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:textColor="@color/colorOnPrimary"
+        android:textSize="16sp"
+        android:hint="@string/app_list_search_edit_text_hint"
+        android:textColorHint="@color/colorPrimary"
+        android:drawableStart="@drawable/ic_search"
+        android:drawableTint="@color/colorOnPrimary"
+        />
 
 </LinearLayout>

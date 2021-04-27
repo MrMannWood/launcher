@@ -83,6 +83,10 @@
     <string name="home_arrangement_widget_color">Color</string>
     <string name="home_arrangement_widget_hide">Hide</string>
 
+    <string name="dialog_color_picker_swatch_content_description">shows selected color</string>
+    <string name="dialog_color_picker_red_content_description">sets red value</string>
+    <string name="dialog_color_picker_green_content_description">sets green value</string>
+    <string name="dialog_color_picker_blue_content_description">sets blue value</string>
     <string name="color_picker_button_positive">OK</string>
 
     <string name="wallpaper_title">Wallpaper</string>

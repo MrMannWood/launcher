@@ -9,7 +9,8 @@
     <View
         android:id="@+id/swatch"
         android:layout_width="match_parent"
-        android:layout_height="160dp"/>
+        android:layout_height="160dp"
+        android:contentDescription="@string/dialog_color_picker_swatch_content_description"/>
 
     <Space
         android:layout_width="0dp"
@@ -25,7 +26,8 @@
         app:labelBehavior="gone"
         app:trackColorActive="#FF0000"
         app:trackColorInactive="#FF4D4D"
-        app:thumbColor="#FF0000"/>
+        app:thumbColor="#FF0000"
+        android:contentDescription="@string/dialog_color_picker_red_content_description"/>
 
     <com.google.android.material.slider.Slider
         android:id="@+id/slider_green"
@@ -37,7 +39,8 @@
         app:labelBehavior="gone"
         app:trackColorActive="#00FF00"
         app:trackColorInactive="#4DFF4D"
-        app:thumbColor="#00FF00"/>
+        app:thumbColor="#00FF00"
+        android:contentDescription="@string/dialog_color_picker_green_content_description"/>
 
     <com.google.android.material.slider.Slider
         android:id="@+id/slider_blue"
@@ -49,7 +52,8 @@
         app:labelBehavior="gone"
         app:trackColorActive="#0000FF"
         app:trackColorInactive="#4D4DFF"
-        app:thumbColor="#0000FF"/>
+        app:thumbColor="#0000FF"
+        android:contentDescription="@string/dialog_color_picker_blue_content_description"/>
 
     <Space
         android:layout_width="0dp"

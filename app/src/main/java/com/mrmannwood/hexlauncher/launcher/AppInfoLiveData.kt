@@ -27,9 +27,8 @@ class AppInfoLiveData private constructor(
 
         private lateinit var instance: AppInfoLiveData
 
-        fun createAndGet(application: Application) : AppInfoLiveData {
+        fun create(application: Application) {
             instance = AppInfoLiveData(application)
-            return instance
         }
 
         fun get() : AppInfoLiveData {

@@ -22,7 +22,7 @@ class LauncherApplication : Application() {
 
         PreferencesLiveData.create(this).observeForever { }
 
-        AppInfoLiveData.createAndGet(this).observeForever { }
+        AppInfoLiveData.create(this)
 
         registerReceiver(
                 PackageObserverBroadcastReceiver(),

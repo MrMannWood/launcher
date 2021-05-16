@@ -1,6 +1,7 @@
 package com.mrmannwood.hexlauncher.settings
 
 import android.app.Activity
+import android.app.WallpaperManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -24,7 +25,6 @@ import com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
-import com.mrmannwood.hexlauncher.wallpaper.WallpaperActivity.Companion.makeWallpaperActivityIntent
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 
@@ -33,7 +33,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private val wallpaperPickerContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
         if (result.data?.data == null) return@registerForActivityResult
-        startActivity(requireActivity().makeWallpaperActivityIntent(result.data!!.data!!))
+        startActivity(
+            WallpaperManager.getInstance(requireContext())
+                .getCropAndSetWallpaperIntent(result.data!!.data!!).apply {
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+        )
     }
 
     private val setHomeLauncherResultContract = registerForActivityResult(

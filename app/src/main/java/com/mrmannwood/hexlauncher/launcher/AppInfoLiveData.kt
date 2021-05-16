@@ -62,11 +62,8 @@ class AppInfoLiveData private constructor(
     private fun triggerLoad() {
         scope?.launch {
             try {
-                val jobs = mutableListOf<Deferred<AppInfo>>()
-                for (pack in loadAppList()) {
-                    jobs.add(async { loadApp(pack) })
-                }
-                val apps = jobs.map { it.await() }
+                val apps = loadAppList()
+                    .map { loadApp(it) }
                     .filter { it.packageName != app.packageName }
                     .toMutableList()
                 apps.sortBy { it.label }

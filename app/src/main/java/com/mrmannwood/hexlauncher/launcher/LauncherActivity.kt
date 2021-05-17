@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import com.mrmannwood.hexlauncher.HandleBackPressed
+import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.contacts.ContactData
 import com.mrmannwood.hexlauncher.home.HomeFragment
@@ -34,6 +35,7 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
                 startActivity(Intent(this@LauncherActivity, NUXActivity::class.java))
             }
         }
+        viewModel.appInfoLiveData.observe(this) { }
 
         if (supportFragmentManager.findFragmentById(R.id.container) == null) {
             supportFragmentManager.beginTransaction()

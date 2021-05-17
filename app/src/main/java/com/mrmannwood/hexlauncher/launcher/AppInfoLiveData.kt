@@ -12,9 +12,9 @@ import android.graphics.Canvas
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.os.DeadObjectException
 import androidx.core.graphics.get
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.coroutine.LiveDataWithCoroutineScope
 import kotlinx.coroutines.*
 import timber.log.Timber

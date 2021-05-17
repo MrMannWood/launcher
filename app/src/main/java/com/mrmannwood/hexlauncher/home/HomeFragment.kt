@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
 import com.mrmannwood.hexlauncher.HandleBackPressed
+import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.gesture.LauncherGestureDetectorListener
 import com.mrmannwood.hexlauncher.settings.SettingsActivity

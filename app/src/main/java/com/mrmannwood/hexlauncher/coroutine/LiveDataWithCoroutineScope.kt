@@ -21,5 +21,4 @@ open class LiveDataWithCoroutineScope<T> : LiveData<T>() {
         super.onInactive()
         scope!!.cancel()
     }
-
 }

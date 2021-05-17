@@ -1,6 +1,7 @@
 package com.mrmannwood.hexlauncher.icon
 
 import android.annotation.TargetApi
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.AdaptiveIconDrawable
@@ -23,6 +24,12 @@ interface IconAdapter {
 
     fun getBackgroundColor(icon: Drawable) : Int?
 
+    fun getForegroundBitmap(icon: Drawable) : Bitmap?
+
+    fun getBackgroundBitmap(icon: Drawable) : Bitmap
+
+    fun makeIconDrawable(res: Resources, foreground: Bitmap?, background: Bitmap) : Drawable
+
     @TargetApi(Build.VERSION_CODES.O)
     private class OreoIconAdapter : DefaultIconAdapter() {
 
@@ -37,6 +44,24 @@ interface IconAdapter {
             }
             return super.getBackgroundColor(icon)
         }
+
+        override fun getForegroundBitmap(icon: Drawable): Bitmap? {
+            if (!isAdaptive(icon)) return null
+            return drawableToBitmap((icon as AdaptiveIconDrawable).foreground)
+        }
+
+        override fun getBackgroundBitmap(icon: Drawable): Bitmap {
+            if (!isAdaptive(icon)) return super.getBackgroundBitmap(icon)
+            return drawableToBitmap((icon as AdaptiveIconDrawable).background)
+        }
+
+        override fun makeIconDrawable(res: Resources, foreground: Bitmap?, background: Bitmap): Drawable {
+            if (foreground == null) return super.makeIconDrawable(res, foreground, background)
+            return AdaptiveIconDrawable(
+                BitmapDrawable(res, background),
+                BitmapDrawable(res, foreground)
+            )
+        }
     }
 
     private open class DefaultIconAdapter : IconAdapter {
@@ -47,9 +72,31 @@ interface IconAdapter {
             return drawableToBitmap(icon) { bitmap -> getDominantColor(bitmap) }
         }
 
+        override fun getForegroundBitmap(icon: Drawable): Bitmap? = null
+
+        override fun getBackgroundBitmap(icon: Drawable): Bitmap {
+            return drawableToBitmap(icon)
+        }
+
+        override fun makeIconDrawable(res: Resources, foreground: Bitmap?, background: Bitmap): Drawable {
+            return BitmapDrawable(res, background)
+        }
+
         fun <T> drawableToBitmap(drawable: Drawable, func: (Bitmap) -> T) : T {
             if (drawable is BitmapDrawable && drawable.bitmap != null) {
                 return func(drawable.bitmap)
+            }
+
+            val bitmap = drawableToBitmap(drawable)
+
+            val result = func(bitmap)
+            bitmap.recycle()
+            return result
+        }
+
+        fun drawableToBitmap(drawable: Drawable) : Bitmap {
+            if (drawable is BitmapDrawable && drawable.bitmap != null) {
+                return drawable.bitmap
             }
 
             val (width, height) = if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
@@ -63,9 +110,7 @@ interface IconAdapter {
             drawable.setBounds(0, 0, canvas.width, canvas.height)
             drawable.draw(canvas)
 
-            val result = func(bitmap)
-            bitmap.recycle()
-            return result
+            return bitmap
         }
 
         fun getDominantColor(bitmap: Bitmap) : Int? {

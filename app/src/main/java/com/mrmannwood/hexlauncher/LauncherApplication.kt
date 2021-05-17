@@ -1,17 +1,28 @@
 package com.mrmannwood.hexlauncher
 
 import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.StrictMode
 import com.mrmannwood.hexlauncher.Result
+import com.mrmannwood.hexlauncher.applist.AppListUpdater
 import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
 import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
 import com.mrmannwood.launcher.BuildConfig
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class LauncherApplication : Application() {
+
+    companion object {
+        val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -23,7 +34,13 @@ class LauncherApplication : Application() {
 
         PreferencesLiveData.create(this).observeForever { }
 
-        AppInfoLiveData.createAndGet(this).observeForever { _ -> }
+        DB.init(this@LauncherApplication)
+
+        applicationScope.launch {
+            AppListUpdater.updateAppListInternal(applicationContext)
+        }
+
+        AppInfoLiveData.createAndGet(this).observeForever { }
 
         registerReceiver(
                 PackageObserverBroadcastReceiver(),

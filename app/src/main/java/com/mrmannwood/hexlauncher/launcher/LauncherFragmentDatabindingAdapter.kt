@@ -1,18 +1,17 @@
 package com.mrmannwood.hexlauncher.launcher
 
-import android.graphics.drawable.AdaptiveIconDrawable
 import android.view.View
+import com.mrmannwood.hexlauncher.icon.IconAdapter
 
 object LauncherFragmentDatabindingAdapter {
 
     fun getAppName(appInfo: AppInfo) = appInfo.label
 
     fun getAdaptiveIconVisibility(appInfo: AppInfo) : Int {
-        return if (appInfo.icon is AdaptiveIconDrawable) View.VISIBLE else View.GONE
+        return if (IconAdapter.INSTANCE.isAdaptive(appInfo.icon)) View.VISIBLE else View.GONE
     }
 
     fun getNonAdaptiveIconVisibility(appInfo: AppInfo) : Int {
-        return if (appInfo.icon is AdaptiveIconDrawable) View.GONE else View.VISIBLE
+        return if (IconAdapter.INSTANCE.isAdaptive(appInfo.icon)) View.GONE else View.VISIBLE
     }
-
 }

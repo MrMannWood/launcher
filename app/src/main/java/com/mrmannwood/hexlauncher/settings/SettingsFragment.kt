@@ -108,12 +108,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
         settingsViewModel.contactsPermissionLiveData.observe(this) { permissionsResult ->
             when (permissionsResult) {
-                is PermissionsLiveData.PermissionsResult.PrefGrantedPermissionGranted -> { /* checked */  }
-                is PermissionsLiveData.PermissionsResult.PrefGrantedPermissionDenied -> {
+                is PermissionsLiveData.PermissionsResult.Granted -> { /* checked */  }
+                is PermissionsLiveData.PermissionsResult.NotGranted -> { /* unchecked */ }
+                is PermissionsLiveData.PermissionsResult.UserShouldGrantPermission -> {
                     requestContactsPermissionContract.launch(
                             settingsViewModel.contactsPermissionLiveData.permission)
                 }
-                is PermissionsLiveData.PermissionsResult.PrefDeniedPermissionGranted -> {
+                is PermissionsLiveData.PermissionsResult.UserShouldRevokePermission -> {
                     MaterialAlertDialogBuilder(requireActivity())
                             .setTitle(R.string.preferences_contacts_dialog_title)
                             .setMessage(R.string.preferences_contacts_dialog_message)
@@ -127,7 +128,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             .setNegativeButton(R.string.preferences_contacts_dialog_button_negative) { _, _ -> }
                             .show()
                 }
-                is PermissionsLiveData.PermissionsResult.PrefDeniedPermissionDenied -> { /* unchecked */ }
             }
         }
     }

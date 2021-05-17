@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.StrictMode
+import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
 import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
@@ -22,7 +23,7 @@ class LauncherApplication : Application() {
 
         PreferencesLiveData.create(this).observeForever { }
 
-        AppInfoLiveData.create(this)
+        AppInfoLiveData.createAndGet(this).observeForever { _ -> }
 
         registerReceiver(
                 PackageObserverBroadcastReceiver(),

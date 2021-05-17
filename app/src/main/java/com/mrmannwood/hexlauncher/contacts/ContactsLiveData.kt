@@ -33,7 +33,7 @@ class ContactsLiveData(private val context: Context) : LiveDataWithCoroutineScop
     private val query = AtomicReference<() -> Unit>()
 
     private val permissionObserver = Observer<PermissionsLiveData.PermissionsResult> {
-        if (it == PermissionsLiveData.PermissionsResult.PrefGrantedPermissionGranted) {
+        if (it == PermissionsLiveData.PermissionsResult.Granted) {
             query.set {
                 scope?.launch {
                     searchTerm.getAndSet(null)?.let { term ->

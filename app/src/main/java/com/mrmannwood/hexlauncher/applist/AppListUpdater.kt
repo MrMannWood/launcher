@@ -2,6 +2,7 @@ package com.mrmannwood.hexlauncher.applist
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.widget.Toast
@@ -25,41 +26,20 @@ object AppListUpdater {
             try {
                 val prefs = PreferencesLiveData.get().getSharedPreferences();
 
-                val lastCheckTime = prefs.getLong(LAST_APP_CHECK_KEY, 0)
+                val cachedApps = getCachedApps()
+                val installedApps = getAllInstalledApps(appContext, appContext.packageManager)
 
-                val cachedApps = DB.get().appDataDao().getApps().associateBy { it.packageName }
+                val deletedApps = findDeletedApps(cachedApps, installedApps)
+                val updatedApps = findNewOrUpdatedApps(
+                    appContext, getLastCacheUpdateTime(prefs), installedApps)
 
-                val appsFromSystem = getAppsFromSystem(appContext, appContext.packageManager).associateBy { it.second }
-                val appsToDelete = cachedApps
-                    .filter { app -> !appsFromSystem.containsKey(app.value.packageName) }
-                    .map { app -> app.value.packageName }
-
-                val toUpdate = appsFromSystem
-                    .map { it.value }
-                    .filter { app -> app.first >= lastCheckTime }
-                    .map {
-                        val icon = it.third.loadIcon(appContext.packageManager)
-                        AppData(
-                            packageName = it.second,
-                            label = it.third.loadLabel(appContext.packageManager).toString(),
-                            lastUpdateTime = it.first,
-                            backgroundColor = IconAdapter.INSTANCE.getBackgroundColor(icon)
-                                ?: 0xFFC1CC,
-                            foreground = IconAdapter.INSTANCE.getForegroundBitmap(icon),
-                            background = IconAdapter.INSTANCE.getBackgroundBitmap(icon)
-                        )
-                    }
-
-                if (appsToDelete.isNotEmpty()) {
-                    Timber.d("Deleting ${appsToDelete.size} apps")
-                    DB.get().appDataDao().deleteAll(appsToDelete)
+                if (deletedApps.isNotEmpty()) {
+                    DB.get().appDataDao().deleteAll(deletedApps)
                 }
 
-                if (toUpdate.isNotEmpty()) {
-                    Timber.d("Insert/updating ${appsToDelete.size} apps")
-                    DB.get().appDataDao().insertAll(toUpdate)
-                    toUpdate.forEach {
-                        Timber.d("Inserted ${it.label}: ${it.background != null}")
+                if (updatedApps.isNotEmpty()) {
+                    DB.get().appDataDao().insertAll(updatedApps)
+                    updatedApps.forEach {
                         it.foreground?.recycle()
                         it.background.recycle()
                     }
@@ -74,7 +54,47 @@ object AppListUpdater {
     }
 
     @WorkerThread
-    private fun getAppsFromSystem(context: Context, pacman: PackageManager) : List<Triple<Long, String, ResolveInfo>> {
+    private fun getLastCacheUpdateTime(prefs: SharedPreferences) : Long =
+        prefs.getLong(LAST_APP_CHECK_KEY, 0)
+
+    @WorkerThread
+    private fun getCachedApps() : Map<String, AppData> =
+        DB.get()
+            .appDataDao()
+            .getApps()
+            .associateBy { it.packageName }
+
+    private fun findDeletedApps(
+        cachedApps: Map<String, AppData>,
+        installedApps: Map<String, Pair<Long, ResolveInfo>>
+    ) : List<String> = cachedApps
+        .filter { app -> !installedApps.containsKey(app.value.packageName) }
+        .map { app -> app.value.packageName }
+
+    private fun findNewOrUpdatedApps(
+        context: Context,
+        lastCacheUpdateTime: Long,
+        installedApps: Map<String, Pair<Long, ResolveInfo>>
+    ) : List<AppData> = installedApps
+        .filter { app -> app.value.first >= lastCacheUpdateTime }
+        .map {
+            val packageName = it.key
+            val lastUpdateTime = it.value.first
+            val resolveInfo = it.value.second
+            val icon = it.value.second.loadIcon(context.packageManager)
+            AppData(
+                packageName = packageName,
+                label = resolveInfo.loadLabel(context.packageManager).toString(),
+                lastUpdateTime = lastUpdateTime,
+                backgroundColor = IconAdapter.INSTANCE.getBackgroundColor(icon)
+                    ?: 0xFFC1CC,
+                foreground = IconAdapter.INSTANCE.getForegroundBitmap(icon),
+                background = IconAdapter.INSTANCE.getBackgroundBitmap(icon)
+            )
+        }
+
+    @WorkerThread
+    private fun getAllInstalledApps(context: Context, pacman: PackageManager) : Map<String, Pair<Long, ResolveInfo>> {
         return pacman.queryIntentActivities(
             Intent(Intent.ACTION_MAIN, null).addCategory(Intent.CATEGORY_LAUNCHER), 0
         )
@@ -82,11 +102,10 @@ object AppListUpdater {
             .map { resolveInfo ->
                 resolveInfo to pacman.getPackageInfo(resolveInfo.activityInfo.packageName, 0)
             }.map { (resolveInfo, packageInfo) ->
-                Triple(
+                Pair(
                     packageInfo.lastUpdateTime,
-                    resolveInfo.activityInfo.packageName,
                     resolveInfo
                 )
-            }
+            }.associateBy { it.second.activityInfo.packageName }
     }
 }

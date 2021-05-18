@@ -43,8 +43,13 @@
 
     <string name="preferences_app_database_title">Store Apps</string>
     <string name="preferences_app_database_description">Copy app data to local database for faster access</string>
+    <string name="preferences_app_database_dialog_title">App Restart Required</string>
+    <string name="preferences_app_database_dialog_message">This requires restarting the app, which may unset it as your default. Are you sure you want to do this?</string>
+    <string name="preferences_app_database_dialog_button_positive">I\'m Sure</string>
+    <string name="preferences_app_database_dialog_button_negative">No</string>
 
     <string name="preferences_category_experimental">Experimental Features</string>
+    <string name="preferences_category_experimental_summary">Toggling these are a bad idea. Proceed with caution.</string>
     <string name="preferences_experimental_show">Enable Experimental Features</string>
 
     <string name="preferences_category_version_info">Version Info</string>

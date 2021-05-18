@@ -29,9 +29,6 @@ object PreferenceKeys {
     object Apps {
         const val USE_APP_DATABASE = "use_app_database"
     }
-    object Experimental {
-        const val SHOW_EXPERIMENTAL = "show_experimental"
-    }
     object Version {
         const val LAST_RUN_VERSION_NAME = "previous_version_name"
     }

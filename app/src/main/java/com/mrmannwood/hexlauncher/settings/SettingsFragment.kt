@@ -1,10 +1,14 @@
 package com.mrmannwood.hexlauncher.settings
 
 import android.app.Activity
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.app.WallpaperManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Process
 import android.provider.Settings
 import android.view.View
 import android.widget.Toast
@@ -21,6 +25,7 @@ import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
 import com.mrmannwood.hexlauncher.home.HomeArrangementActivity
+import com.mrmannwood.hexlauncher.launcher.LauncherActivity
 import com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
@@ -85,7 +90,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private val settingsViewModel : SettingsViewModel by activityViewModels()
     private val prefs = PreferencesLiveData.get().getSharedPreferences()
-    private val experimentalPrefs = mutableListOf<Preference>()
 
     private lateinit var homeRolePreference: Preference
     private lateinit var swipeRightAppPreference: Preference
@@ -220,33 +224,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
-            setTitle(R.string.preferences_category_experimental)
-            addPreference(SwitchPreference(activity).apply {
-                setTitle(R.string.preferences_experimental_show)
-                key = PreferenceKeys.Experimental.SHOW_EXPERIMENTAL
-                setOnPreferenceClickListener {
-                    if (isChecked) {
-                        experimentalPrefs.forEach { it.isVisible = true }
-                    } else {
-                        experimentalPrefs.forEach { it.isVisible = false }
-                        prefs.edit {
-                            experimentalPrefs.forEach { remove(it.key) }
-                        }
-                    }
-
-                    true
-                }
-            })
-            addPreference(SwitchPreference(activity).apply {
-                experimentalPrefs.add(this)
-                setTitle(R.string.preferences_app_database_title)
-                setSummary(R.string.preferences_app_database_description)
-                isVisible = prefs.getBoolean(PreferenceKeys.Experimental.SHOW_EXPERIMENTAL, false)
-            })
-        }
-
-        PreferenceCategory(activity).apply {
-            screen.addPreference(this)
             setTitle(R.string.preferences_category_legal)
             addPreference(Preference(activity).apply {
                 setTitle(R.string.preferences_privacy_policy)
@@ -265,6 +242,32 @@ class SettingsFragment : PreferenceFragmentCompat() {
             })
             addPreference(Preference(activity).apply {
                 title = getString(R.string.preferences_version_build_type, BuildConfig.BUILD_TYPE)
+            })
+        }
+
+        PreferenceCategory(activity).apply {
+            screen.addPreference(this)
+            setTitle(R.string.preferences_category_experimental)
+            setSummary(R.string.preferences_category_experimental_summary)
+            addPreference(SwitchPreference(activity).apply {
+                setTitle(R.string.preferences_app_database_title)
+                setSummary(R.string.preferences_app_database_description)
+                key = PreferenceKeys.Apps.USE_APP_DATABASE
+                val enabled = prefs.getBoolean(key, false)
+                setOnPreferenceClickListener {
+                    MaterialAlertDialogBuilder(requireActivity())
+                        .setTitle(R.string.preferences_app_database_dialog_title)
+                        .setMessage(R.string.preferences_app_database_dialog_message)
+                        .setPositiveButton(R.string.preferences_app_database_dialog_button_positive) { _, _ ->
+                            forceRestart()
+                        }
+                        .setNegativeButton(R.string.preferences_app_database_dialog_button_negative) { _, _ ->
+                            this@apply.isChecked = enabled
+                            prefs.edit { putBoolean(PreferenceKeys.Apps.USE_APP_DATABASE, enabled) }
+                        }
+                        .show()
+                    true
+                }
             })
         }
 
@@ -294,5 +297,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
             }
         }
+    }
+
+    private fun forceRestart() {
+        val context = requireContext()
+        (context.getSystemService(Context.ALARM_SERVICE) as AlarmManager).set(
+            AlarmManager.RTC,
+            System.currentTimeMillis() + 100,
+            PendingIntent.getActivity(
+                context,
+                123456,
+                Intent(context, LauncherActivity::class.java),
+                PendingIntent.FLAG_CANCEL_CURRENT
+            )
+        )
+        Runtime.getRuntime().exit(0)
     }
 }

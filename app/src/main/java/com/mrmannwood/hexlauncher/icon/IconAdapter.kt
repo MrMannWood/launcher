@@ -22,7 +22,7 @@ interface IconAdapter {
 
     fun isAdaptive(icon : Drawable) : Boolean
 
-    fun getBackgroundColor(icon: Drawable) : Int?
+    fun getBackgroundColor(icon: Drawable) : Int
 
     fun getForegroundBitmap(icon: Drawable) : Bitmap?
 
@@ -35,7 +35,7 @@ interface IconAdapter {
 
         override fun isAdaptive(icon : Drawable) = icon is AdaptiveIconDrawable
 
-        override fun getBackgroundColor(icon: Drawable) : Int? {
+        override fun getBackgroundColor(icon: Drawable) : Int {
             if (icon is AdaptiveIconDrawable) {
                 val result = drawableToBitmap(icon.background) { getDominantColor(it) }
                 if (result != null) {
@@ -68,8 +68,8 @@ interface IconAdapter {
 
         override fun isAdaptive(icon : Drawable) = false
 
-        override fun getBackgroundColor(icon: Drawable) : Int? {
-            return drawableToBitmap(icon) { bitmap -> getDominantColor(bitmap) }
+        override fun getBackgroundColor(icon: Drawable) : Int {
+            return drawableToBitmap(icon) { bitmap -> getDominantColor(bitmap) } ?: 0xFFC1CC
         }
 
         override fun getForegroundBitmap(icon: Drawable): Bitmap? = null

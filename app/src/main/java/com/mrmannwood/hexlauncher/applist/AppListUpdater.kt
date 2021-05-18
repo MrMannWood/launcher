@@ -3,6 +3,7 @@ package com.mrmannwood.hexlauncher.applist
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.widget.Toast
@@ -10,6 +11,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.content.edit
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.icon.IconAdapter
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
 import com.mrmannwood.launcher.R
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +26,10 @@ object AppListUpdater {
         val appContext = context.applicationContext
         withContext(Dispatchers.IO) {
             try {
-                val prefs = PreferencesLiveData.get().getSharedPreferences();
+                val prefs = PreferencesLiveData.get().getSharedPreferences()
+                if (!prefs.getBoolean(PreferenceKeys.Apps.USE_APP_DATABASE, false)) {
+                    return@withContext
+                }
 
                 val cachedApps = getCachedApps()
                 val installedApps = getAllInstalledApps(appContext, appContext.packageManager)
@@ -86,20 +91,16 @@ object AppListUpdater {
                 packageName = packageName,
                 label = resolveInfo.loadLabel(context.packageManager).toString(),
                 lastUpdateTime = lastUpdateTime,
-                backgroundColor = IconAdapter.INSTANCE.getBackgroundColor(icon)
-                    ?: 0xFFC1CC,
+                backgroundColor = IconAdapter.INSTANCE.getBackgroundColor(icon),
                 foreground = IconAdapter.INSTANCE.getForegroundBitmap(icon),
                 background = IconAdapter.INSTANCE.getBackgroundBitmap(icon)
             )
         }
 
     @WorkerThread
-    private fun getAllInstalledApps(context: Context, pacman: PackageManager) : Map<String, Pair<Long, ResolveInfo>> {
-        return pacman.queryIntentActivities(
-            Intent(Intent.ACTION_MAIN, null).addCategory(Intent.CATEGORY_LAUNCHER), 0
-        )
-            .filter { it.activityInfo.packageName != context.packageName }
-            .map { resolveInfo ->
+    private suspend fun getAllInstalledApps(context: Context, pacman: PackageManager) : Map<String, Pair<Long, ResolveInfo>> {
+        return getAllInstalledApps(context) {
+            it.map { resolveInfo ->
                 resolveInfo to pacman.getPackageInfo(resolveInfo.activityInfo.packageName, 0)
             }.map { (resolveInfo, packageInfo) ->
                 Pair(
@@ -107,5 +108,18 @@ object AppListUpdater {
                     resolveInfo
                 )
             }.associateBy { it.second.activityInfo.packageName }
+        }
     }
+
+
+    suspend fun <T> getAllInstalledApps(context: Context, func: (List<ResolveInfo>) -> T) : T {
+        return withContext(Dispatchers.IO) {
+            func(
+                context.packageManager.queryIntentActivities(
+                    Intent(Intent.ACTION_MAIN, null).addCategory(Intent.CATEGORY_LAUNCHER), 0
+                ).filter { it.activityInfo.packageName != context.packageName }
+            )
+        }
+    }
+
 }

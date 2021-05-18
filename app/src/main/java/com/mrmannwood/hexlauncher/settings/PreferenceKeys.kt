@@ -26,6 +26,12 @@ object PreferenceKeys {
             const val PACKAGE_NAME = "gestures_swipe_left_package_name"
         }
     }
+    object Apps {
+        const val USE_APP_DATABASE = "use_app_database"
+    }
+    object Experimental {
+        const val SHOW_EXPERIMENTAL = "show_experimental"
+    }
     object Version {
         const val LAST_RUN_VERSION_NAME = "previous_version_name"
     }

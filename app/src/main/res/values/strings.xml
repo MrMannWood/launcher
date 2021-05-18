@@ -41,6 +41,9 @@
     <string name="preferences_category_legal">Legal</string>
     <string name="preferences_privacy_policy">Privacy Policy</string>
 
+    <string name="preferences_app_database_title">Store Apps</string>
+    <string name="preferences_app_database_description">Copy app data to local database for faster access</string>
+
     <string name="preferences_category_experimental">Experimental Features</string>
     <string name="preferences_experimental_show">Enable Experimental Features</string>
 

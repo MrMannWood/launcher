@@ -43,7 +43,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private val setHomeLauncherResultContract = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { _ -> updateHomeRolePreference(requireActivity()) }
+    ) { updateHomeRolePreference(requireActivity()) }
 
     private val preferenceSwipeRightResultContract = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -85,6 +85,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private val settingsViewModel : SettingsViewModel by activityViewModels()
     private val prefs = PreferencesLiveData.get().getSharedPreferences()
+    private val experimentalPrefs = mutableListOf<Preference>()
 
     private lateinit var homeRolePreference: Preference
     private lateinit var swipeRightAppPreference: Preference
@@ -214,6 +215,33 @@ class SettingsFragment : PreferenceFragmentCompat() {
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_contacts_allow_search)
                 key = PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH
+            })
+        }
+
+        PreferenceCategory(activity).apply {
+            screen.addPreference(this)
+            setTitle(R.string.preferences_category_experimental)
+            addPreference(SwitchPreference(activity).apply {
+                setTitle(R.string.preferences_experimental_show)
+                key = PreferenceKeys.Experimental.SHOW_EXPERIMENTAL
+                setOnPreferenceClickListener {
+                    if (isChecked) {
+                        experimentalPrefs.forEach { it.isVisible = true }
+                    } else {
+                        experimentalPrefs.forEach { it.isVisible = false }
+                        prefs.edit {
+                            experimentalPrefs.forEach { remove(it.key) }
+                        }
+                    }
+
+                    true
+                }
+            })
+            addPreference(SwitchPreference(activity).apply {
+                experimentalPrefs.add(this)
+                setTitle(R.string.preferences_app_database_title)
+                setSummary(R.string.preferences_app_database_description)
+                isVisible = prefs.getBoolean(PreferenceKeys.Experimental.SHOW_EXPERIMENTAL, false)
             })
         }
 

@@ -5,7 +5,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.StrictMode
+import androidx.appcompat.app.AppCompatDelegate
 import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
 import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
@@ -30,6 +32,9 @@ class LauncherApplication : Application() {
             DebugBuildModeConfiguration.onApplicationCreate()
         } else {
             ReleaseBuildModeConfiguration.onApplicationCreate()
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
 
         PreferencesLiveData.create(this).observeForever { }

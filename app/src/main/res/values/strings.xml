@@ -85,7 +85,7 @@
     <string name="contact_image_content_description">Contact image for %s</string>
 
     <string name="home_arrangement_tutorial_title">Widget Customization</string>
-    <string name="home_arrangement_tutorial_message">Long press to get started</string>
+    <string name="home_arrangement_tutorial_message">Long press the background get started. Long press a widget to customize it.</string>
     <string name="home_arrangement_tutorial_button">OK</string>
     <string name="home_arrangement_widgets_menu_title">Widgets</string>
     <string name="home_arrangement_widget_color">Color</string>

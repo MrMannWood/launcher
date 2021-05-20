@@ -33,7 +33,5 @@
         <item name="android:navigationBarColor">@color/colorPrimary</item>
         <item name="android:windowShowWallpaper">false</item>
         <item name="android:windowBackground">@color/colorPrimary</item>
-        <item name="android:textColor">@color/colorOnPrimary</item>
-        <item name="android:textColorSecondary">@color/colorOnPrimary</item>
     </style>
 </resources>

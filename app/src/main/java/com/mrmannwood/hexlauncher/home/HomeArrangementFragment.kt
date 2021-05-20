@@ -157,7 +157,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.home_arrangement_tutorial_title)
             .setMessage(R.string.home_arrangement_tutorial_message)
-            .setNeutralButton(R.string.home_arrangement_tutorial_button) { _, _ -> }
+            .setPositiveButton(R.string.home_arrangement_tutorial_button) { _, _ -> }
             .show()
     }
 

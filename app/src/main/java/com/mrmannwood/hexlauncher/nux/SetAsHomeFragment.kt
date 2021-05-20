@@ -8,11 +8,13 @@ import androidx.fragment.app.Fragment
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.launcher.R
 
-class SetAsHomeFragment : Fragment(R.layout.fragment_nux_set_home) {
+class SetAsHomeFragment : Fragment(R.layout.fragment_nux_set_home), NUXHostFragment.AcceptsNuxCompleted {
 
     private val setHomeLauncherResultContract = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { _ -> requireActivity().finish() }
+    ) { onNuxCompleted.onNuxCompleted() }
+
+    private lateinit var onNuxCompleted: NUXHostFragment.NuxCompleted
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -27,8 +29,11 @@ class SetAsHomeFragment : Fragment(R.layout.fragment_nux_set_home) {
             }
         }
         view.findViewById<View>(R.id.try_it_out).apply {
-            setOnClickListener { requireActivity().finish() }
+            setOnClickListener { onNuxCompleted.onNuxCompleted() }
         }
     }
 
+    override fun acceptNuxCompleted(nuxCompleted: NUXHostFragment.NuxCompleted) {
+        onNuxCompleted = nuxCompleted
+    }
 }

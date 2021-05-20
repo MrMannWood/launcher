@@ -33,7 +33,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name="com.mrmannwood.hexlauncher.nux.NUXActivity"/>
         <activity android:name="com.mrmannwood.hexlauncher.applist.AppListActivity" />
         <activity
             android:name="com.mrmannwood.hexlauncher.settings.SettingsActivity"

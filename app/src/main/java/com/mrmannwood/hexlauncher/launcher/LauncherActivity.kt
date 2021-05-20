@@ -12,11 +12,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import com.mrmannwood.hexlauncher.HandleBackPressed
-import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.contacts.ContactData
 import com.mrmannwood.hexlauncher.home.HomeFragment
-import com.mrmannwood.hexlauncher.nux.NUXActivity
+import com.mrmannwood.hexlauncher.nux.NUXHostFragment
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
@@ -32,7 +31,9 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
 
         viewModel.preferencesLiveData.observe(this) { prefs ->
             if (checkShouldShowNux(prefs)) {
-                startActivity(Intent(this@LauncherActivity, NUXActivity::class.java))
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.container, NUXHostFragment())
+                    .commit()
             }
         }
         viewModel.appInfoLiveData.observe(this) { }
@@ -62,6 +63,9 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
     }
 
     private fun checkShouldShowNux(prefs: SharedPreferences) : Boolean {
+        if (true) { // TODO
+            return true
+        }
         return prefs.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null)?.let { _ ->
             // todo make this smarter, so new nuxes can be shown as necessary
             false

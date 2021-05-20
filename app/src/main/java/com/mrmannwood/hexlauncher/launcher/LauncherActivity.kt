@@ -63,9 +63,6 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
     }
 
     private fun checkShouldShowNux(prefs: SharedPreferences) : Boolean {
-        if (true) { // TODO
-            return true
-        }
         return prefs.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null)?.let { _ ->
             // todo make this smarter, so new nuxes can be shown as necessary
             false

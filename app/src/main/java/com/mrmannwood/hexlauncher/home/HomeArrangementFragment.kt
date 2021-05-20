@@ -15,6 +15,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerDialog
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerViewModel
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
+import com.mrmannwood.hexlauncher.view.ContextMenuCompat
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
 
@@ -63,10 +64,10 @@ class HomeArrangementFragment : WidgetHostFragment() {
                         widget = null
                         findTouchedWidget(e.x, e.y)?.let { widget ->
                             showParentContextMenu = false
-                            widget.showContextMenu(widget.width / 2f, widget.height / 2f)
+                            ContextMenuCompat.INSTANCE.showContextMenu(widget, widget.width / 2f, widget.height / 2f)
                         } ?: run {
                             showParentContextMenu = true
-                            widgetContainer.showContextMenu(e.x, e.y)
+                            ContextMenuCompat.INSTANCE.showContextMenu(widgetContainer, e.x, e.y)
                         }
                     }
                 }
@@ -152,6 +153,12 @@ class HomeArrangementFragment : WidgetHostFragment() {
                     }
             }
         })
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.home_arrangement_tutorial_title)
+            .setMessage(R.string.home_arrangement_tutorial_message)
+            .setNeutralButton(R.string.home_arrangement_tutorial_button) { _, _ -> }
+            .show()
     }
 
     override fun onStop() {

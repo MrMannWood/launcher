@@ -1,11 +1,14 @@
 package com.mrmannwood.hexlauncher.home
 
+import android.app.Activity
+import android.app.WallpaperManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
 import com.mrmannwood.hexlauncher.HandleBackPressed
@@ -13,11 +16,23 @@ import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.gesture.LauncherGestureDetectorListener
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
+import com.mrmannwood.hexlauncher.view.ContextMenuCompat
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
 import timber.log.Timber
 
 class HomeFragment : WidgetHostFragment(), HandleBackPressed {
+
+    private val wallpaperPickerContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
+        if (result.data?.data == null) return@registerForActivityResult
+        startActivity(
+            WallpaperManager.getInstance(requireContext())
+                .getCropAndSetWallpaperIntent(result.data!!.data!!).apply {
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+        )
+    }
 
     private val viewModel: HomeViewModel by activityViewModels()
 
@@ -39,6 +54,14 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             }
         })
         databinder.root.setOnCreateContextMenuListener { menu, _, _ ->
+            menu.add(R.string.menu_item_home_choose_wallpaper).setOnMenuItemClickListener {
+                wallpaperPickerContract.launch(Intent(Intent.ACTION_PICK).apply { type = "image/*" })
+                true
+            }
+            menu.add(R.string.menu_item_home_manage_widgets).setOnMenuItemClickListener {
+                startActivity(Intent(activity, HomeArrangementActivity::class.java))
+                true
+            }
             menu.add(R.string.menu_item_home_settings).setOnMenuItemClickListener {
                 startActivity(Intent(requireActivity(), SettingsActivity::class.java))
                 true
@@ -78,12 +101,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             }
 
             override fun onLongPress(x: Float, y: Float) {
-                // TODO
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    requireView().showContextMenu(x, y)
-                } else {
-                    requireView().showContextMenu()
-                }
+                ContextMenuCompat.INSTANCE.showContextMenu(requireView(), x, y)
             }
         })
     )

@@ -34,17 +34,6 @@ import com.mrmannwood.launcher.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
-    private val wallpaperPickerContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
-        if (result.data?.data == null) return@registerForActivityResult
-        startActivity(
-            WallpaperManager.getInstance(requireContext())
-                .getCropAndSetWallpaperIntent(result.data!!.data!!).apply {
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                }
-        )
-    }
-
     private val setHomeLauncherResultContract = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { updateHomeRolePreference(requireActivity()) }
@@ -147,30 +136,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         updateHomeRolePreference(activity)
-
-        PreferenceCategory(activity).apply {
-            screen.addPreference(this)
-            setTitle(R.string.preferences_category_wallpaper)
-            addPreference(Preference(activity).apply {
-                setTitle(R.string.preferences_wallpaper_choose_image)
-                setOnPreferenceClickListener {
-                    wallpaperPickerContract.launch(Intent(Intent.ACTION_PICK).apply { type = "image/*" })
-                    true
-                }
-            })
-        }
-
-        PreferenceCategory(activity).apply {
-            screen.addPreference(this)
-            setTitle(R.string.preferences_category_home)
-            addPreference(Preference(activity).apply {
-                setTitle(R.string.preferences_home_widgets)
-                setOnPreferenceClickListener {
-                    startActivity(Intent(activity, HomeArrangementActivity::class.java))
-                    true
-                }
-            })
-        }
 
         PreferenceCategory(activity).apply {
             screen.addPreference(this)

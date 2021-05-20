@@ -10,7 +10,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.launcher.R
 
-class NUXHostFragment : Fragment(R.layout.activity_nux), HandleBackPressed {
+class NUXHostFragment : Fragment(R.layout.fragment_nux_host), HandleBackPressed {
 
     interface NuxCompleted {
         fun onNuxCompleted()

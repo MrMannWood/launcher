@@ -246,7 +246,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
     }
 
     private fun performSearch() {
-        val search = searchView.text.toString().trim().toLowerCase(Locale.ROOT)
+        val search = searchView.text.toString().trim().lowercase(Locale.ROOT)
         viewModel.contacts.setSearchTerm(search)
         apps?.let { data ->
             val filteredApps =

@@ -26,7 +26,6 @@ import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForA
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
 import com.mrmannwood.hexlauncher.home.HomeArrangementActivity
 import com.mrmannwood.hexlauncher.launcher.LauncherActivity
-import com.mrmannwood.hexlauncher.legal.PrivacyPolicyActivity
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
@@ -228,7 +227,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             addPreference(Preference(activity).apply {
                 setTitle(R.string.preferences_privacy_policy)
                 setOnPreferenceClickListener {
-                    startActivity(Intent(activity, PrivacyPolicyActivity::class.java))
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://mrmannwood.github.io/launcher/")))
                     true
                 }
             })

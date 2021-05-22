@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
         <import type="android.view.View"/>
@@ -12,9 +11,10 @@
             type="com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter" />
     </data>
 
-    <RelativeLayout
+    <FrameLayout
         android:layout_width="75dp"
         android:layout_height="75dp"
+        android:foregroundGravity="center"
         android:visibility="@{appInfo == null ? View.INVISIBLE : View.VISIBLE}">
 
         <com.mrmannwood.hexlauncher.view.HexagonView
@@ -23,7 +23,6 @@
             android:layout_gravity="center"
             android:scaleType="fitCenter"
             android:src="@{appInfo.backgroundColor}"
-            android:layout_centerInParent="true"
             android:contentDescription="@{adapter.getAppName(appInfo)}"
             />
 
@@ -33,7 +32,6 @@
             android:layout_gravity="center"
             android:scaleType="fitCenter"
             android:src="@{appInfo.icon}"
-            android:layout_centerInParent="true"
             android:visibility="@{adapter.getNonAdaptiveIconVisibility(appInfo)}"
             />
 
@@ -43,11 +41,10 @@
             android:layout_gravity="center"
             android:scaleType="fitCenter"
             android:src="@{appInfo.icon}"
-            android:layout_centerInParent="true"
             android:visibility="@{adapter.getAdaptiveIconVisibility(appInfo)}"
             android:contentDescription="@{adapter.getAppName(appInfo)}"
             />
 
-    </RelativeLayout>
+    </FrameLayout>
 
 </layout>

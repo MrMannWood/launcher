@@ -25,14 +25,14 @@ class HexagonView @JvmOverloads constructor(
         val centerY = measuredHeight / 2f
 
         hexagonPath.apply {
-            reset();
-            moveTo(centerX, centerY + radius);
-            lineTo(centerX - triangleHeight, centerY + halfRadius);
-            lineTo(centerX - triangleHeight, centerY - halfRadius);
-            lineTo(centerX, centerY - radius);
-            lineTo(centerX + triangleHeight, centerY - halfRadius);
-            lineTo(centerX + triangleHeight, centerY + halfRadius);
-            close();
+            reset()
+            moveTo(centerX, centerY + radius)
+            lineTo(centerX - triangleHeight, centerY + halfRadius)
+            lineTo(centerX - triangleHeight, centerY - halfRadius)
+            lineTo(centerX, centerY - radius)
+            lineTo(centerX + triangleHeight, centerY - halfRadius)
+            lineTo(centerX + triangleHeight, centerY + halfRadius)
+            close()
         }
 
         invalidate()

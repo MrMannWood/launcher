@@ -27,7 +27,7 @@
         android:textColor="@color/colorOnPrimary"
         android:textSize="16sp"
         android:hint="@string/app_list_search_edit_text_hint"
-        android:textColorHint="@color/colorPrimary"
+        android:textColorHint="@android:color/transparent"
         android:drawableStart="@drawable/ic_search"
         android:drawableTint="@color/colorOnPrimary"
         />

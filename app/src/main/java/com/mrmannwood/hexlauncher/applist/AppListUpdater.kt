@@ -3,7 +3,6 @@ package com.mrmannwood.hexlauncher.applist
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.widget.Toast
@@ -11,7 +10,6 @@ import androidx.annotation.WorkerThread
 import androidx.core.content.edit
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.icon.IconAdapter
-import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
 import com.mrmannwood.launcher.R
 import kotlinx.coroutines.Dispatchers
@@ -27,9 +25,6 @@ object AppListUpdater {
         withContext(Dispatchers.IO) {
             try {
                 val prefs = PreferencesLiveData.get().getSharedPreferences()
-                if (!prefs.getBoolean(PreferenceKeys.Apps.USE_APP_DATABASE, false)) {
-                    return@withContext
-                }
 
                 val cachedApps = getCachedApps()
                 val installedApps = getAllInstalledApps(appContext, appContext.packageManager)

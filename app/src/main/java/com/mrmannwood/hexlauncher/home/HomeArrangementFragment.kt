@@ -2,16 +2,16 @@ package com.mrmannwood.hexlauncher.home
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.os.Bundle
 import android.view.*
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.content.edit
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerDialog
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerViewModel
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
@@ -24,6 +24,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
     private val viewModel : HomeArrangementViewModel by activityViewModels()
     private val colorPickerViewModel : ColorPickerViewModel by activityViewModels()
 
+    private lateinit var instructionMessage: TextView
     private lateinit var widgetContainer: FrameLayout
     private lateinit var sharedPrefs : SharedPreferences
 
@@ -154,11 +155,18 @@ class HomeArrangementFragment : WidgetHostFragment() {
             }
         })
 
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.home_arrangement_tutorial_title)
-            .setMessage(R.string.home_arrangement_tutorial_message)
-            .setPositiveButton(R.string.home_arrangement_tutorial_button) { _, _ -> }
-            .show()
+        instructionMessage = LayoutInflater.from(requireContext())
+            .inflate(R.layout.item_home_arrangement_instruction, databinder.container, true)
+            .findViewById(R.id.arrangement_instruction)
+        setInstructionText()
+        instructionMessage.startAnimation(
+            AlphaAnimation(0.0f, 1.0f).apply {
+                duration = 1250
+                startOffset = 20
+                repeatMode = Animation.REVERSE
+                repeatCount = Animation.INFINITE
+            }
+        )
     }
 
     override fun onStop() {
@@ -180,6 +188,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
 
     private fun removeWidget(widgetDescription: WidgetDescription) {
         widgetContainer.removeView(widgets.remove(widgetDescription))
+        setInstructionText()
     }
 
     private fun onWidgetShown(description: WidgetDescription, widget: View) {
@@ -209,6 +218,15 @@ class HomeArrangementFragment : WidgetHostFragment() {
                 ColorPickerDialog().show(childFragmentManager, null)
                 true
             }
+        }
+        setInstructionText()
+    }
+
+    private fun setInstructionText() {
+        if (widgets.isEmpty()) {
+            instructionMessage.setText(R.string.home_arrangement_tutorial_get_started)
+        } else {
+            instructionMessage.setText(R.string.home_arrangement_tutorial_customize_widget)
         }
     }
 

@@ -38,13 +38,6 @@
     <string name="preferences_category_legal">Legal</string>
     <string name="preferences_privacy_policy">Privacy Policy</string>
 
-    <string name="preferences_app_database_title">Store Apps</string>
-    <string name="preferences_app_database_description">Copy app data to local database for faster access</string>
-    <string name="preferences_app_database_dialog_title">App Restart Required</string>
-    <string name="preferences_app_database_dialog_message">This requires restarting the app, which may unset it as your default. Are you sure you want to do this?</string>
-    <string name="preferences_app_database_dialog_button_positive">I\'m Sure</string>
-    <string name="preferences_app_database_dialog_button_negative">No</string>
-
     <string name="preferences_category_experimental">Experimental Features</string>
     <string name="preferences_category_experimental_summary">Toggling these are a bad idea. Proceed with caution.</string>
     <string name="preferences_experimental_show">Enable Experimental Features</string>
@@ -84,9 +77,9 @@
 
     <string name="contact_image_content_description">Contact image for %s</string>
 
-    <string name="home_arrangement_tutorial_title">Widget Customization</string>
-    <string name="home_arrangement_tutorial_message">Long press the background get started. Long press a widget to customize it.</string>
-    <string name="home_arrangement_tutorial_button">OK</string>
+    <string name="home_arrangement_tutorial_get_started">Long press the background to get started</string>
+    <string name="home_arrangement_tutorial_customize_widget">Long press a widget to customize it.</string>
+
     <string name="home_arrangement_widgets_menu_title">Widgets</string>
     <string name="home_arrangement_widget_color">Color</string>
     <string name="home_arrangement_widget_hide">Hide</string>

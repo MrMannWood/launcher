@@ -12,14 +12,14 @@
     </data>
 
     <FrameLayout
-        android:layout_width="75dp"
+        android:layout_width="@dimen/hex_view_height"
         android:layout_height="75dp"
         android:foregroundGravity="center"
         android:visibility="@{appInfo == null ? View.INVISIBLE : View.VISIBLE}">
 
         <com.mrmannwood.hexlauncher.view.HexagonView
-            android:layout_width="75dp"
-            android:layout_height="75dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
             android:scaleType="fitCenter"
             android:src="@{appInfo.backgroundColor}"

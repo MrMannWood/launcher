@@ -7,6 +7,7 @@ import android.graphics.Path
 import android.graphics.PorterDuff
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
@@ -40,7 +41,7 @@ class HexagonView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         canvas.clipPath(hexagonPath)
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.DST)
         super.onDraw(canvas)
     }
 
@@ -49,7 +50,6 @@ class HexagonView @JvmOverloads constructor(
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = MeasureSpec.getSize(heightMeasureSpec)
         setMeasuredDimension(width, height)
-        calculatePath(min(width / 2f, height / 2f) - 10f)
+        calculatePath(max(width / 2f, height / 2f) - 10f)
     }
-
 }

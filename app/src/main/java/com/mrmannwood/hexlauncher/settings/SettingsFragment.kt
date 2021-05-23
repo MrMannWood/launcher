@@ -142,6 +142,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     true
                 }
             })
+            addPreference(SwitchPreference(activity).apply {
+                setTitle(R.string.preferences_app_list_use_hex_grid)
+                key = PreferenceKeys.Apps.USE_HEX_GRID
+                setDefaultValue(false)
+            })
         }
 
         PreferenceCategory(activity).apply {

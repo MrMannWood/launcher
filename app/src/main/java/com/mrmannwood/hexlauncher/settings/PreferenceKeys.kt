@@ -26,6 +26,9 @@ object PreferenceKeys {
             const val PACKAGE_NAME = "gestures_swipe_left_package_name"
         }
     }
+    object Apps {
+        const val USE_HEX_GRID = "apps_use_hex_grid"
+    }
     object Version {
         const val LAST_RUN_VERSION_NAME = "previous_version_name"
     }

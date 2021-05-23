@@ -27,6 +27,7 @@
 
     <string name="preferences_category_app_list">Apps</string>
     <string name="preferences_app_list_show_all_apps">Show All Apps</string>
+    <string name="preferences_app_list_use_hex_grid">Use Experimental Hex Grid</string>
 
     <string name="preferences_category_gestures">Gestures</string>
     <string name="preferences_gestures_swipe_right">Swipe Right</string>

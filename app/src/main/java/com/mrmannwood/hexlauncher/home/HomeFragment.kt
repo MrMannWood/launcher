@@ -14,6 +14,9 @@ import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.gesture.LauncherGestureDetectorListener
+import com.mrmannwood.hexlauncher.launcher.HexAppListFragment
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys
+import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.hexlauncher.view.ContextMenuCompat
 import com.mrmannwood.launcher.R
@@ -106,10 +109,19 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     )
 
     private fun showLauncherFragment() {
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.container, AppListFragment())
-            .addToBackStack("AppListFragment")
-            .commit()
+        PreferencesLiveData.get().observe(viewLifecycleOwner) { prefs ->
+            if(prefs.getBoolean(PreferenceKeys.Apps.USE_HEX_GRID, false)) {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.container, HexAppListFragment())
+                    .addToBackStack("HexAppListFragment")
+                    .commit()
+            } else {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.container, AppListFragment())
+                    .addToBackStack("AppListFragment")
+                    .commit()
+            }
+        }
     }
 
     private fun tryLaunchPackage(packageName: String?) {

@@ -248,39 +248,44 @@ class AppListFragment : Fragment(), HandleBackPressed {
     private fun performSearch() {
         val search = searchView.text.toString().trim().lowercase(Locale.ROOT)
         viewModel.contacts.setSearchTerm(search)
-        apps?.let { data ->
-            val filteredApps =
-                    if (search.isEmpty()) {
-                        Collections.emptyList()
-                    } else {
-                        val sorted = mutableMapOf<AppInfo, Int>()
-                        val length = search.length
-                        data.forEach {
-                            if (search.contains(' ')) {
-                                if (length <= it.lowerLabel.length) {
-                                    sorted[it] = search.qwertyMistakes(it.lowerLabel.substring(0, length))
-                                }
-                            } else {
-                                var smallestVal = Int.MAX_VALUE
-                                for (label in it.labelComponents) {
-                                    if (length <= label.length) {
-                                        val result = search.qwertyMistakes(label.substring(0, length))
-                                        if (result < smallestVal) {
-                                            smallestVal = result
-                                        }
-                                    }
-                                }
-                                sorted[it] = smallestVal
+        resultListAdapter.setData(
+                SearchResult.App::class,
+            searchApps(apps, search, numColumnsInAppList).map { SearchResult.App(it) }
+        )
+    }
+}
+
+
+fun searchApps(apps: List<AppInfo>?, term: String, maxReturn: Int) : List<AppInfo> {
+    return apps?.let { data ->
+        if (term.isEmpty()) {
+            Collections.emptyList()
+        } else {
+            val sorted = mutableMapOf<AppInfo, Int>()
+            val length = term.length
+            data.forEach {
+                if (term.contains(' ')) {
+                    if (length <= it.lowerLabel.length) {
+                        sorted[it] = term.qwertyMistakes(it.lowerLabel.substring(0, length))
+                    }
+                } else {
+                    var smallestVal = Int.MAX_VALUE
+                    for (label in it.labelComponents) {
+                        if (length <= label.length) {
+                            val result = term.qwertyMistakes(label.substring(0, length))
+                            if (result < smallestVal) {
+                                smallestVal = result
                             }
                         }
-                        sorted.filter { it.value != Int.MAX_VALUE }
-                                .toList()
-                                .sortedWith(compareBy({ it.second }, { it.first.label }))
-                                .map { it.first }
-                                .take(numColumnsInAppList)
                     }
-            resultListAdapter.setData(
-                    SearchResult.App::class, filteredApps.map { SearchResult.App(it) })
+                    sorted[it] = smallestVal
+                }
+            }
+            sorted.filter { it.value != Int.MAX_VALUE }
+                .toList()
+                .sortedWith(compareBy({ it.second }, { it.first.label }))
+                .map { it.first }
+                .take(maxReturn)
         }
-    }
+    } ?: Collections.emptyList()
 }

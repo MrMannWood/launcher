@@ -8,7 +8,6 @@ import android.graphics.PorterDuff
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
 import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.sqrt
 
 class HexagonView @JvmOverloads constructor(

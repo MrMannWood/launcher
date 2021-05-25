@@ -20,7 +20,7 @@ class PackageObserverBroadcastReceiver : BroadcastReceiver() {
         }
         LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(PACKAGES_CHANGED))
         LauncherApplication.applicationScope.launch {
-            AppListUpdater.updateAppListInternal(context.applicationContext)
+            AppListUpdater.updateAppList(context.applicationContext)
         }
     }
 }

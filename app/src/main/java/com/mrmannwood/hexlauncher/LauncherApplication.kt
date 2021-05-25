@@ -1,14 +1,11 @@
 package com.mrmannwood.hexlauncher
 
 import android.app.Application
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
-import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
 import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
@@ -42,7 +39,7 @@ class LauncherApplication : Application() {
         DB.init(this@LauncherApplication)
 
         applicationScope.launch {
-            AppListUpdater.updateAppListInternal(applicationContext)
+            AppListUpdater.updateAppList(applicationContext)
         }
 
         AppInfoLiveData.createAndGet(this).observeForever { }

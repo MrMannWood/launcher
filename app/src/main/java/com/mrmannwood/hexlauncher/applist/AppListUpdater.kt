@@ -5,13 +5,11 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.content.edit
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.icon.IconAdapter
 import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
-import com.mrmannwood.launcher.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -20,7 +18,7 @@ object AppListUpdater {
 
     private const val LAST_APP_CHECK_KEY = "last_app_check_time"
 
-    suspend fun updateAppListInternal(context: Context) {
+    suspend fun updateAppList(context: Context) {
         val appContext = context.applicationContext
         withContext(Dispatchers.IO) {
             try {
@@ -48,7 +46,6 @@ object AppListUpdater {
                 prefs.edit { putLong(LAST_APP_CHECK_KEY, System.currentTimeMillis()) }
             } catch (e: Exception) {
                 Timber.e(e, "An error occurred while updating the app database")
-                Toast.makeText(appContext, R.string.error_app_load, Toast.LENGTH_LONG).show()
             }
         }
     }

@@ -137,8 +137,7 @@ class HexAppListFragment : Fragment(), HandleBackPressed {
     private fun performSearch() {
         val search = searchView.text.toString().trim().lowercase(Locale.ROOT)
         val filteredApps = searchApps(apps, search, 8)
-        for (i in 0..7) {
-            val binding = appBindings[i]
+        appBindings.forEachIndexed { i, binding ->
             filteredApps.getOrNull(i)?.let { app ->
                 binding.second.invoke(app)
                 getAppListHost().onAppInfoBinding(binding.first, app)

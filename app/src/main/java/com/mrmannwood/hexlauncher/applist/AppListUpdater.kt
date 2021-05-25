@@ -23,6 +23,7 @@ object AppListUpdater {
         withContext(Dispatchers.IO) {
             try {
                 val prefs = PreferencesLiveData.get().getSharedPreferences()
+                val appDao = DB.get().appDataDao()
 
                 val cachedApps = getCachedApps()
                 val installedApps = getAllInstalledApps(appContext, appContext.packageManager)
@@ -32,11 +33,11 @@ object AppListUpdater {
                     appContext, getLastCacheUpdateTime(prefs), installedApps)
 
                 if (deletedApps.isNotEmpty()) {
-                    DB.get().appDataDao().deleteAll(deletedApps)
+                    appDao.deleteAll(deletedApps)
                 }
 
                 if (updatedApps.isNotEmpty()) {
-                    DB.get().appDataDao().insertAll(updatedApps)
+                    appDao.insertAll(updatedApps)
                     updatedApps.forEach {
                         it.foreground?.recycle()
                         it.background.recycle()
@@ -102,7 +103,6 @@ object AppListUpdater {
             }.associateBy { it.second.activityInfo.packageName }
         }
     }
-
 
     suspend fun <T> getAllInstalledApps(context: Context, func: (List<ResolveInfo>) -> T) : T {
         return withContext(Dispatchers.IO) {

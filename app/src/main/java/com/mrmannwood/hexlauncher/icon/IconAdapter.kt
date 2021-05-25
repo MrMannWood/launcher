@@ -30,6 +30,8 @@ interface IconAdapter {
 
     fun makeIconDrawable(res: Resources, foreground: Bitmap?, background: Bitmap) : Drawable
 
+    fun closeIconDrawable(icon: Drawable) : Unit
+
     @TargetApi(Build.VERSION_CODES.O)
     private class OreoIconAdapter : DefaultIconAdapter() {
 
@@ -62,6 +64,14 @@ interface IconAdapter {
                 BitmapDrawable(res, foreground)
             )
         }
+
+        override fun closeIconDrawable(icon: Drawable) : Unit {
+            if (!isAdaptive(icon)) return super.closeIconDrawable(icon)
+            with(icon as AdaptiveIconDrawable) {
+                super.closeIconDrawable(foreground)
+                super.closeIconDrawable(background)
+            }
+        }
     }
 
     private open class DefaultIconAdapter : IconAdapter {
@@ -80,6 +90,12 @@ interface IconAdapter {
 
         override fun makeIconDrawable(res: Resources, foreground: Bitmap?, background: Bitmap): Drawable {
             return BitmapDrawable(res, background)
+        }
+
+        override fun closeIconDrawable(icon: Drawable) {
+            if (icon is BitmapDrawable) {
+                icon.bitmap.recycle()
+            }
         }
 
         fun <T> drawableToBitmap(drawable: Drawable, func: (Bitmap) -> T) : T {

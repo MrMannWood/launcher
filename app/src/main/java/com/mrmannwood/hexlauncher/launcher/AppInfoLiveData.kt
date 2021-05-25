@@ -1,6 +1,8 @@
 package com.mrmannwood.hexlauncher.launcher
 
 import android.app.Application
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.MediatorLiveData
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.Result
@@ -26,6 +28,8 @@ class AppInfoLiveData private constructor(
         }
     }
 
+    private val handler = Handler(Looper.getMainLooper())
+
     init {
         addSource(DB.get().appDataDao().watchApps()) {
             onAppsLoaded(it)
@@ -34,7 +38,20 @@ class AppInfoLiveData private constructor(
 
     private fun onAppsLoaded(apps: List<AppData>) {
         try {
+            val previous = value
             postValue(Result.success(apps.map { loadApp(it) }))
+            if (previous != null) {
+                handler.postDelayed(
+                    {
+                        previous.onSuccess { apps ->
+                            apps.forEach { app ->
+                                IconAdapter.INSTANCE.closeIconDrawable(app.icon)
+                            }
+                        }
+                    },
+                    5
+                )
+            }
         } catch (e: Exception) {
             Timber.e(e, "Error loading packages")
             postValue(Result.failure(e))

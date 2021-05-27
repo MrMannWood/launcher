@@ -5,10 +5,13 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.StrictMode
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
+import com.mrmannwood.hexlauncher.foregrounddetection.ForegroundActivityListener
 import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
+import com.mrmannwood.hexlauncher.rageshake.ShakeManager
 import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
 import com.mrmannwood.launcher.BuildConfig
 import kotlinx.coroutines.CoroutineScope
@@ -52,6 +55,23 @@ class LauncherApplication : Application() {
                     addAction(Intent.ACTION_PACKAGE_REMOVED)
                 }
         )
+
+        // TODO make rageshake do something useful
+        if (BuildConfig.DEBUG) {
+            ForegroundActivityListener.init(this)
+            val shakeManager = ShakeManager(3) {
+                ForegroundActivityListener.forCurrentForegroundActivity { activity ->
+                    Toast.makeText(activity, "Rage Shake", Toast.LENGTH_LONG).show()
+                }
+            }
+            ForegroundActivityListener.registerForegroundUpdateListener { inForeground ->
+                if (inForeground) {
+                    shakeManager.startRageShakeDetector(this@LauncherApplication)
+                } else {
+                    shakeManager.stopRageShakeDetector()
+                }
+            }
+        }
     }
 
     private interface BuildModeConfiguration {

@@ -14,15 +14,19 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.preference.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
+import com.mrmannwood.hexlauncher.applist.AppListUpdater
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -211,6 +215,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 screen.addPreference(this)
                 setTitle(R.string.preferences_category_experimental)
                 setSummary(R.string.preferences_category_experimental_summary)
+
+                addPreference(Preference(activity).apply {
+                    title = "Refresh Apps"
+                    setOnPreferenceClickListener {
+                        GlobalScope.launch {
+                            PreferencesLiveData.get().getSharedPreferences().edit(commit = true) {
+                                remove("last_app_check_time")
+                            }
+                            AppListUpdater.updateAppList(activity.applicationContext)
+                        }
+                        true
+                    }
+                })
             }
         }
         preferenceScreen = screen

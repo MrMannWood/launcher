@@ -25,8 +25,10 @@ import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -210,26 +212,27 @@ class SettingsFragment : PreferenceFragmentCompat() {
             })
         }
 
-        if (BuildConfig.DEBUG) {
-            PreferenceCategory(activity).apply {
-                screen.addPreference(this)
-                setTitle(R.string.preferences_category_experimental)
-                setSummary(R.string.preferences_category_experimental_summary)
+        PreferenceCategory(activity).apply {
+            screen.addPreference(this)
+            setTitle(R.string.preferences_category_experimental)
+            setSummary(R.string.preferences_category_experimental_summary)
 
-                addPreference(Preference(activity).apply {
-                    title = "Refresh Apps"
-                    setOnPreferenceClickListener {
-                        GlobalScope.launch {
+            addPreference(Preference(activity).apply {
+                setTitle(R.string.preferences_refresh_app_cache_title)
+                setOnPreferenceClickListener {
+                    GlobalScope.launch {
+                        withContext(Dispatchers.IO) {
                             PreferencesLiveData.get().getSharedPreferences().edit(commit = true) {
                                 remove("last_app_check_time")
                             }
-                            AppListUpdater.updateAppList(activity.applicationContext)
                         }
-                        true
+                        AppListUpdater.updateAppList(activity.applicationContext)
                     }
-                })
-            }
+                    true
+                }
+            })
         }
+
         preferenceScreen = screen
     }
 

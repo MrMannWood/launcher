@@ -29,6 +29,9 @@ object PreferenceKeys {
     object Apps {
         const val USE_HEX_GRID = "apps_use_hex_grid"
     }
+    object Logging {
+        const val ENABLE_DISK_LOGGING = "enable_disk_logging"
+    }
     object Version {
         const val LAST_RUN_VERSION_NAME = "previous_version_name"
     }

@@ -12,7 +12,10 @@ import com.mrmannwood.hexlauncher.foregrounddetection.ForegroundActivityListener
 import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
 import com.mrmannwood.hexlauncher.rageshake.ShakeManager
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys
+import com.mrmannwood.hexlauncher.settings.PreferenceLiveData
 import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
+import com.mrmannwood.hexlauncher.timber.FileLoggerTree
 import com.mrmannwood.launcher.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,16 +31,28 @@ class LauncherApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        Timber.plant(FileLoggerTree.getAndInit(this@LauncherApplication))
         if (BuildConfig.DEBUG) {
-            DebugBuildModeConfiguration.onApplicationCreate()
+            DebugBuildModeConfiguration.onApplicationCreate(this@LauncherApplication)
         } else {
-            ReleaseBuildModeConfiguration.onApplicationCreate()
+            ReleaseBuildModeConfiguration.onApplicationCreate(this@LauncherApplication)
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
 
-        PreferencesLiveData.create(this).observeForever { }
+        PreferencesLiveData.create(this).observeForever {
+            PreferenceLiveData(
+                PreferenceKeys.Logging.ENABLE_DISK_LOGGING,
+                PreferenceLiveData.Extractor.BooleanExtractor
+            ).observeForever { enable ->
+                if (enable == true) {
+                    FileLoggerTree.get().enableDiskFlush()
+                } else {
+                    FileLoggerTree.get().disableDiskFlush()
+                }
+            }
+        }
 
         DB.init(this@LauncherApplication)
 
@@ -75,11 +90,11 @@ class LauncherApplication : Application() {
     }
 
     private interface BuildModeConfiguration {
-        fun onApplicationCreate()
+        fun onApplicationCreate(application: Application)
     }
 
     private object DebugBuildModeConfiguration : BuildModeConfiguration {
-        override fun onApplicationCreate() {
+        override fun onApplicationCreate(application: Application) {
             Timber.plant(Timber.DebugTree())
 
             StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().detectAll().build())
@@ -88,6 +103,7 @@ class LauncherApplication : Application() {
     }
 
     private object ReleaseBuildModeConfiguration : BuildModeConfiguration {
-        override fun onApplicationCreate() { }
+        override fun onApplicationCreate(application: Application) {
+        }
     }
 }

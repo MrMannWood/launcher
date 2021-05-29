@@ -14,7 +14,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.preference.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
@@ -23,6 +22,7 @@ import com.mrmannwood.hexlauncher.applist.AppListUpdater
 import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
+import com.mrmannwood.hexlauncher.timber.FileLoggerTree
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 import kotlinx.coroutines.Dispatchers
@@ -186,6 +186,22 @@ class SettingsFragment : PreferenceFragmentCompat() {
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_contacts_allow_search)
                 key = PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH
+            })
+        }
+
+        PreferenceCategory(activity).apply {
+            screen.addPreference(this)
+            setTitle(R.string.preferences_logging_enable)
+            addPreference(SwitchPreference(activity).apply {
+                setTitle(R.string.preferences_logging_enable)
+                key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING
+            })
+            addPreference(Preference(activity).apply {
+                setTitle(R.string.preferences_logging_flush)
+                setOnPreferenceClickListener {
+                    FileLoggerTree.get().flush()
+                    true
+                }
             })
         }
 

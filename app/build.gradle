@@ -23,7 +23,7 @@ android {
         applicationId "com.mrmannwood.hexlauncher"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 18
+        versionCode 19
         versionName "1.2.12"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

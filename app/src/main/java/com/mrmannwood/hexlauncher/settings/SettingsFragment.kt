@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.preference.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
@@ -29,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -191,17 +193,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
+            addPreference(Preference(activity).apply {
+                setTitle(R.string.preferences_report_a_problem)
+                setOnPreferenceClickListener {
+                    (activity.application as LauncherApplication).rageShakeThing(activity)
+                    true
+                }
+            })
+        }
+
+        PreferenceCategory(activity).apply {
+            screen.addPreference(this)
             setTitle(R.string.preferences_logging_enable)
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_logging_enable)
                 key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING
-            })
-            addPreference(Preference(activity).apply {
-                setTitle(R.string.preferences_logging_flush)
-                setOnPreferenceClickListener {
-                    FileLoggerTree.get().flush()
-                    true
-                }
             })
         }
 

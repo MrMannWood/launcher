@@ -5,7 +5,9 @@ import android.content.Context.MODE_PRIVATE
 import android.database.sqlite.SQLiteException
 import android.os.Handler
 import android.os.HandlerThread
+import android.os.Looper
 import android.os.Message
+import com.mrmannwood.hexlauncher.file.copyContentsTo
 import timber.log.Timber
 import java.io.*
 import java.text.DateFormat
@@ -17,6 +19,7 @@ import kotlin.collections.ArrayList
 class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
 
     companion object {
+        const val LOGS_DIRECTORY = "logs"
         private const val TAG = "FileLoggerTree"
         private const val MAX_LOG_FILES = 3
         private const val MAX_LOGS_IN_MEMORY = 100
@@ -24,6 +27,7 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
         private const val LOG_FILE_SUFFIX = "txt"
         private const val MESSAGE_GOT_LOG = 1
         private const val MESSAGE_FLUSH = 2
+        private const val MESSAGE_COPY_LOGS = 3
 
         private var INSTANCE : FileLoggerTree? = null
 
@@ -49,6 +53,11 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
         enableDiskFlush.set(false)
     }
 
+    fun copyLogsTo(out: File, callback: () -> Unit) {
+        flush()
+        handler.sendMessage(handler.obtainMessage(MESSAGE_COPY_LOGS, Pair(out, callback)))
+    }
+
     fun flush() {
         handler.sendMessage(handler.obtainMessage(MESSAGE_FLUSH))
     }
@@ -67,6 +76,10 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
             when (msg.what) {
                 MESSAGE_GOT_LOG -> log(context, msg.obj as Log)
                 MESSAGE_FLUSH -> flush(context)
+                MESSAGE_COPY_LOGS -> {
+                    val (out: File, callback) = msg.obj as Pair<File, () -> Unit>
+                    copyLogs(context, out, callback)
+                }
             }
         }
 
@@ -125,6 +138,17 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
             logs.clear()
         }
 
+        private fun copyLogs(context: Context, out: File, callback: () -> Unit) {
+            try {
+                openLogsFolder(context)?.copyContentsTo(out)
+            } catch (e: IOException) {
+                logError("Unable to copy logs to ${out.absoluteFile}", e)
+            }
+            Handler(Looper.getMainLooper()).post {
+                callback()
+            }
+        }
+
         private fun countLinesInFile(file: File) : Int {
             return BufferedReader(InputStreamReader(FileInputStream(file))).use { reader ->
                 var count = 0
@@ -163,7 +187,7 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
 
         private fun openLogsFolder(context: Context) : File? {
             return try {
-                context.getDir("logs", MODE_PRIVATE)
+                context.getDir(LOGS_DIRECTORY, MODE_PRIVATE)
             } catch (e: SQLiteException) {
                 logError("Cannot open logs directory", e)
                 null

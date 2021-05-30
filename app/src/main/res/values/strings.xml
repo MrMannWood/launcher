@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Hex Launcher</string>
+    <string name="dev_email">intentionalhexlauncher@gmail.com</string>
 
     <string name="unable_to_start_app">Unable to start app</string>
     <string name="no_app_selected">No app selected</string>
@@ -14,6 +15,8 @@
     <string name="menu_item_app_details">App Details</string>
 
     <string name="preferences_role_set_home">Set Hex Launcher as Home app</string>
+
+    <string name="preferences_report_a_problem">Report a Problem</string>
 
     <string name="preferences_category_contacts">Contacts</string>
     <string name="preferences_contacts_allow_search">Allow search to query contacts</string>
@@ -100,5 +103,7 @@
     <string name="wallpaper_title">Wallpaper</string>
     <string name="wallpaper_button_set">Set Wallpaper</string>
     <string name="wallpaper_greyscale_switch_title">Grayscale</string>
+
+    <string name="rage_shake_email_body">DebugInfo:\n%s\n\nPlease describe the issue you\'re experiencing</string>
 
 </resources>

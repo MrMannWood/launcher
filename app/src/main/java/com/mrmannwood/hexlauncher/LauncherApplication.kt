@@ -1,13 +1,15 @@
 package com.mrmannwood.hexlauncher
 
+import android.app.Activity
 import android.app.Application
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.StrictMode
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.FileProvider
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
+import com.mrmannwood.hexlauncher.applist.writeAppsToFile
 import com.mrmannwood.hexlauncher.foregrounddetection.ForegroundActivityListener
 import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
@@ -17,11 +19,12 @@ import com.mrmannwood.hexlauncher.settings.PreferenceLiveData
 import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
 import com.mrmannwood.hexlauncher.timber.FileLoggerTree
 import com.mrmannwood.launcher.BuildConfig
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import com.mrmannwood.launcher.R
+import kotlinx.coroutines.*
 import timber.log.Timber
+import java.io.File
+import java.util.ArrayList
+import java.util.concurrent.CountDownLatch
 
 class LauncherApplication : Application() {
 
@@ -71,21 +74,60 @@ class LauncherApplication : Application() {
                 }
         )
 
-        // TODO make rageshake do something useful
-        if (BuildConfig.DEBUG) {
-            ForegroundActivityListener.init(this)
-            val shakeManager = ShakeManager(3) {
-                ForegroundActivityListener.forCurrentForegroundActivity { activity ->
-                    Toast.makeText(activity, "Rage Shake", Toast.LENGTH_LONG).show()
-                }
+        ForegroundActivityListener.init(this)
+        val shakeManager = ShakeManager(3) {
+            ForegroundActivityListener.forCurrentForegroundActivity { activity ->
+                rageShakeThing(activity)
             }
-            ForegroundActivityListener.registerForegroundUpdateListener { inForeground ->
-                if (inForeground) {
-                    shakeManager.startRageShakeDetector(this@LauncherApplication)
-                } else {
-                    shakeManager.stopRageShakeDetector()
-                }
+        }
+        ForegroundActivityListener.registerForegroundUpdateListener { inForeground ->
+            if (inForeground) {
+                shakeManager.startRageShakeDetector(this@LauncherApplication)
+            } else {
+                shakeManager.stopRageShakeDetector()
             }
+        }
+        CoroutineScope(Dispatchers.IO).launch  {
+            File(filesDir, "rage_shake").deleteRecursively()
+        }
+    }
+
+    fun rageShakeThing(activity: Activity) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val rageShakeDir = File(filesDir, "rage_shake")
+            writeAppsToFile(rageShakeDir)
+
+            val latch = CountDownLatch(1)
+
+            FileLoggerTree.get().copyLogsTo(File(filesDir, "rage_shake")) { latch.countDown() }
+
+            runCatching { latch.await() }
+
+            val uris = ArrayList(
+                rageShakeDir.listFiles()?.map {
+                    FileProvider.getUriForFile(
+                        activity, "com.mrmannwood.hexlauncher.fileprovider", it)
+                } ?: emptyList()
+            )
+
+            val debugInfo ="""
+                OS Version: ${System.getProperty("os.version")} (${Build.VERSION.INCREMENTAL})
+                OS API Level: ${Build.VERSION.SDK_INT}
+                Device: ${Build.DEVICE}
+                Model and Product: ${Build.MODEL} ${Build.PRODUCT}
+                App Version: ${getString(R.string.app_version)}
+            """.trimIndent()
+
+            activity.startActivity(
+                Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.dev_email)))
+                    putExtra(Intent.EXTRA_SUBJECT, "Rage Shake Report")
+                    putExtra(Intent.EXTRA_STREAM, uris)
+                    putExtra(Intent.EXTRA_TEXT, getString(R.string.rage_shake_email_body, debugInfo))
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+            )
         }
     }
 

@@ -20,6 +20,8 @@ interface IconAdapter {
         }
     }
 
+    fun isRecycled(icon: Drawable) : Boolean
+
     fun isAdaptive(icon : Drawable) : Boolean
 
     fun getBackgroundColor(icon: Drawable) : Int
@@ -34,6 +36,13 @@ interface IconAdapter {
 
     @TargetApi(Build.VERSION_CODES.O)
     private class OreoIconAdapter : DefaultIconAdapter() {
+
+        override fun isRecycled(icon: Drawable): Boolean {
+            if (icon is AdaptiveIconDrawable) {
+                return super.isRecycled(icon.foreground) || super.isRecycled(icon.background)
+            }
+            return super.isRecycled(icon)
+        }
 
         override fun isAdaptive(icon : Drawable) = icon is AdaptiveIconDrawable
 
@@ -75,6 +84,13 @@ interface IconAdapter {
     }
 
     private open class DefaultIconAdapter : IconAdapter {
+
+        override fun isRecycled(icon: Drawable): Boolean {
+            if (icon is BitmapDrawable && icon.bitmap != null) {
+                return icon.bitmap.isRecycled
+            }
+            return false
+        }
 
         override fun isAdaptive(icon : Drawable) = false
 

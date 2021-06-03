@@ -2,116 +2,88 @@ package com.mrmannwood.hexlauncher.applist
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
+import android.database.sqlite.SQLiteException
 import androidx.annotation.WorkerThread
-import androidx.core.content.edit
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.icon.IconAdapter
-import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 object AppListUpdater {
 
-    private const val LAST_APP_CHECK_KEY = "last_app_check_time"
-
     suspend fun updateAppList(context: Context) {
+        updateAppListWithCount(context, 0)
+    }
+
+    private suspend fun updateAppListWithCount(context: Context, count: Int) {
         val appContext = context.applicationContext
         withContext(Dispatchers.IO) {
+            var runAgain = false
             try {
-                val prefs = PreferencesLiveData.get().getSharedPreferences()
+                val installedApps = getInstalledApps(appContext)
                 val appDao = DB.get().appDataDao()
 
-                val cachedApps = getCachedApps()
-                val installedApps = getAllInstalledApps(appContext, appContext.packageManager)
+                appDao.deleteNotIncluded(installedApps)
 
-                val deletedApps = findDeletedApps(cachedApps, installedApps)
-                val updatedApps = findNewOrUpdatedApps(
-                    appContext, getLastCacheUpdateTime(prefs), installedApps)
+                val appUpdateTimes = appDao.getLastUpdateTimeStamps().associateBy({ it.packageName }, {it.timestamp})
+                for (packageName in installedApps) {
+                    val packageInfo = context.packageManager.getPackageInfo(packageName, 0)
+                    val lastUpdateTime = appUpdateTimes.getOrElse(packageName, { -1L })
+                    if (lastUpdateTime >= packageInfo.lastUpdateTime) continue
+                    Timber.d("Inserting $packageName")
 
-                if (deletedApps.isNotEmpty()) {
-                    appDao.deleteAll(deletedApps)
-                }
-
-                if (updatedApps.isNotEmpty()) {
-                    appDao.insertAll(updatedApps)
-                    updatedApps.forEach {
-                        it.foreground?.recycle()
-                        it.background.recycle()
+                    loadAppDataFromPacman(packageInfo, context.packageManager)?.use { appData ->
+                        try {
+                            appDao.insert(appData)
+                        } catch (e: SQLiteException) {
+                            Timber.e(e, "An error occurred while writing app to db: $appData")
+                        }
+                    } ?: run {
+                        runAgain = true
+                        Timber.d("$packageName had a null icon")
                     }
                 }
 
-                prefs.edit { putLong(LAST_APP_CHECK_KEY, System.currentTimeMillis()) }
             } catch (e: Exception) {
                 Timber.e(e, "An error occurred while updating the app database")
+            }
+            if (runAgain && count <= 5) {
+                delay(100)
+                updateAppListWithCount(appContext, count + 1)
             }
         }
     }
 
     @WorkerThread
-    private fun getLastCacheUpdateTime(prefs: SharedPreferences) : Long =
-        prefs.getLong(LAST_APP_CHECK_KEY, 0)
+    private fun getInstalledApps(context: Context) : List<String> {
+        return context.packageManager.queryIntentActivities(
+            Intent(Intent.ACTION_MAIN, null).addCategory(Intent.CATEGORY_LAUNCHER), 0
+        )
+            .filter { it.activityInfo.packageName != context.packageName }
+            .map { it.activityInfo.packageName }
+            .distinct() // apparently there are times where this is necessary
+    }
 
     @WorkerThread
-    private fun getCachedApps() : Map<String, AppData> =
-        DB.get()
-            .appDataDao()
-            .getApps()
-            .associateBy { it.packageName }
-
-    private fun findDeletedApps(
-        cachedApps: Map<String, AppData>,
-        installedApps: Map<String, Pair<Long, ResolveInfo>>
-    ) : List<String> = cachedApps
-        .filter { app -> !installedApps.containsKey(app.value.packageName) }
-        .map { app -> app.value.packageName }
-
-    private fun findNewOrUpdatedApps(
-        context: Context,
-        lastCacheUpdateTime: Long,
-        installedApps: Map<String, Pair<Long, ResolveInfo>>
-    ) : List<AppData> = installedApps
-        .filter { app -> app.value.first >= lastCacheUpdateTime }
-        .map {
-            val packageName = it.key
-            val lastUpdateTime = it.value.first
-            val resolveInfo = it.value.second
-            val icon = it.value.second.loadIcon(context.packageManager)
+    private fun loadAppDataFromPacman(packageInfo: PackageInfo, pacman: PackageManager) : AppData? {
+        val packageName = packageInfo.packageName
+        val appInfo = packageInfo.applicationInfo
+        val icon = appInfo.loadIcon(pacman)
+        return if (IconAdapter.INSTANCE.isRecycled(icon)) {
+            null
+        } else {
             AppData(
                 packageName = packageName,
-                label = resolveInfo.loadLabel(context.packageManager).toString(),
-                lastUpdateTime = lastUpdateTime,
+                label = appInfo.loadLabel(pacman).toString(),
+                lastUpdateTime = packageInfo.lastUpdateTime,
                 backgroundColor = IconAdapter.INSTANCE.getBackgroundColor(icon),
                 foreground = IconAdapter.INSTANCE.getForegroundBitmap(icon),
                 background = IconAdapter.INSTANCE.getBackgroundBitmap(icon)
             )
         }
-
-    @WorkerThread
-    private suspend fun getAllInstalledApps(context: Context, pacman: PackageManager) : Map<String, Pair<Long, ResolveInfo>> {
-        return getAllInstalledApps(context) {
-            it.map { resolveInfo ->
-                resolveInfo to pacman.getPackageInfo(resolveInfo.activityInfo.packageName, 0)
-            }.map { (resolveInfo, packageInfo) ->
-                Pair(
-                    packageInfo.lastUpdateTime,
-                    resolveInfo
-                )
-            }.associateBy { it.second.activityInfo.packageName }
-        }
     }
-
-    suspend fun <T> getAllInstalledApps(context: Context, func: (List<ResolveInfo>) -> T) : T {
-        return withContext(Dispatchers.IO) {
-            func(
-                context.packageManager.queryIntentActivities(
-                    Intent(Intent.ACTION_MAIN, null).addCategory(Intent.CATEGORY_LAUNCHER), 0
-                ).filter { it.activityInfo.packageName != context.packageName }
-            )
-        }
-    }
-
 }

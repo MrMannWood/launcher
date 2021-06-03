@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.preference.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
 import com.mrmannwood.hexlauncher.applist.AppListActivity
@@ -244,11 +245,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 setOnPreferenceClickListener {
                     GlobalScope.launch {
                         withContext(Dispatchers.IO) {
-                            PreferencesLiveData.get().getSharedPreferences().edit(commit = true) {
-                                remove("last_app_check_time")
-                            }
+                            DB.get().appDataDao().zeroAllLastUpdateTimeStamps()
+                            AppListUpdater.updateAppList(activity.applicationContext)
                         }
-                        AppListUpdater.updateAppList(activity.applicationContext)
                     }
                     true
                 }

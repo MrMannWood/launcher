@@ -12,8 +12,14 @@ interface AppDataDao {
     fun watchApps() : LiveData<List<AppData>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(apps: List<AppData>)
+    fun insert(app: AppData)
 
-    @Query("DELETE FROM app_data WHERE package_name IN (:packageName)")
-    fun deleteAll(packageName: List<String>)
+    @Query("DELETE FROM app_data WHERE package_name NOT IN (:packageName)")
+    fun deleteNotIncluded(packageName: List<String>)
+
+    @Query("SELECT package_name, last_update_time FROM app_data")
+    fun getLastUpdateTimeStamps() : List<AppData.Timestamp>
+
+    @Query("UPDATE app_data SET last_update_time = 0 WHERE package_name IS NOT NULL")
+    fun zeroAllLastUpdateTimeStamps()
 }

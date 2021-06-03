@@ -51,9 +51,13 @@ object AppListUpdater {
             } catch (e: Exception) {
                 Timber.e(e, "An error occurred while updating the app database")
             }
-            if (runAgain && count <= 5) {
-                delay(100)
-                updateAppListWithCount(appContext, count + 1)
+            if (runAgain) {
+                if (count <= 5) {
+                    delay(100)
+                    updateAppListWithCount(appContext, count + 1)
+                } else {
+                    Timber.wtf("Cannot get an icon for at least one app")
+                }
             }
         }
     }

@@ -40,6 +40,8 @@ class LauncherApplication : Application() {
         } else {
             ReleaseBuildModeConfiguration.onApplicationCreate(this@LauncherApplication)
         }
+        installUncaughtExceptionHandler()
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
@@ -89,6 +91,16 @@ class LauncherApplication : Application() {
         }
         CoroutineScope(Dispatchers.IO).launch  {
             File(filesDir, "rage_shake").deleteRecursively()
+        }
+    }
+
+    private fun installUncaughtExceptionHandler() {
+        val exceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            try {
+                Timber.e(throwable, "An uncaught exception occurred on thread ${thread.name}")
+            } catch (ignored: Throwable) { }
+            exceptionHandler?.uncaughtException(thread, throwable)
         }
     }
 

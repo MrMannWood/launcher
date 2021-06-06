@@ -16,11 +16,9 @@
 
     <string name="preferences_role_set_home">Set Hex Launcher as Home app</string>
 
-    <string name="preferences_report_a_problem">Report a Problem</string>
-
-    <string name="preferences_category_logging">Logging</string>
-    <string name="preferences_logging_enable">Log to disk</string>
-    <string name="preferences_logging_flush">Flush logs to disk</string>
+    <string name="preferences_category_debugging">Debugging</string>
+    <string name="preferences_debugging_report_a_problem">Report a Problem</string>
+    <string name="preferences_debugging_logging_enable">Log to disk</string>
 
     <string name="preferences_home_widgets_date_name">Date</string>
     <string name="preferences_home_widgets_time_name">Time</string>

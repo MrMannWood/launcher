@@ -150,20 +150,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
+            setTitle(R.string.preferences_category_debugging)
             addPreference(Preference(activity).apply {
-                setTitle(R.string.preferences_report_a_problem)
+                setTitle(R.string.preferences_debugging_report_a_problem)
                 setOnPreferenceClickListener {
                     (activity.application as LauncherApplication).rageShakeThing(activity)
                     true
                 }
             })
-        }
-
-        PreferenceCategory(activity).apply {
-            screen.addPreference(this)
-            setTitle(R.string.preferences_category_logging)
             addPreference(SwitchPreference(activity).apply {
-                setTitle(R.string.preferences_logging_enable)
+                setTitle(R.string.preferences_debugging_logging_enable)
                 key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING
             })
         }

@@ -16,7 +16,7 @@ suspend fun writeAppsToFile(out: File) {
         try {
             FileWriter(File(out, "db_dump.txt")).use { writer ->
                 apps.forEach { app ->
-                    writer.append("{package-name}:${app.label}:${app.foreground != null}\n")
+                    writer.append("${app.label}:${app.packageName}:${app.lastUpdateTime}:${app.backgroundColor}")
                 }
             }
         } catch (e: IOException) {

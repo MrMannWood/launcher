@@ -11,7 +11,9 @@ object DB {
             app.applicationContext,
             Database::class.java,
             "database"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     fun get() = db

@@ -9,6 +9,6 @@ data class AppInfo(
     val backgroundColor: Int,
     val label: String
 ) {
-    val lowerLabel = label.toLowerCase(Locale.ROOT)
+    val lowerLabel = label.lowercase(Locale.ROOT)
     val labelComponents = lowerLabel.split(' ')
 }

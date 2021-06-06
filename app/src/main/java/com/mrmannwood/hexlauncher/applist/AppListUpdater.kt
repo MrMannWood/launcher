@@ -36,7 +36,7 @@ object AppListUpdater {
                     if (lastUpdateTime >= packageInfo.lastUpdateTime) continue
                     Timber.d("Inserting $packageName")
 
-                    loadAppDataFromPacman(packageInfo, context.packageManager)?.use { appData ->
+                    loadAppDataFromPacman(packageInfo, context.packageManager)?.let { appData ->
                         try {
                             appDao.insert(appData)
                         } catch (e: SQLiteException) {
@@ -84,9 +84,7 @@ object AppListUpdater {
                 packageName = packageName,
                 label = appInfo.loadLabel(pacman).toString(),
                 lastUpdateTime = packageInfo.lastUpdateTime,
-                backgroundColor = IconAdapter.INSTANCE.getBackgroundColor(icon),
-                foreground = IconAdapter.INSTANCE.getForegroundBitmap(icon),
-                background = IconAdapter.INSTANCE.getBackgroundBitmap(icon)
+                backgroundColor = IconAdapter.INSTANCE.getBackgroundColor(icon)
             )
         }
     }

@@ -10,15 +10,17 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.gesture.LauncherGestureDetectorListener
 import com.mrmannwood.hexlauncher.launcher.HexAppListFragment
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
-import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
+import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class HomeFragment : WidgetHostFragment(), HandleBackPressed {
@@ -107,8 +109,9 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     )
 
     private fun showLauncherFragment() {
-        PreferencesLiveData.get().observe(viewLifecycleOwner) { prefs ->
-            if(prefs.getBoolean(PreferenceKeys.Apps.USE_HEX_GRID, false)) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val prefs = PreferencesRepository.getPrefs(requireContext())
+            if (prefs.getBoolean(PreferenceKeys.Apps.USE_HEX_GRID, false)) {
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.container, HexAppListFragment())
                     .addToBackStack("HexAppListFragment")
@@ -123,7 +126,9 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     }
 
     private fun tryLaunchPackage(packageName: String?) {
-        packageName?.let { packageName ->
+        if (packageName == null) {
+            Toast.makeText(requireContext(), R.string.gesture_no_action_selected, Toast.LENGTH_SHORT).show()
+        } else {
             requireActivity().packageManager.getLaunchIntentForPackage(packageName)?.let { intent ->
                 try {
                     startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
@@ -131,11 +136,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                     Timber.e(e, "Unable to open package: $packageName")
                     Toast.makeText(requireContext(), R.string.unable_to_start_app, Toast.LENGTH_SHORT).show()
                 }
-            } ?: {
-                Toast.makeText(requireContext(), R.string.unable_to_start_app, Toast.LENGTH_SHORT).show()
             }
-        } ?: run {
-            Toast.makeText(requireContext(), R.string.gesture_no_action_selected, Toast.LENGTH_SHORT).show()
         }
     }
 }

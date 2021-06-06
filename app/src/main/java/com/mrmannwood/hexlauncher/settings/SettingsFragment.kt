@@ -11,6 +11,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.role.RoleManagerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.*
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.LauncherApplication
@@ -39,9 +40,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
     ) { result ->
         result.data.onAppListResult(
                 onSuccess = { appName, packageName ->
-                    prefs.edit {
-                        putString(PreferenceKeys.Gestures.SwipeRight.APP_NAME, appName)
-                        putString(PreferenceKeys.Gestures.SwipeRight.PACKAGE_NAME, packageName)
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        PreferencesRepository.getPrefs(requireContext()).edit {
+                            putString(PreferenceKeys.Gestures.SwipeRight.APP_NAME, appName)
+                            putString(PreferenceKeys.Gestures.SwipeRight.PACKAGE_NAME, packageName)
+                        }
                     }
                 },
                 onFailure = {
@@ -54,20 +57,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
             ActivityResultContracts.StartActivityForResult()
     ) { result ->
         result.data.onAppListResult(
-                onSuccess = { appName, packageName ->
-                    prefs.edit {
+            onSuccess = { appName, packageName ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    PreferencesRepository.getPrefs(requireContext()).edit {
                         putString(PreferenceKeys.Gestures.SwipeLeft.APP_NAME, appName)
                         putString(PreferenceKeys.Gestures.SwipeLeft.PACKAGE_NAME, packageName)
                     }
-                },
-                onFailure = {
-                    Toast.makeText(requireContext(), R.string.no_app_selected, Toast.LENGTH_LONG).show()
                 }
+            },
+            onFailure = {
+                Toast.makeText(requireContext(), R.string.no_app_selected, Toast.LENGTH_LONG).show()
+            }
         )
     }
 
     private val settingsViewModel : SettingsViewModel by activityViewModels()
-    private val prefs = PreferencesLiveData.get().getSharedPreferences()
 
     private lateinit var homeRolePreference: Preference
     private lateinit var swipeRightAppPreference: Preference

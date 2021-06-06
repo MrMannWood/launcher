@@ -14,13 +14,15 @@ import com.mrmannwood.hexlauncher.foregrounddetection.ForegroundActivityListener
 import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
 import com.mrmannwood.hexlauncher.rageshake.ShakeManager
+import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
-import com.mrmannwood.hexlauncher.settings.PreferenceLiveData
-import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
+import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.hexlauncher.timber.FileLoggerTree
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import java.io.File
 import java.util.ArrayList
@@ -46,17 +48,19 @@ class LauncherApplication : Application() {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
 
-        PreferencesLiveData.create(this).observeForever {
-            PreferenceLiveData(
-                PreferenceKeys.Logging.ENABLE_DISK_LOGGING,
-                PreferenceLiveData.Extractor.BooleanExtractor
-            ).observeForever { enable ->
-                if (enable == true) {
-                    FileLoggerTree.get().enableDiskFlush()
-                } else {
-                    FileLoggerTree.get().disableDiskFlush()
-                }
-            }
+        applicationScope.launch {
+            PreferencesRepository.watchPref(
+                context = this@LauncherApplication,
+                key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING,
+                extractor = PreferenceExtractor.BooleanExtractor
+            )
+                .onEach { enable ->
+                    if (enable == true) {
+                        FileLoggerTree.get().enableDiskFlush()
+                    } else {
+                        FileLoggerTree.get().disableDiskFlush()
+                    }
+                }.collect {  }
         }
 
         DB.init(this@LauncherApplication)

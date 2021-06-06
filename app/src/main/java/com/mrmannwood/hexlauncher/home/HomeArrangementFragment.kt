@@ -12,20 +12,22 @@ import androidx.core.content.edit
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerDialog
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerViewModel
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
+import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
+import kotlinx.coroutines.launch
 
 class HomeArrangementFragment : WidgetHostFragment() {
 
-    private val viewModel : HomeArrangementViewModel by activityViewModels()
     private val colorPickerViewModel : ColorPickerViewModel by activityViewModels()
 
     private lateinit var instructionMessage: TextView
     private lateinit var widgetContainer: FrameLayout
-    private lateinit var sharedPrefs : SharedPreferences
+    private var sharedPrefs : SharedPreferences? = null
 
     private val widgets = mutableMapOf<WidgetDescription, View>()
     private var viewBottom = 0
@@ -47,7 +49,9 @@ class HomeArrangementFragment : WidgetHostFragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(databinder: FragmentHomeBinding, savedInstanceState: Bundle?) {
-        sharedPrefs = viewModel.preferencesLiveData.getSharedPreferences()
+        viewLifecycleOwner.lifecycleScope.launch {
+            sharedPrefs = PreferencesRepository.getPrefs(requireContext())
+        }
 
         widgetContainer = databinder.container
         widgetContainer.addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, _ -> viewBottom = bottom }
@@ -170,7 +174,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
 
     override fun onStop() {
         super.onStop()
-        sharedPrefs.edit {
+        sharedPrefs?.edit {
             allWidgets
                 .filter { !widgets.contains(it.value) }
                 .map { it.key }

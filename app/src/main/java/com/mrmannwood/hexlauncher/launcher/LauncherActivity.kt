@@ -8,39 +8,38 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
+import androidx.lifecycle.lifecycleScope
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.home.HomeFragment
 import com.mrmannwood.hexlauncher.nux.NUXHostFragment
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
+import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
+import kotlinx.coroutines.launch
 
 class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivity {
-
-    private val viewModel by viewModels<LauncherActivityViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
         supportActionBar?.hide()
 
-        viewModel.preferencesLiveData.observe(this) { prefs ->
-            if (checkShouldShowNux(prefs)) {
-                supportFragmentManager.beginTransaction()
-                    .add(R.id.container, NUXHostFragment())
-                    .commit()
-            }
-        }
-        viewModel.appInfoLiveData.observe(this) { }
-
         if (supportFragmentManager.findFragmentById(R.id.container) == null) {
             supportFragmentManager.beginTransaction()
                 .add(R.id.container, HomeFragment())
                 .commit()
+        }
+
+        lifecycleScope.launch {
+            if (checkShouldShowNux(PreferencesRepository.getPrefs(this@LauncherActivity))) {
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.container, NUXHostFragment())
+                    .commit()
+            }
         }
     }
 

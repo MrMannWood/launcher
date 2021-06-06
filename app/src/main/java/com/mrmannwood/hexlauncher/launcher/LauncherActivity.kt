@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
-import com.mrmannwood.hexlauncher.contacts.ContactData
 import com.mrmannwood.hexlauncher.home.HomeFragment
 import com.mrmannwood.hexlauncher.nux.NUXHostFragment
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
@@ -77,14 +76,6 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
     private val appListFragmentHost = object : AppListFragment.Host<Void>(
         killFragment = { _ -> supportFragmentManager.popBackStack() }
     ) {
-
-        override fun showContacts(): Boolean = true
-
-        override fun onContactClicked(contact: ContactData) {
-            startActivity(Intent(Intent.ACTION_VIEW, contact.uri))
-            end()
-        }
-
         override fun onSearchButtonPressed(searchTerm: String) {
             startActivity(Intent(Intent.ACTION_WEB_SEARCH).apply {
                 putExtra(SearchManager.QUERY, searchTerm)

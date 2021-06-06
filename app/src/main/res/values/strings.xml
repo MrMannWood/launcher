@@ -18,13 +18,6 @@
 
     <string name="preferences_report_a_problem">Report a Problem</string>
 
-    <string name="preferences_category_contacts">Contacts</string>
-    <string name="preferences_contacts_allow_search">Allow search to query contacts</string>
-    <string name="preferences_contacts_dialog_title">Revoke Contacts Permissions?</string>
-    <string name="preferences_contacts_dialog_message">To protect your privacy, you should revoke unused permissions. Do you want to revoke the contacts permission, as it is no longer needed?</string>
-    <string name="preferences_contacts_dialog_button_positive">Yes</string>
-    <string name="preferences_contacts_dialog_button_negative">No</string>
-
     <string name="preferences_category_logging">Logging</string>
     <string name="preferences_logging_enable">Log to disk</string>
     <string name="preferences_logging_flush">Flush logs to disk</string>

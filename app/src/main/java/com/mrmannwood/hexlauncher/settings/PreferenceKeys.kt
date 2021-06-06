@@ -1,9 +1,6 @@
 package com.mrmannwood.hexlauncher.settings
 
 object PreferenceKeys {
-    object Contacts {
-        const val ALLOW_CONTACT_SEARCH = "contacts_allow_search"
-    }
     object Home {
         object Widgets {
             const val DATE = "home_widget_date"

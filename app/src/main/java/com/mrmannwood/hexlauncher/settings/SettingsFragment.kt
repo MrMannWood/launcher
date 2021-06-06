@@ -3,7 +3,6 @@ package com.mrmannwood.hexlauncher.settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,7 +12,6 @@ import androidx.core.role.RoleManagerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.preference.*
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
@@ -21,17 +19,14 @@ import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
-import com.mrmannwood.hexlauncher.permissions.PermissionsLiveData
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
-import com.mrmannwood.hexlauncher.timber.FileLoggerTree
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -71,12 +66,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         )
     }
 
-    private val requestContactsPermissionContract = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        prefs.edit {
-            putBoolean(PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH, isGranted)
-        }
-    }
-
     private val settingsViewModel : SettingsViewModel by activityViewModels()
     private val prefs = PreferencesLiveData.get().getSharedPreferences()
 
@@ -98,30 +87,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 swipeLeftAppPreference.summary = appName
             } else {
                 swipeLeftAppPreference.setSummary(R.string.preferences_gestures_unset)
-            }
-        }
-        settingsViewModel.contactsPermissionLiveData.observe(this) { permissionsResult ->
-            when (permissionsResult) {
-                is PermissionsLiveData.PermissionsResult.Granted -> { /* checked */  }
-                is PermissionsLiveData.PermissionsResult.NotGranted -> { /* unchecked */ }
-                is PermissionsLiveData.PermissionsResult.UserShouldGrantPermission -> {
-                    requestContactsPermissionContract.launch(
-                            settingsViewModel.contactsPermissionLiveData.permission)
-                }
-                is PermissionsLiveData.PermissionsResult.UserShouldRevokePermission -> {
-                    MaterialAlertDialogBuilder(requireActivity())
-                            .setTitle(R.string.preferences_contacts_dialog_title)
-                            .setMessage(R.string.preferences_contacts_dialog_message)
-                            .setPositiveButton(R.string.preferences_contacts_dialog_button_positive) { _, _ ->
-                                startActivity(
-                                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                            data = Uri.fromParts("package", requireActivity().packageName, null)
-                                        }
-                                )
-                            }
-                            .setNegativeButton(R.string.preferences_contacts_dialog_button_negative) { _, _ -> }
-                            .show()
-                }
             }
         }
     }
@@ -180,15 +145,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                                     .decorateForAppListLaunch(R.string.preferences_gestures_swipe_left_chooser_title))
                     true
                 }
-            })
-        }
-
-        PreferenceCategory(activity).apply {
-            screen.addPreference(this)
-            setTitle(R.string.preferences_category_contacts)
-            addPreference(SwitchPreference(activity).apply {
-                setTitle(R.string.preferences_contacts_allow_search)
-                key = PreferenceKeys.Contacts.ALLOW_CONTACT_SEARCH
             })
         }
 

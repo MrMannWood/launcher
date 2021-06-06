@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,8 +18,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.hexlauncher.HandleBackPressed
-import com.mrmannwood.hexlauncher.contacts.ContactData
-import com.mrmannwood.hexlauncher.contacts.ContactsDatabindingAdapter
 import com.mrmannwood.hexlauncher.launcher.Adapter
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
@@ -29,8 +26,6 @@ import com.mrmannwood.hexlauncher.qwertyMistakes
 import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
-import com.mrmannwood.launcher.databinding.ListItemContactBinding
-import timber.log.Timber
 import java.util.*
 
 class AppListFragment : Fragment(), HandleBackPressed {
@@ -51,9 +46,6 @@ class AppListFragment : Fragment(), HandleBackPressed {
         }
 
         abstract fun onAppSelected(appInfo: AppInfo)
-        abstract fun showContacts(): Boolean // TODO this really doesn't belong here
-        open fun onContactClicked(contact: ContactData) { }
-
         open fun onSearchButtonPressed(searchTerm: String) { }
         open fun onAppInfoBinding(view: View, appInfo: AppInfo) { }
     }
@@ -65,9 +57,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
 
     private lateinit var searchView: KeyboardEditText
     private lateinit var resultListView: RecyclerView
-    private lateinit var resultListAdapter: Adapter<SearchResult>
-
-    private lateinit var contactsDatabindingAdapter : ContactsDatabindingAdapter
+    private lateinit var resultListAdapter: Adapter<AppInfo>
 
     private var numColumnsInAppList: Int = 0
 
@@ -118,8 +108,6 @@ class AppListFragment : Fragment(), HandleBackPressed {
             }
         }
 
-        contactsDatabindingAdapter = ContactsDatabindingAdapter(resources)
-
         startObservingLiveData()
     }
 
@@ -151,13 +139,6 @@ class AppListFragment : Fragment(), HandleBackPressed {
                 Toast.makeText(requireContext(), R.string.error_app_load, Toast.LENGTH_SHORT).show()
             }
         })
-        if (getAppListHost().showContacts()) {
-            viewModel.contacts.observe(viewLifecycleOwner) { contacts ->
-                resultListAdapter.setData(
-                        SearchResult.Contact::class,
-                        contacts.take(2).map { contact -> SearchResult.Contact(contact) })
-            }
-        }
     }
 
     private fun createResultLayoutManager() : GridLayoutManager {
@@ -171,53 +152,27 @@ class AppListFragment : Fragment(), HandleBackPressed {
         }.apply {
             spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
-                    return when (resultListAdapter.getItem(position)) {
-                        is SearchResult.App -> 1
-                        is SearchResult.Contact -> numColumnsInAppList
-                    }
+                    return 1
                 }
             }
         }
     }
 
-    private fun createResultAdapter(): Adapter<SearchResult> {
-        val idGenerator = Adapter.IdGenerator(
-                listOf(
-                        SearchResult.App::class to { (it as SearchResult.App).appInfo.packageName },
-                        SearchResult.Contact::class to { (it as SearchResult.Contact).contact.id }
-                )
-        )
+    private fun createResultAdapter(): Adapter<AppInfo> {
+        val idGenerator = Adapter.IdGenerator(listOf(AppInfo::class to { it.packageName }))
         return Adapter(
                 context = requireContext(),
-                order = arrayOf(SearchResult.App::class, SearchResult.Contact::class),
+                order = arrayOf(AppInfo::class),
                 idFunc = idGenerator::genId,
-                viewFunc = {
-                    when (it) {
-                        is SearchResult.App -> R.layout.list_app_item
-                        is SearchResult.Contact -> R.layout.list_item_contact
+                viewFunc = { R.layout.list_app_item },
+                bindFunc = { vdb, appInfo ->
+                    (vdb as ListAppItemBinding).apply {
+                        this.appInfo = appInfo
+                        this.adapter = LauncherFragmentDatabindingAdapter
                     }
-                },
-                bindFunc = { vdb, result ->
-                    when (result) {
-                        is SearchResult.App -> {
-                            (vdb as ListAppItemBinding).apply {
-                                appInfo = result.appInfo
-                                adapter = LauncherFragmentDatabindingAdapter
-                            }
-                            getAppListHost().onAppInfoBinding(vdb.root, result.appInfo)
-                            vdb.root.setOnClickListener {
-                                getAppListHost().onAppSelected(result.appInfo)
-                            }
-                        }
-                        is SearchResult.Contact -> {
-                            (vdb as ListItemContactBinding).apply {
-                                contact = result.contact
-                                adapter = contactsDatabindingAdapter
-                            }
-                            vdb.root.setOnClickListener {
-                                getAppListHost().onContactClicked(result.contact)
-                            }
-                        }
+                    getAppListHost().onAppInfoBinding(vdb.root, appInfo)
+                    vdb.root.setOnClickListener {
+                        getAppListHost().onAppSelected(appInfo)
                     }
                 }
         )
@@ -247,10 +202,9 @@ class AppListFragment : Fragment(), HandleBackPressed {
 
     private fun performSearch() {
         val search = searchView.text.toString().trim().lowercase(Locale.ROOT)
-        viewModel.contacts.setSearchTerm(search)
         resultListAdapter.setData(
-                SearchResult.App::class,
-            searchApps(apps, search, numColumnsInAppList).map { SearchResult.App(it) }
+            AppInfo::class,
+            searchApps(apps, search, numColumnsInAppList).map { it }
         )
     }
 }

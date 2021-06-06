@@ -94,7 +94,5 @@ class AppListActivity : AppCompatActivity(), AppListFragment.AppListHostActivity
         override fun onAppSelected(appInfo: AppInfo) {
             end(appInfo)
         }
-
-        override fun showContacts(): Boolean = false
     }
 }

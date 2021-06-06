@@ -1,7 +1,10 @@
 package com.mrmannwood.hexlauncher.file
 
-import java.io.*
+import java.io.File
+import java.io.IOException
+import java.nio.file.Files
 
+@Throws(IOException::class)
 fun File.copyContentsTo(dest: File) : List<File> {
     if (!dest.exists()) dest.mkdirs()
 
@@ -9,15 +12,7 @@ fun File.copyContentsTo(dest: File) : List<File> {
     for (file in listFiles() ?: emptyArray()) {
         val result = File(dest, file.name)
         if (!result.createNewFile()) continue
-        BufferedReader(FileReader(file)).use { reader ->
-            OutputStreamWriter(FileOutputStream(result)).use { writer ->
-                while (true) {
-                    val line = reader.readLine() ?: break
-                    writer.write(line)
-                    writer.write("\n")
-                }
-            }
-        }
+        Files.copy(file.toPath(), result.toPath())
         files.add(result)
     }
     return files

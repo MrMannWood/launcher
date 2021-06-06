@@ -1,23 +1,16 @@
 package com.mrmannwood.hexlauncher.icon
 
-import android.annotation.TargetApi
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.os.Build
 import androidx.core.graphics.get
 
 interface IconAdapter {
 
     companion object {
-        val INSTANCE : IconAdapter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            OreoIconAdapter()
-        } else {
-            DefaultIconAdapter()
-        }
+        val INSTANCE : IconAdapter = DefaultIconAdapter()
     }
 
     fun isRecycled(icon: Drawable) : Boolean
@@ -26,20 +19,15 @@ interface IconAdapter {
 
     fun getBackgroundColor(icon: Drawable) : Int
 
-    fun getForegroundBitmap(icon: Drawable) : Bitmap?
-
-    fun getBackgroundBitmap(icon: Drawable) : Bitmap
-
-    fun makeIconDrawable(res: Resources, foreground: Bitmap?, background: Bitmap) : Drawable
-
-    @TargetApi(Build.VERSION_CODES.O)
-    private class OreoIconAdapter : DefaultIconAdapter() {
+    private open class DefaultIconAdapter : IconAdapter {
 
         override fun isRecycled(icon: Drawable): Boolean {
-            if (icon is AdaptiveIconDrawable) {
-                return super.isRecycled(icon.foreground) || super.isRecycled(icon.background)
+            if (icon is BitmapDrawable && icon.bitmap != null) {
+                return icon.bitmap.isRecycled
+            } else if (icon is AdaptiveIconDrawable) {
+                return isRecycled(icon.foreground) || isRecycled(icon.background)
             }
-            return super.isRecycled(icon)
+            return false
         }
 
         override fun isAdaptive(icon : Drawable) = icon is AdaptiveIconDrawable
@@ -51,51 +39,7 @@ interface IconAdapter {
                     return result
                 }
             }
-            return super.getBackgroundColor(icon)
-        }
-
-        override fun getForegroundBitmap(icon: Drawable): Bitmap? {
-            if (!isAdaptive(icon)) return null
-            return drawableToBitmap((icon as AdaptiveIconDrawable).foreground)
-        }
-
-        override fun getBackgroundBitmap(icon: Drawable): Bitmap {
-            if (!isAdaptive(icon)) return super.getBackgroundBitmap(icon)
-            return drawableToBitmap((icon as AdaptiveIconDrawable).background)
-        }
-
-        override fun makeIconDrawable(res: Resources, foreground: Bitmap?, background: Bitmap): Drawable {
-            if (foreground == null) return super.makeIconDrawable(res, foreground, background)
-            return AdaptiveIconDrawable(
-                BitmapDrawable(res, background),
-                BitmapDrawable(res, foreground)
-            )
-        }
-    }
-
-    private open class DefaultIconAdapter : IconAdapter {
-
-        override fun isRecycled(icon: Drawable): Boolean {
-            if (icon is BitmapDrawable && icon.bitmap != null) {
-                return icon.bitmap.isRecycled
-            }
-            return false
-        }
-
-        override fun isAdaptive(icon : Drawable) = false
-
-        override fun getBackgroundColor(icon: Drawable) : Int {
             return drawableToBitmap(icon) { bitmap -> getDominantColor(bitmap) } ?: 0xFFC1CC
-        }
-
-        override fun getForegroundBitmap(icon: Drawable): Bitmap? = null
-
-        override fun getBackgroundBitmap(icon: Drawable): Bitmap {
-            return drawableToBitmap(icon)
-        }
-
-        override fun makeIconDrawable(res: Resources, foreground: Bitmap?, background: Bitmap): Drawable {
-            return BitmapDrawable(res, background)
         }
 
         fun <T> drawableToBitmap(drawable: Drawable, func: (Bitmap) -> T) : T {

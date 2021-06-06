@@ -20,7 +20,7 @@ abstract class WidgetHostFragment : Fragment() {
 
     final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         databinder = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
-        databinder.adapter = HomeViewDatabindingAdapter(requireActivity().application)
+        databinder.adapter = HomeViewDatabindingAdapter
         databinder.description = makeDescription(isLoading = true)
         return databinder.root
     }

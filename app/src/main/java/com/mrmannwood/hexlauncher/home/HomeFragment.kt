@@ -11,14 +11,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
 import com.mrmannwood.hexlauncher.HandleBackPressed
-import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.gesture.LauncherGestureDetectorListener
 import com.mrmannwood.hexlauncher.launcher.HexAppListFragment
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.PreferencesLiveData
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
-import com.mrmannwood.hexlauncher.view.ContextMenuCompat
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
 import timber.log.Timber
@@ -103,7 +101,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             }
 
             override fun onLongPress(x: Float, y: Float) {
-                ContextMenuCompat.INSTANCE.showContextMenu(requireView(), x, y)
+                requireView().showContextMenu(x, y)
             }
         })
     )

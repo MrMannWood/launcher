@@ -15,7 +15,6 @@ import androidx.lifecycle.Observer
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerDialog
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerViewModel
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
-import com.mrmannwood.hexlauncher.view.ContextMenuCompat
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
 
@@ -65,10 +64,10 @@ class HomeArrangementFragment : WidgetHostFragment() {
                         widget = null
                         findTouchedWidget(e.x, e.y)?.let { widget ->
                             showParentContextMenu = false
-                            ContextMenuCompat.INSTANCE.showContextMenu(widget, widget.width / 2f, widget.height / 2f)
+                            widget.showContextMenu(widget.width / 2f, widget.height / 2f)
                         } ?: run {
                             showParentContextMenu = true
-                            ContextMenuCompat.INSTANCE.showContextMenu(widgetContainer, e.x, e.y)
+                            widgetContainer.showContextMenu(e.x, e.y)
                         }
                     }
                 }

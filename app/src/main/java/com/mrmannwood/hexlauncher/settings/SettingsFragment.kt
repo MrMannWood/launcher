@@ -161,7 +161,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
-            setTitle(R.string.preferences_logging_enable)
+            setTitle(R.string.preferences_category_logging)
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_logging_enable)
                 key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING

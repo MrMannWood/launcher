@@ -2,6 +2,7 @@ package com.mrmannwood.hexlauncher.applist
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
@@ -9,15 +10,16 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowInsets
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.hexlauncher.HandleBackPressed
+import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
 import com.mrmannwood.hexlauncher.launcher.Adapter
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
@@ -26,22 +28,16 @@ import com.mrmannwood.hexlauncher.qwertyMistakes
 import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
+import kotlinx.coroutines.*
 import java.util.*
 
-class AppListFragment : Fragment(), HandleBackPressed {
+class AppListFragment : InstrumentedFragment(), HandleBackPressed {
 
     abstract class Host<T>(private val killFragment: (T?) -> Unit) {
-
-        private lateinit var onEndFunc: () -> Unit
-
-        fun setOnEnd(onEnd: () -> Unit) {
-            this.onEndFunc = onEnd
-        }
 
         fun end() = end(null)
 
         fun end(value: T?) {
-            onEndFunc()
             killFragment(value)
         }
 
@@ -58,6 +54,7 @@ class AppListFragment : Fragment(), HandleBackPressed {
     private lateinit var searchView: KeyboardEditText
     private lateinit var resultListView: RecyclerView
     private lateinit var resultListAdapter: Adapter<AppInfo>
+    private var showKeyboardJob : Job? = null
 
     private var numColumnsInAppList: Int = 0
 
@@ -68,6 +65,8 @@ class AppListFragment : Fragment(), HandleBackPressed {
     private fun getAppListHost() : Host<*> {
         return (requireActivity() as AppListHostActivity).getAppListHost()
     }
+
+    override val nameForInstrumentation = "AppListFragment"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,10 +80,6 @@ class AppListFragment : Fragment(), HandleBackPressed {
     ): View = inflater.inflate(R.layout.fragment_app_list, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        getAppListHost().setOnEnd {
-            hideKeyboard(requireActivity())
-        }
-
         resultListAdapter = createResultAdapter()
         resultListView = view.findViewById<RecyclerView>(R.id.result_list).apply {
             layoutManager = createResultLayoutManager()
@@ -113,12 +108,17 @@ class AppListFragment : Fragment(), HandleBackPressed {
 
     override fun onStart() {
         super.onStart()
-        forceShowKeyboard(searchView)
+        showKeyboardJob = viewLifecycleOwner.lifecycleScope.launch {
+            forceShowKeyboard(searchView)
+        }
     }
 
     override fun onStop() {
         super.onStop()
-        hideKeyboard(requireActivity())
+        viewLifecycleOwner.lifecycleScope.launch {
+            showKeyboardJob?.cancelAndJoin()
+            hideKeyboard(requireActivity())
+        }
     }
 
     override fun handleBackPressed(): Boolean {
@@ -184,15 +184,36 @@ class AppListFragment : Fragment(), HandleBackPressed {
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
     }
 
-    private fun forceShowKeyboard(view: EditText) {
-        view.requestFocus()
-        val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+    private suspend fun forceShowKeyboard(view: EditText) {
+        withContext(Dispatchers.Main) {
+            view.requestFocus()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val rootView = requireActivity().window.decorView
+                while (!rootView.rootWindowInsets.isVisible(WindowInsets.Type.ime())) {
+                    rootView.windowInsetsController!!.show(WindowInsets.Type.ime())
+                    delay(10)
+                }
+            } else {
+                val imm =
+                    view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+            }
+        }
     }
 
-    private fun hideKeyboard(activity: Activity) {
-        val windowToken = activity.currentFocus?.windowToken ?: searchView.windowToken
-        (activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(windowToken, 0)
+    private suspend fun hideKeyboard(activity: Activity) {
+        withContext(Dispatchers.Main) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val controller = searchView.windowInsetsController!!
+                controller.hide(WindowInsets.Type.ime())
+            } else {
+                val windowToken = activity.currentFocus?.windowToken ?: searchView.windowToken
+                (activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+                    windowToken,
+                    0
+                )
+            }
+        }
     }
 
     private fun performSearch() {

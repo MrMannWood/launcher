@@ -2,6 +2,7 @@ package com.mrmannwood.hexlauncher.launcher
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
@@ -9,22 +10,24 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowInsets
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.applist.searchApps
+import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
 import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHexAppListBinding
+import kotlinx.coroutines.*
 import java.util.*
 
-class HexAppListFragment : Fragment(), HandleBackPressed {
+class HexAppListFragment : InstrumentedFragment(), HandleBackPressed {
 
     private lateinit var searchView: KeyboardEditText
     private lateinit var databinder : FragmentHexAppListBinding
@@ -32,10 +35,13 @@ class HexAppListFragment : Fragment(), HandleBackPressed {
 
     private val appBindings = mutableListOf<Pair<View, (AppInfo?) -> Unit>>()
     private var apps : List<AppInfo>? = null
+    private var showKeyboardJob : Job? = null
 
     private fun getAppListHost() : AppListFragment.Host<*> {
         return (requireActivity() as AppListFragment.AppListHostActivity).getAppListHost()
     }
+
+    override val nameForInstrumentation = "HexAppListFragment"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,9 +54,6 @@ class HexAppListFragment : Fragment(), HandleBackPressed {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        getAppListHost().setOnEnd {
-            hideKeyboard(requireActivity())
-        }
         databinder.adapter = LauncherFragmentDatabindingAdapter
 
         searchView = view.findViewById(R.id.search)
@@ -84,12 +87,17 @@ class HexAppListFragment : Fragment(), HandleBackPressed {
 
     override fun onStart() {
         super.onStart()
-        forceShowKeyboard(searchView)
+        showKeyboardJob = viewLifecycleOwner.lifecycleScope.launch {
+            forceShowKeyboard(searchView)
+        }
     }
 
     override fun onStop() {
         super.onStop()
-        hideKeyboard(requireActivity())
+        viewLifecycleOwner.lifecycleScope.launch {
+            showKeyboardJob?.cancelAndJoin()
+            hideKeyboard(requireActivity())
+        }
     }
 
     override fun handleBackPressed(): Boolean {
@@ -118,15 +126,36 @@ class HexAppListFragment : Fragment(), HandleBackPressed {
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
     }
 
-    private fun forceShowKeyboard(view: EditText) {
-        view.requestFocus()
-        val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+    private suspend fun forceShowKeyboard(view: EditText) {
+        withContext(Dispatchers.Main) {
+            view.requestFocus()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val rootView = requireActivity().window.decorView
+                while (!rootView.rootWindowInsets.isVisible(WindowInsets.Type.ime())) {
+                    rootView.windowInsetsController!!.show(WindowInsets.Type.ime())
+                    delay(10)
+                }
+            } else {
+                val imm =
+                    view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+            }
+        }
     }
 
-    private fun hideKeyboard(activity: Activity) {
-        val windowToken = activity.currentFocus?.windowToken ?: searchView.windowToken
-        (activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(windowToken, 0)
+    private suspend fun hideKeyboard(activity: Activity) {
+        withContext(Dispatchers.Main) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val controller = searchView.windowInsetsController!!
+                controller.hide(WindowInsets.Type.ime())
+            } else {
+                val windowToken = activity.currentFocus?.windowToken ?: searchView.windowToken
+                (activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+                    windowToken,
+                    0
+                )
+            }
+        }
     }
 
     private fun performSearch() {

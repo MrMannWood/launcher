@@ -41,6 +41,8 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     private var swipeRightPackage : String? = null
     private var swipeLeftPackage : String? = null
 
+    override val nameForInstrumentation = "HomeFragment"
+
     override fun makeDescription(isLoading: Boolean): HomeViewDescription {
         return HomeViewDescription.HomeDescription(isLoading = isLoading)
     }
@@ -114,7 +116,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             if (prefs.getBoolean(PreferenceKeys.Apps.USE_HEX_GRID, false)) {
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.container, HexAppListFragment())
-                    .addToBackStack("HexAppListFragment")
+                    .addToBackStack("AppListFragment")
                     .commit()
             } else {
                 parentFragmentManager.beginTransaction()

@@ -33,6 +33,8 @@ class HomeArrangementFragment : WidgetHostFragment() {
     private var viewBottom = 0
     private var showParentContextMenu = false
 
+    override val nameForInstrumentation = "HomeArrangementFragment"
+
     override fun makeDescription(isLoading: Boolean): HomeViewDescription {
         return HomeViewDescription.ArrangementDescription(isLoading = false)
     }

@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
@@ -25,12 +26,14 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        goFullscreen()
         setContentView(R.layout.activity_launcher)
         supportActionBar?.hide()
 
         if (supportFragmentManager.findFragmentById(R.id.container) == null) {
             supportFragmentManager.beginTransaction()
                 .add(R.id.container, HomeFragment())
+                .addToBackStack("HomeFragment")
                 .commit()
         }
 
@@ -72,8 +75,12 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
         }
     }
 
+    private fun goFullscreen() {
+        WindowCompat.setDecorFitsSystemWindows(window, true)
+    }
+
     private val appListFragmentHost = object : AppListFragment.Host<Void>(
-        killFragment = { _ -> supportFragmentManager.popBackStack() }
+        killFragment = { _ -> supportFragmentManager.popBackStack("HomeFragment", 0) }
     ) {
         override fun onSearchButtonPressed(searchTerm: String) {
             startActivity(Intent(Intent.ACTION_WEB_SEARCH).apply {

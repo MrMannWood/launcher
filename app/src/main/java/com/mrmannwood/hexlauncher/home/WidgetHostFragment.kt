@@ -9,10 +9,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
 
-abstract class WidgetHostFragment : Fragment() {
+abstract class WidgetHostFragment : InstrumentedFragment() {
 
     private val viewModel: WidgetHostViewModel by activityViewModels()
 

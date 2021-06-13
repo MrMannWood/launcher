@@ -70,7 +70,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             }
         }
 
-        viewModel.appListLiveData.observe(viewLifecycleOwner) { _ -> onLoadingComplete() }
+        viewModel.appListLiveData.observe(viewLifecycleOwner) { onLoadingComplete() }
         viewModel.swipeRightLiveData.observe(viewLifecycleOwner) { packageName ->
             swipeRightPackage = packageName
         }

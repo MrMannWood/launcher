@@ -36,13 +36,8 @@ class AllAppsListFragment : Fragment() {
             adapter = resultListAdapter
         }
 
-        viewModel.apps.observe(viewLifecycleOwner, { result ->
-            result.onSuccess {
-                    appList -> resultListAdapter.setData(AppInfo::class, appList)
-            }
-            result.onFailure {
-                Toast.makeText(requireContext(), R.string.error_app_load, Toast.LENGTH_SHORT).show()
-            }
+        viewModel.apps.observe(viewLifecycleOwner, { appList ->
+            resultListAdapter.setData(AppInfo::class, appList)
         })
     }
 

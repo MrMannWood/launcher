@@ -1,11 +1,11 @@
 package com.mrmannwood.hexlauncher.allapps
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.launcher.AppInfo
-import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
+import com.mrmannwood.hexlauncher.launcher.getAppInfoLiveData
 
-class AllAppsViewModel: ViewModel() {
-    val apps: LiveData<Result<List<AppInfo>>> = AppInfoLiveData.get()
+class AllAppsViewModel(app: Application): AndroidViewModel(app) {
+    val apps: LiveData<List<AppInfo>> = getAppInfoLiveData(app)
 }

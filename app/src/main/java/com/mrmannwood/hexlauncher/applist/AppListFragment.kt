@@ -130,14 +130,9 @@ class AppListFragment : Fragment(), HandleBackPressed {
     }
 
     private fun startObservingLiveData() {
-        viewModel.apps.observe(viewLifecycleOwner, { result ->
-            result.onSuccess { appList ->
-                apps = appList
-                performSearch()
-            }
-            result.onFailure {
-                Toast.makeText(requireContext(), R.string.error_app_load, Toast.LENGTH_SHORT).show()
-            }
+        viewModel.apps.observe(viewLifecycleOwner, { appList ->
+            apps = appList
+            performSearch()
         })
     }
 

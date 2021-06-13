@@ -11,7 +11,6 @@ import androidx.core.content.FileProvider
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
 import com.mrmannwood.hexlauncher.applist.writeAppsToFile
 import com.mrmannwood.hexlauncher.foregrounddetection.ForegroundActivityListener
-import com.mrmannwood.hexlauncher.launcher.AppInfoLiveData
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
 import com.mrmannwood.hexlauncher.rageshake.ShakeManager
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
@@ -21,7 +20,6 @@ import com.mrmannwood.hexlauncher.timber.FileLoggerTree
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -67,8 +65,6 @@ class LauncherApplication : Application() {
         applicationScope.launch {
             AppListUpdater.updateAppList(applicationContext)
         }
-
-        AppInfoLiveData.createAndGet(this).observeForever { }
 
         registerReceiver(
                 PackageObserverBroadcastReceiver(),

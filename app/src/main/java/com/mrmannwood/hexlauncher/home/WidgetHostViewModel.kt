@@ -6,10 +6,11 @@ import androidx.annotation.LayoutRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.asLiveData
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
-import com.mrmannwood.hexlauncher.settings.PreferenceLiveData
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor.FloatExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor.IntExtractor
+import com.mrmannwood.hexlauncher.settings.PreferencesRepository.watchPref
 import com.mrmannwood.launcher.R
 
 class WidgetHostViewModel(application: Application) : AndroidViewModel(application) {
@@ -34,11 +35,11 @@ class WidgetHostViewModel(application: Application) : AndroidViewModel(applicati
         init {
             var posSet = false
             var colorSet = false
-            addSource(PreferenceLiveData(application, Widgets.Position.key(widget), FloatExtractor)) { yPos ->
+            addSource(watchPref(application, Widgets.Position.key(widget), FloatExtractor).asLiveData()) { yPos ->
                 value = WidgetPlacement(widget, layout, yPos, value?.color, colorSet)
                 posSet = true
             }
-            addSource(PreferenceLiveData(application, Widgets.Color.key(widget), IntExtractor)) { color ->
+            addSource(watchPref(application, Widgets.Color.key(widget), IntExtractor).asLiveData()) { color ->
                 value = WidgetPlacement(widget, layout, value?.yPosition, color ?: Color.WHITE, posSet)
                 colorSet = true
             }

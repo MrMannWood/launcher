@@ -22,6 +22,7 @@ import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import java.io.File
@@ -48,20 +49,18 @@ class LauncherApplication : Application() {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
 
-        applicationScope.launch {
-            PreferencesRepository.watchPref(
-                context = this@LauncherApplication,
-                key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING,
-                extractor = PreferenceExtractor.BooleanExtractor
-            )
-                .onEach { enable ->
-                    if (enable == true) {
-                        FileLoggerTree.get().enableDiskFlush()
-                    } else {
-                        FileLoggerTree.get().disableDiskFlush()
-                    }
-                }.collect {  }
-        }
+        PreferencesRepository.watchPref(
+            context = this@LauncherApplication,
+            key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING,
+            extractor = PreferenceExtractor.BooleanExtractor
+        )
+            .onEach { enable ->
+                if (enable == true) {
+                    FileLoggerTree.get().enableDiskFlush()
+                } else {
+                    FileLoggerTree.get().disableDiskFlush()
+                }
+            }.launchIn(applicationScope)
 
         DB.init(this@LauncherApplication)
 

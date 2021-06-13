@@ -11,7 +11,6 @@ fun File.copyContentsTo(dest: File) : List<File> {
     val files = mutableListOf<File>()
     for (file in listFiles() ?: emptyArray()) {
         val result = File(dest, file.name)
-        if (!result.createNewFile()) continue
         Files.copy(file.toPath(), result.toPath())
         files.add(result)
     }

@@ -7,7 +7,6 @@ import android.graphics.Path
 import android.graphics.PorterDuff
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
-import kotlin.math.min
 import kotlin.math.sqrt
 
 class HalfHexagonView @JvmOverloads constructor(

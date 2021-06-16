@@ -2,7 +2,6 @@ package com.mrmannwood.hexlauncher.settings
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import com.mrmannwood.launcher.R
 
 class SettingsActivity : AppCompatActivity() {

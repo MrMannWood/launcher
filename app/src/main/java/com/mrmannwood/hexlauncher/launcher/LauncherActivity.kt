@@ -80,7 +80,7 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
     }
 
     private val appListFragmentHost = object : AppListFragment.Host<Void>(
-        killFragment = { _ -> supportFragmentManager.popBackStack("HomeFragment", 0) }
+        killFragment = { supportFragmentManager.popBackStack("HomeFragment", 0) }
     ) {
         override fun onSearchButtonPressed(searchTerm: String) {
             startActivity(Intent(Intent.ACTION_WEB_SEARCH).apply {

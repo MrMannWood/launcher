@@ -49,9 +49,6 @@
 
     <string name="settings_title">Settings</string>
 
-    <string name="error_app_load">An error occurred while loading your apps</string>
-    <string name="error_contact_load">An error occurred while loading your contacts</string>
-
     <string name="nux_welcome_message">Welcome to Hex Launcher</string>
     <string name="nux_welcome_image_content_description">Welcome Image of stacked hexagons</string>
     <string name="nux_swipe_message">Swipe up to search</string>
@@ -74,9 +71,6 @@
     <string name="home_time_content_description">Time</string>
     <string name="home_date_content_description">Date</string>
     <string name="home_apps_still_loading">Apps are still loading</string>
-    <string name="home_unable_to_load_apps">Unable to load apps</string>
-
-    <string name="contact_image_content_description">Contact image for %s</string>
 
     <string name="home_arrangement_tutorial_get_started">Long press the background to get started</string>
     <string name="home_arrangement_tutorial_customize_widget">Long press a widget to customize it.</string>
@@ -90,10 +84,6 @@
     <string name="dialog_color_picker_green_content_description">green</string>
     <string name="dialog_color_picker_blue_content_description">blue</string>
     <string name="color_picker_button_positive">OK</string>
-
-    <string name="wallpaper_title">Wallpaper</string>
-    <string name="wallpaper_button_set">Set Wallpaper</string>
-    <string name="wallpaper_greyscale_switch_title">Grayscale</string>
 
     <string name="rage_shake_email_body">DebugInfo:\n%s\n\nPlease describe the issue you\'re experiencing</string>
 

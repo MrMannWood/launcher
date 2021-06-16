@@ -28,7 +28,7 @@ class Adapter<T : Any>(
     private val data: MutableList<List<T>> = (order.indices).map { emptyList<T>() }.toMutableList()
     private var expandedData : List<T> = emptyList()
 
-    fun setData(clazz: KClass<out T>, data: List<out T>) {
+    fun setData(clazz: KClass<out T>, data: List<T>) {
         this.data[order.indexOf(clazz)] = data
 
         expandedData = this.data.flatten()

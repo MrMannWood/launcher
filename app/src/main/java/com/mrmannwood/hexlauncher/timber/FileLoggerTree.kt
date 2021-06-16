@@ -58,7 +58,7 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
         handler.sendMessage(handler.obtainMessage(MESSAGE_COPY_LOGS, Pair(out, callback)))
     }
 
-    fun flush() {
+    private fun flush() {
         handler.sendMessage(handler.obtainMessage(MESSAGE_FLUSH))
     }
 

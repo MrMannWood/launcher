@@ -16,6 +16,9 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.lifecycleScope
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
@@ -25,6 +28,7 @@ import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHexAppListBinding
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.util.*
 
 class HexAppListFragment : InstrumentedFragment(), HandleBackPressed {
@@ -83,21 +87,22 @@ class HexAppListFragment : InstrumentedFragment(), HandleBackPressed {
         appBindings.add(Pair(databinder.app8, { app -> databinder.setApp8(app) }))
 
         startObservingLiveData()
-    }
 
-    override fun onStart() {
-        super.onStart()
-        showKeyboardJob = viewLifecycleOwner.lifecycleScope.launch {
-            forceShowKeyboard(searchView)
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        viewLifecycleOwner.lifecycleScope.launch {
-            showKeyboardJob?.cancelAndJoin()
-            hideKeyboard(requireActivity())
-        }
+        viewLifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+            @OnLifecycleEvent(Lifecycle.Event.ON_START)
+            fun onStart() {
+                showKeyboardJob = viewLifecycleOwner.lifecycleScope.launch {
+                    forceShowKeyboard(searchView)
+                }
+            }
+            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+            fun onStop() {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    showKeyboardJob?.cancelAndJoin()
+                    hideKeyboard(requireActivity())
+                }
+            }
+        })
     }
 
     override fun handleBackPressed(): Boolean {
@@ -131,9 +136,12 @@ class HexAppListFragment : InstrumentedFragment(), HandleBackPressed {
             view.requestFocus()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 val rootView = requireActivity().window.decorView
-                while (!rootView.rootWindowInsets.isVisible(WindowInsets.Type.ime())) {
+                while (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
                     rootView.windowInsetsController!!.show(WindowInsets.Type.ime())
-                    delay(10)
+                    if (rootView.rootWindowInsets.isVisible(WindowInsets.Type.ime())) {
+                        break
+                    }
+                    delay(20)
                 }
             } else {
                 val imm =

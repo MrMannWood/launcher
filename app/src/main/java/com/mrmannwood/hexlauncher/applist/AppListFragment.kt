@@ -15,6 +15,9 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,6 +32,7 @@ import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.util.*
 
 class AppListFragment : InstrumentedFragment(), HandleBackPressed {
@@ -104,21 +108,22 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         }
 
         startObservingLiveData()
-    }
 
-    override fun onStart() {
-        super.onStart()
-        showKeyboardJob = viewLifecycleOwner.lifecycleScope.launch {
-            forceShowKeyboard(searchView)
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        viewLifecycleOwner.lifecycleScope.launch {
-            showKeyboardJob?.cancelAndJoin()
-            hideKeyboard(requireActivity())
-        }
+        viewLifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+            @OnLifecycleEvent(Lifecycle.Event.ON_START)
+            fun onStart() {
+                showKeyboardJob = viewLifecycleOwner.lifecycleScope.launch {
+                    forceShowKeyboard(searchView)
+                }
+            }
+            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+            fun onStop() {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    showKeyboardJob?.cancelAndJoin()
+                    hideKeyboard(requireActivity())
+                }
+            }
+        })
     }
 
     override fun handleBackPressed(): Boolean {
@@ -189,9 +194,12 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
             view.requestFocus()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 val rootView = requireActivity().window.decorView
-                while (!rootView.rootWindowInsets.isVisible(WindowInsets.Type.ime())) {
+                while (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
                     rootView.windowInsetsController!!.show(WindowInsets.Type.ime())
-                    delay(10)
+                    if (rootView.rootWindowInsets.isVisible(WindowInsets.Type.ime())) {
+                        break
+                    }
+                    delay(20)
                 }
             } else {
                 val imm =

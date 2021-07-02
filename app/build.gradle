@@ -36,9 +36,11 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue "string", "file_provider_name", "${defaultConfig.applicationId}.fileprovider"
         }
         debug {
             applicationIdSuffix ".debug"
+            resValue "string", "file_provider_name", "${defaultConfig.applicationId}.fileprovider.debug"
         }
     }
 }

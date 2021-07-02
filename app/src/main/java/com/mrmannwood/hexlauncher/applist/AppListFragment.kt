@@ -196,7 +196,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
                 val rootView = requireActivity().window.decorView
                 while (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
                     rootView.windowInsetsController!!.show(WindowInsets.Type.ime())
-                    if (rootView.rootWindowInsets.isVisible(WindowInsets.Type.ime())) {
+                    if (rootView.rootWindowInsets?.isVisible(WindowInsets.Type.ime()) == true) {
                         break
                     }
                     delay(20)

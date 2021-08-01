@@ -16,4 +16,9 @@ object LauncherFragmentDatabindingAdapter {
         if (appInfo == null) return View.GONE
         return if (IconAdapter.INSTANCE.isAdaptive(appInfo.icon)) View.GONE else View.VISIBLE
     }
+
+    fun getHiddenVisibility(appInfo: AppInfo?) : Int {
+        if (appInfo == null) return View.GONE
+        return if (appInfo.hidden) View.VISIBLE else View.GONE
+    }
 }

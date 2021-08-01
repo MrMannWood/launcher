@@ -1,6 +1,9 @@
 package com.mrmannwood.hexlauncher.allapps
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.mrmannwood.hexlauncher.appcustomize.AppCustomizationFragment
 import com.mrmannwood.hexlauncher.applist.calculateNoOfColumnsForAppList
 import com.mrmannwood.hexlauncher.launcher.Adapter
 import com.mrmannwood.hexlauncher.launcher.AppInfo
@@ -62,6 +66,28 @@ class AllAppsListFragment : Fragment() {
                 (vdb as ListAppItemFullBinding).apply {
                     appInfo = result
                     adapter = LauncherFragmentDatabindingAdapter
+                }
+                vdb.root.setOnCreateContextMenuListener { menu, _, _ ->
+                    menu.setHeaderTitle(result.label)
+                    menu.add(R.string.menu_item_app_details).setOnMenuItemClickListener {
+                        startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.parse("package:${result.packageName}")
+                        })
+                        true
+                    }
+                    menu.add(R.string.menu_item_app_customize).setOnMenuItemClickListener {
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.settings_root, AppCustomizationFragment.forPackage(result.packageName))
+                            .addToBackStack("AppCustomizationFragment")
+                            .commit()
+                        true
+                    }
+                    menu.add(R.string.menu_item_uninstall_app_title).setOnMenuItemClickListener {
+                        startActivity(Intent(Intent.ACTION_DELETE).apply {
+                            data = Uri.parse("package:${result.packageName}")
+                        })
+                        true
+                    }
                 }
             }
         )

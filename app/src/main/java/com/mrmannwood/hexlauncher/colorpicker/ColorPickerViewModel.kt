@@ -6,4 +6,5 @@ import androidx.lifecycle.ViewModel
 class ColorPickerViewModel : ViewModel() {
     val colorLiveData = MutableLiveData<Int>()
     val completionLiveData = MutableLiveData<Boolean>()
+    val cancellationLiveData = MutableLiveData<Boolean>()
 }

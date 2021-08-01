@@ -7,7 +7,8 @@ data class AppInfo(
     val packageName: String,
     val icon: Drawable,
     val backgroundColor: Int,
-    val label: String
+    val label: String,
+    val hidden: Boolean
 ) {
     val lowerLabel = label.lowercase(Locale.ROOT)
     val labelComponents = lowerLabel.split(' ')

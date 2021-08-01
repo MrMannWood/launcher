@@ -19,6 +19,7 @@ class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.completionLiveData.value = false
+        viewModel.cancellationLiveData.value = false
 
         (viewModel.colorLiveData.value ?: Color.WHITE).let { color ->
             redValue = Color.red(color)
@@ -52,6 +53,12 @@ class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
         }
 
         view.findViewById<View>(R.id.button_positive).setOnClickListener {
+            viewModel.completionLiveData.value = true
+            dismiss()
+        }
+
+        view.findViewById<View>(R.id.button_negative).setOnClickListener {
+            viewModel.cancellationLiveData.value = true
             viewModel.completionLiveData.value = true
             dismiss()
         }

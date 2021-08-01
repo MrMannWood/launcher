@@ -13,6 +13,7 @@
 
     <string name="menu_item_uninstall_app_title">Uninstall</string>
     <string name="menu_item_app_details">App Details</string>
+    <string name="menu_item_app_customize">Customize</string>
 
     <string name="preferences_role_set_home">Set Hex Launcher as Home app</string>
 
@@ -84,7 +85,15 @@
     <string name="dialog_color_picker_green_content_description">green</string>
     <string name="dialog_color_picker_blue_content_description">blue</string>
     <string name="color_picker_button_positive">OK</string>
+    <string name="color_picker_button_negative">Cancel</string>
 
     <string name="rage_shake_email_body">DebugInfo:\n%s\n\nPlease describe the issue you\'re experiencing</string>
+
+    <string name="customize_hide_app">Hide App</string>
+    <string name="customize_show_app">Un-Hide App</string>
+    <string name="customize_app_icon">Icon</string>
+    <string name="customize_app_background_color">Background Color</string>
+    <string name="customize_app_foreground_icon">Foreground Icon</string>
+    <string name="customize_app_background_icon">Background Icon</string>
 
 </resources>

@@ -19,6 +19,10 @@ interface IconAdapter {
 
     fun getBackgroundColor(icon: Drawable) : Int
 
+    fun getForegroundDrawable(icon: Drawable) : Drawable?
+
+    fun getBackgroundDrawable(icon: Drawable) : Drawable?
+
     private open class DefaultIconAdapter : IconAdapter {
 
         override fun isRecycled(icon: Drawable): Boolean {
@@ -40,6 +44,22 @@ interface IconAdapter {
                 }
             }
             return drawableToBitmap(icon) { bitmap -> getDominantColor(bitmap) } ?: 0xFFC1CC
+        }
+
+        override fun getForegroundDrawable(icon: Drawable): Drawable? {
+            return if (icon is AdaptiveIconDrawable) {
+                icon.foreground.constantState!!.newDrawable().mutate()
+            } else {
+                null
+            }
+        }
+
+        override fun getBackgroundDrawable(icon: Drawable): Drawable? {
+            return if (icon is AdaptiveIconDrawable) {
+                icon.background.constantState!!.newDrawable().mutate()
+            } else {
+                null
+            }
         }
 
         fun <T> drawableToBitmap(drawable: Drawable, func: (Bitmap) -> T) : T {

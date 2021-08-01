@@ -28,8 +28,9 @@ object AppListUpdater {
                 val appDao = DB.get().appDataDao()
 
                 appDao.deleteNotIncluded(installedApps)
+                appDao.deleteNotIncludedDecoration(installedApps)
 
-                val appUpdateTimes = appDao.getLastUpdateTimeStamps().associateBy({ it.packageName }, {it.timestamp})
+                val appUpdateTimes = appDao.getLastUpdateTimeStamps().associateBy({ it.packageName }, { it.timestamp })
                 for (packageName in installedApps) {
                     val packageInfo = context.packageManager.getPackageInfo(packageName, 0)
                     val lastUpdateTime = appUpdateTimes.getOrElse(packageName, { -1L })
@@ -39,6 +40,7 @@ object AppListUpdater {
                     loadAppDataFromPacman(packageInfo, context.packageManager)?.let { appData ->
                         try {
                             appDao.insert(appData)
+                            appDao.insert(AppDataDecoration(appData.packageName))
                         } catch (e: SQLiteException) {
                             Timber.e(e, "An error occurred while writing app to db: $appData")
                         }

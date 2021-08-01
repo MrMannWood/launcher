@@ -13,6 +13,7 @@ import androidx.core.content.edit
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.mrmannwood.hexlauncher.HandleBackPressed
+import com.mrmannwood.hexlauncher.appcustomize.AppCustomizationFragment
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.home.HomeFragment
 import com.mrmannwood.hexlauncher.nux.NUXHostFragment
@@ -102,12 +103,22 @@ class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivit
             view.setOnCreateContextMenuListener { menu, _, _ ->
                 menu.setHeaderTitle(appInfo.label)
                 menu.add(R.string.menu_item_app_details).setOnMenuItemClickListener {
+                    end()
                     startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         data = Uri.parse("package:${appInfo.packageName}")
                     })
                     true
                 }
+                menu.add(R.string.menu_item_app_customize).setOnMenuItemClickListener {
+                    end()
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.container, AppCustomizationFragment.forPackage(appInfo.packageName))
+                        .addToBackStack("AppCustomizationFragment")
+                        .commit()
+                    true
+                }
                 menu.add(R.string.menu_item_uninstall_app_title).setOnMenuItemClickListener {
+                    end()
                     startActivity(Intent(Intent.ACTION_DELETE).apply {
                         data = Uri.parse("package:${appInfo.packageName}")
                     })

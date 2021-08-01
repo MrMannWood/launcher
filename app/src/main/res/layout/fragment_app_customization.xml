@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="icon_bgc_override"
+            type="java.lang.Integer" />
+        <variable
+            name="appInfo"
+            type="com.mrmannwood.hexlauncher.launcher.AppInfo" />
+        <variable
+            name="adapter"
+            type="com.mrmannwood.hexlauncher.appcustomize.CustomizationFragmentDatabindingAdapter" />
+        <variable
+            name="resources"
+            type="android.content.res.Resources"/>
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/primary_translucent">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:layout_gravity="center"
+            android:visibility="@{appInfo != null ? View.GONE : View.VISIBLE}"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@color/primary_translucent"
+            android:visibility="@{appInfo == null ? View.GONE : View.VISIBLE}">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginStart="12dp"
+                android:layout_gravity="start|bottom"
+                android:text="@{appInfo.label}"
+                android:textSize="22sp"
+                android:textColor="@color/colorOnPrimary"/>
+
+            <FrameLayout
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="12dp"
+                android:foregroundGravity="center">
+
+                <com.mrmannwood.hexlauncher.view.HexagonView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:scaleType="fitCenter"
+                    android:src="@{adapter.getBackgroundColor(icon_bgc_override, appInfo)}"
+                    android:contentDescription="@{adapter.getAppName(appInfo)}"
+                    />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_gravity="center"
+                    android:scaleType="fitCenter"
+                    android:src="@{appInfo.icon}"
+                    android:visibility="@{adapter.getNonAdaptiveIconVisibility(appInfo)}"
+                    />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:scaleType="fitCenter"
+                    android:src="@{appInfo.icon}"
+                    android:visibility="@{adapter.getAdaptiveIconVisibility(appInfo)}"
+                    android:contentDescription="@{adapter.getAppName(appInfo)}"
+                    />
+
+            </FrameLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_hide_app"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginStart="12dp"
+                android:text="@{adapter.getHideButtonText(resources, appInfo)}"
+                />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginStart="12dp"
+                android:layout_gravity="start|bottom"
+                android:textSize="18sp"
+                android:text="@string/customize_app_icon"
+                android:textColor="@color/colorOnPrimary"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp">
+
+                <LinearLayout
+                    android:id="@+id/icon_foreground_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:scaleType="fitCenter"
+                        android:src="@{adapter.getForegroundIcon(appInfo)}"
+                        />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="@string/customize_app_foreground_icon"
+                        android:textColor="@color/colorOnPrimary"
+                        android:maxLines="2"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/icon_background_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:visibility="@{adapter.getAdaptiveIconVisibility(appInfo)}">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:scaleType="fitCenter"
+                        android:src="@{adapter.getBackgroundIcon(appInfo)}"
+                        />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="@string/customize_app_background_icon"
+                        android:textColor="@color/colorOnPrimary"
+                        android:maxLines="2"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/icon_bgc_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
+
+                    <com.mrmannwood.hexlauncher.view.HexagonView
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:scaleType="fitCenter"
+                        android:src="@{adapter.getBackgroundColor(icon_bgc_override, appInfo)}"
+                        />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="@string/customize_app_background_color"
+                        android:textColor="@color/colorOnPrimary"
+                        android:maxLines="2"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</layout>

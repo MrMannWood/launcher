@@ -118,6 +118,14 @@ class AppCustomizationFragment : InstrumentedFragment() {
                 }
             }
         }
+
+        binding.iconBackgroundLayout.setOnClickListener {
+            appInfo?.let { app ->
+                updateAppInfo { dao ->
+                    dao.setBackgroundHidden(app.packageName, !app.backgroundHidden)
+                }
+            }
+        }
     }
 
     fun updateAppInfo(action: (dao: AppDataDao) -> Unit) {

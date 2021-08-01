@@ -8,5 +8,6 @@ import androidx.room.PrimaryKey
 class AppDataDecoration(
     @PrimaryKey @ColumnInfo(name = "package_name_dec") val packageName: String,
     @ColumnInfo(name = "hidden") val hidden: Boolean = false,
-    @ColumnInfo(name = "bgc_override") val bgcOverride: Int? = null
+    @ColumnInfo(name = "bgc_override") val bgcOverride: Int? = null,
+    @ColumnInfo(name = "background_hidden") val backgroundHidden: Boolean = false
 )

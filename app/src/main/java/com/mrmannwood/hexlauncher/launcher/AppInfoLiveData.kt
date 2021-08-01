@@ -49,7 +49,8 @@ private fun transformAppInfo(context: Context, app: DecoratedAppData) : AppInfo?
             icon = context.packageManager.getApplicationIcon(app.appData.packageName),
             backgroundColor = app.decoration.bgcOverride ?: app.appData.backgroundColor,
             label = app.appData.label,
-            hidden = app.decoration.hidden
+            hidden = app.decoration.hidden,
+            backgroundHidden = app.decoration.backgroundHidden
         )
     } catch (e: PackageManager.NameNotFoundException) {
         Timber.w(e, "Package manager error while loading apps")

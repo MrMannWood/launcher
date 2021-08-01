@@ -3,6 +3,8 @@ package com.mrmannwood.hexlauncher.appcustomize
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.view.View
+import androidx.core.content.res.ResourcesCompat
 import com.mrmannwood.hexlauncher.icon.IconAdapter
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
@@ -18,18 +20,14 @@ object CustomizationFragmentDatabindingAdapter {
     fun getNonAdaptiveIconVisibility(appInfo: AppInfo?) : Int =
         LauncherFragmentDatabindingAdapter.getNonAdaptiveIconVisibility(appInfo)
 
-    fun getForegroundIcon(appInfo: AppInfo?) : Drawable? {
-        if (appInfo == null) return null
-        return IconAdapter.INSTANCE.getForegroundDrawable(appInfo.icon) ?: appInfo.icon
-    }
+    fun getForegroundIcon(appInfo: AppInfo?) =
+        LauncherFragmentDatabindingAdapter.getForegroundIcon(appInfo)
 
-    fun getBackgroundIcon(appInfo: AppInfo?) : Drawable? {
-        if (appInfo == null) return null
-        return IconAdapter.INSTANCE.getBackgroundDrawable(appInfo.icon) ?: appInfo.icon
-    }
+    fun getBackgroundIcon(appInfo: AppInfo?) =
+        LauncherFragmentDatabindingAdapter.getBackgroundIcon(appInfo)
 
     fun getBackgroundColor(bgcOverride: java.lang.Integer?, appInfo: AppInfo?) : Int {
-        return bgcOverride?.toInt() ?: appInfo?.backgroundColor ?: Color.WHITE
+        return bgcOverride?.toInt() ?: LauncherFragmentDatabindingAdapter.getBackgroundColor(appInfo)
     }
 
     fun getHideButtonText(res: Resources, appInfo: AppInfo?) : CharSequence? {
@@ -38,6 +36,23 @@ object CustomizationFragmentDatabindingAdapter {
             res.getText(R.string.customize_show_app)
         } else {
             res.getText(R.string.customize_hide_app)
+        }
+    }
+
+    fun getBackgroundIconVisibility(appInfo: AppInfo?) : Int =
+        LauncherFragmentDatabindingAdapter.getBackgroundIconVisibility(appInfo)
+
+    fun getBackgroundVisibilityIcon(res: Resources, appInfo: AppInfo?) : Drawable? {
+        return when {
+            appInfo == null -> {
+                null
+            }
+            appInfo.backgroundHidden -> {
+                ResourcesCompat.getDrawable(res, R.drawable.outline_visibility_off, null)
+            }
+            else -> {
+                ResourcesCompat.getDrawable(res, R.drawable.outline_visibility, null)
+            }
         }
     }
 }

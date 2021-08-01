@@ -71,8 +71,27 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:scaleType="fitCenter"
-                android:src="@{app1.backgroundColor}"
+                android:src="@{adapter.getBackgroundColor(app1)}"
                 android:contentDescription="@{adapter.getAppName(app1)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getBackgroundIcon(app1)}"
+                android:visibility="@{adapter.getBackgroundIconVisibility(app1)}"
+                android:contentDescription="@{adapter.getAppName(app1)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getForegroundIcon(app1)}"
+                android:visibility="@{adapter.getAdaptiveIconVisibility(app1)}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -82,16 +101,6 @@
                 android:scaleType="fitCenter"
                 android:src="@{app1.icon}"
                 android:visibility="@{adapter.getNonAdaptiveIconVisibility(app1)}"
-                />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter"
-                android:src="@{app1.icon}"
-                android:visibility="@{adapter.getAdaptiveIconVisibility(app1)}"
-                android:contentDescription="@{adapter.getAppName(app1)}"
                 />
 
         </FrameLayout>
@@ -110,8 +119,27 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:scaleType="fitCenter"
-                android:src="@{app2.backgroundColor}"
+                android:src="@{adapter.getBackgroundColor(app2)}"
                 android:contentDescription="@{adapter.getAppName(app2)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getBackgroundIcon(app2)}"
+                android:visibility="@{adapter.getBackgroundIconVisibility(app2)}"
+                android:contentDescription="@{adapter.getAppName(app2)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getForegroundIcon(app2)}"
+                android:visibility="@{adapter.getAdaptiveIconVisibility(app2)}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -121,16 +149,6 @@
                 android:scaleType="fitCenter"
                 android:src="@{app2.icon}"
                 android:visibility="@{adapter.getNonAdaptiveIconVisibility(app2)}"
-                />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter"
-                android:src="@{app2.icon}"
-                android:visibility="@{adapter.getAdaptiveIconVisibility(app2)}"
-                android:contentDescription="@{adapter.getAppName(app2)}"
                 />
 
         </FrameLayout>
@@ -151,8 +169,27 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:scaleType="fitCenter"
-                android:src="@{app3.backgroundColor}"
+                android:src="@{adapter.getBackgroundColor(app3)}"
                 android:contentDescription="@{adapter.getAppName(app3)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getBackgroundIcon(app3)}"
+                android:visibility="@{adapter.getBackgroundIconVisibility(app3)}"
+                android:contentDescription="@{adapter.getAppName(app3)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getForegroundIcon(app3)}"
+                android:visibility="@{adapter.getAdaptiveIconVisibility(app3)}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -162,16 +199,6 @@
                 android:scaleType="fitCenter"
                 android:src="@{app3.icon}"
                 android:visibility="@{adapter.getNonAdaptiveIconVisibility(app3)}"
-                />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter"
-                android:src="@{app3.icon}"
-                android:visibility="@{adapter.getAdaptiveIconVisibility(app3)}"
-                android:contentDescription="@{adapter.getAppName(app3)}"
                 />
 
         </FrameLayout>
@@ -190,8 +217,27 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:scaleType="fitCenter"
-                android:src="@{app4.backgroundColor}"
+                android:src="@{adapter.getBackgroundColor(app4)}"
                 android:contentDescription="@{adapter.getAppName(app4)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getBackgroundIcon(app4)}"
+                android:visibility="@{adapter.getBackgroundIconVisibility(app4)}"
+                android:contentDescription="@{adapter.getAppName(app4)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getForegroundIcon(app4)}"
+                android:visibility="@{adapter.getAdaptiveIconVisibility(app4)}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -201,16 +247,6 @@
                 android:scaleType="fitCenter"
                 android:src="@{app4.icon}"
                 android:visibility="@{adapter.getNonAdaptiveIconVisibility(app4)}"
-                />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter"
-                android:src="@{app4.icon}"
-                android:visibility="@{adapter.getAdaptiveIconVisibility(app4)}"
-                android:contentDescription="@{adapter.getAppName(app4)}"
                 />
 
         </FrameLayout>
@@ -230,8 +266,27 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:scaleType="fitCenter"
-                android:src="@{app5.backgroundColor}"
+                android:src="@{adapter.getBackgroundColor(app5)}"
                 android:contentDescription="@{adapter.getAppName(app5)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getBackgroundIcon(app5)}"
+                android:visibility="@{adapter.getBackgroundIconVisibility(app5)}"
+                android:contentDescription="@{adapter.getAppName(app5)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getForegroundIcon(app5)}"
+                android:visibility="@{adapter.getAdaptiveIconVisibility(app5)}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -242,17 +297,6 @@
                 android:src="@{app5.icon}"
                 android:visibility="@{adapter.getNonAdaptiveIconVisibility(app5)}"
                 />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter"
-                android:src="@{app5.icon}"
-                android:visibility="@{adapter.getAdaptiveIconVisibility(app5)}"
-                android:contentDescription="@{adapter.getAppName(app5)}"
-                />
-
         </FrameLayout>
 
         <FrameLayout
@@ -271,8 +315,27 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:scaleType="fitCenter"
-                android:src="@{app6.backgroundColor}"
+                android:src="@{adapter.getBackgroundColor(app6)}"
                 android:contentDescription="@{adapter.getAppName(app6)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getBackgroundIcon(app6)}"
+                android:visibility="@{adapter.getBackgroundIconVisibility(app6)}"
+                android:contentDescription="@{adapter.getAppName(app6)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getForegroundIcon(app6)}"
+                android:visibility="@{adapter.getAdaptiveIconVisibility(app6)}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -282,16 +345,6 @@
                 android:scaleType="fitCenter"
                 android:src="@{app6.icon}"
                 android:visibility="@{adapter.getNonAdaptiveIconVisibility(app6)}"
-                />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter"
-                android:src="@{app6.icon}"
-                android:visibility="@{adapter.getAdaptiveIconVisibility(app6)}"
-                android:contentDescription="@{adapter.getAppName(app6)}"
                 />
 
         </FrameLayout>
@@ -310,8 +363,27 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:scaleType="fitCenter"
-                android:src="@{app7.backgroundColor}"
+                android:src="@{adapter.getBackgroundColor(app7)}"
                 android:contentDescription="@{adapter.getAppName(app7)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getBackgroundIcon(app7)}"
+                android:visibility="@{adapter.getBackgroundIconVisibility(app7)}"
+                android:contentDescription="@{adapter.getAppName(app7)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getForegroundIcon(app7)}"
+                android:visibility="@{adapter.getAdaptiveIconVisibility(app7)}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -321,16 +393,6 @@
                 android:scaleType="fitCenter"
                 android:src="@{app7.icon}"
                 android:visibility="@{adapter.getNonAdaptiveIconVisibility(app7)}"
-                />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter"
-                android:src="@{app7.icon}"
-                android:visibility="@{adapter.getAdaptiveIconVisibility(app7)}"
-                android:contentDescription="@{adapter.getAppName(app7)}"
                 />
 
         </FrameLayout>
@@ -351,8 +413,27 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:scaleType="fitCenter"
-                android:src="@{app8.backgroundColor}"
+                android:src="@{adapter.getBackgroundColor(app8)}"
                 android:contentDescription="@{adapter.getAppName(app8)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getBackgroundIcon(app8)}"
+                android:visibility="@{adapter.getBackgroundIconVisibility(app8)}"
+                android:contentDescription="@{adapter.getAppName(app8)}"
+                />
+
+            <com.mrmannwood.hexlauncher.view.HexagonView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@{adapter.getForegroundIcon(app8)}"
+                android:visibility="@{adapter.getAdaptiveIconVisibility(app8)}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -362,16 +443,6 @@
                 android:scaleType="fitCenter"
                 android:src="@{app8.icon}"
                 android:visibility="@{adapter.getNonAdaptiveIconVisibility(app8)}"
-                />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter"
-                android:src="@{app8.icon}"
-                android:visibility="@{adapter.getAdaptiveIconVisibility(app8)}"
-                android:contentDescription="@{adapter.getAppName(app8)}"
                 />
 
         </FrameLayout>

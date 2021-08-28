@@ -15,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.*
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.LauncherApplication
-import com.mrmannwood.hexlauncher.activity.BaseActivity
 import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
@@ -216,7 +215,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 key = PreferenceKeys.Font.USE_ATKINSON_HYPERLEGIBLE
                 setOnPreferenceClickListener {
                     FontHelper.useAtkinsonHyperlegible = it.isEnabled
-                    (requireActivity() as BaseActivity).forceActivityRestart()
                     true
                 }
             })

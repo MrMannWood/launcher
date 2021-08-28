@@ -2,6 +2,7 @@ package com.mrmannwood.hexlauncher.activity
 
 import android.content.res.Resources
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.mrmannwood.hexlauncher.font.FontHelper
 import com.mrmannwood.launcher.R
@@ -16,21 +17,16 @@ open class BaseActivity : AppCompatActivity() {
         return t
     }
 
+    private val viewModel: BaseActivityViewModel by viewModels()
     private var usedHyperlegibleFontOnCreate: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         usedHyperlegibleFontOnCreate = FontHelper.useAtkinsonHyperlegible
         super.onCreate(savedInstanceState)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (usedHyperlegibleFontOnCreate != FontHelper.useAtkinsonHyperlegible) {
-            forceActivityRestart()
+        viewModel.useHyperlegibleFont.observe(this) { useHyperlegibleFont ->
+            if (usedHyperlegibleFontOnCreate != (useHyperlegibleFont == true)) {
+                recreate()
+            }
         }
-    }
-
-    fun forceActivityRestart() {
-        recreate()
     }
 }

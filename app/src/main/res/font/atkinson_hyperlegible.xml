@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!-- regular -->
+    <font
+        android:font="@font/atkinsonhyperlegible_regular"
+        android:fontStyle="normal"
+        android:fontWeight="400"
+
+        app:font="@font/atkinsonhyperlegible_regular"
+        app:fontStyle="normal"
+        app:fontWeight="400" />
+
+    <!-- italic -->
+    <font
+        android:font="@font/atkinsonhyperlegible_italic"
+        android:fontStyle="italic"
+        android:fontWeight="400"
+
+        app:font="@font/atkinsonhyperlegible_italic"
+        app:fontStyle="italic"
+        app:fontWeight="400" />
+
+    <!-- bold -->
+    <font
+        android:font="@font/atkinsonhyperlegible_bold"
+        android:fontStyle="normal"
+        android:fontWeight="700"
+
+        app:font="@font/atkinsonhyperlegible_bold"
+        app:fontStyle="normal"
+        app:fontWeight="700" />
+
+    <!-- bold italic -->
+    <font
+        android:font="@font/atkinsonhyperlegible_bold_italic"
+        android:fontStyle="italic"
+        android:fontWeight="700"
+
+        app:font="@font/atkinsonhyperlegible_bold_italic"
+        app:fontStyle="italic"
+        app:fontWeight="700" />
+</font-family>

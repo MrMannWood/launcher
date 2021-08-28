@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
     buildFeatures {
@@ -22,9 +22,9 @@ android {
     defaultConfig {
         applicationId "com.mrmannwood.hexlauncher"
         minSdkVersion 26
-        targetSdkVersion 30
-        versionCode 26
-        versionName "1.2.18"
+        targetSdkVersion 31
+        versionCode 27
+        versionName "1.2.19"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -51,7 +51,7 @@ dependencies {
     def preference_version = "1.1.1"
     def room_version = "2.3.0"
 
-    implementation "androidx.constraintlayout:constraintlayout:2.0.4"
+    implementation "androidx.constraintlayout:constraintlayout:2.1.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"

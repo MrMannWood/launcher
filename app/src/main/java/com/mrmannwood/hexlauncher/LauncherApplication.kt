@@ -8,8 +8,10 @@ import android.os.Build
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.FileProvider
+import androidx.lifecycle.asLiveData
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
 import com.mrmannwood.hexlauncher.applist.writeAppsToFile
+import com.mrmannwood.hexlauncher.font.FontHelper
 import com.mrmannwood.hexlauncher.foregrounddetection.ForegroundActivityListener
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
 import com.mrmannwood.hexlauncher.rageshake.ShakeManager
@@ -59,6 +61,13 @@ class LauncherApplication : Application() {
                     FileLoggerTree.get().disableDiskFlush()
                 }
             }.launchIn(applicationScope)
+        PreferencesRepository.watchPref(
+            context = this@LauncherApplication,
+            key = PreferenceKeys.Font.USE_ATKINSON_HYPERLEGIBLE,
+            extractor = PreferenceExtractor.BooleanExtractor
+        )
+            .onEach { FontHelper.useAtkinsonHyperlegible = it == true }
+            .launchIn(applicationScope)
 
         DB.init(this@LauncherApplication)
 

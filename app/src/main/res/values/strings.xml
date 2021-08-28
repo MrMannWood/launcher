@@ -43,6 +43,7 @@
     <string name="preferences_experimental_show">Enable Experimental Features</string>
 
     <string name="preferences_refresh_app_cache_title">Refresh App Cache</string>
+    <string name="preferences_use_experimental_font">Use experimental \'Hyperlegible\' Font</string>
 
     <string name="preferences_category_version_info">Version Info</string>
     <string name="preferences_version_name">App Version: %s</string>

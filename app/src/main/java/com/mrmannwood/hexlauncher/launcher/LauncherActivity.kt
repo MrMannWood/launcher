@@ -8,11 +8,11 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.mrmannwood.hexlauncher.HandleBackPressed
+import com.mrmannwood.hexlauncher.activity.BaseActivity
 import com.mrmannwood.hexlauncher.appcustomize.AppCustomizationFragment
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.home.HomeFragment
@@ -23,7 +23,7 @@ import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 import kotlinx.coroutines.launch
 
-class LauncherActivity : AppCompatActivity(), AppListFragment.AppListHostActivity {
+class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -3,13 +3,13 @@ package com.mrmannwood.hexlauncher.applist
 import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.mrmannwood.hexlauncher.HandleBackPressed
+import com.mrmannwood.hexlauncher.activity.BaseActivity
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.launcher.R
 
-class AppListActivity : AppCompatActivity(), AppListFragment.AppListHostActivity {
+class AppListActivity : BaseActivity(), AppListFragment.AppListHostActivity {
 
     companion object {
         private const val KEY_TITLE = "title"

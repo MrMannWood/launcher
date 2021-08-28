@@ -26,6 +26,9 @@ object PreferenceKeys {
     object Apps {
         const val USE_HEX_GRID = "apps_use_hex_grid"
     }
+    object Font {
+        const val USE_ATKINSON_HYPERLEGIBLE = "use_atkison_hyperlegible"
+    }
     object Logging {
         const val ENABLE_DISK_LOGGING = "enable_disk_logging"
     }

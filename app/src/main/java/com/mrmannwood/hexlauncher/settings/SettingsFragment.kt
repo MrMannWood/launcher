@@ -15,11 +15,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.*
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.LauncherApplication
+import com.mrmannwood.hexlauncher.activity.BaseActivity
 import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
+import com.mrmannwood.hexlauncher.font.FontHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
 import com.mrmannwood.launcher.BuildConfig
@@ -205,6 +207,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             AppListUpdater.updateAppList(activity.applicationContext)
                         }
                     }
+                    true
+                }
+            })
+            addPreference(SwitchPreference(activity).apply {
+                setTitle(R.string.preferences_use_experimental_font)
+                setDefaultValue(false)
+                key = PreferenceKeys.Font.USE_ATKINSON_HYPERLEGIBLE
+                setOnPreferenceClickListener {
+                    FontHelper.useAtkinsonHyperlegible = it.isEnabled
+                    (requireActivity() as BaseActivity).forceActivityRestart()
                     true
                 }
             })

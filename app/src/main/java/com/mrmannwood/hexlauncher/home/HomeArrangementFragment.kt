@@ -1,21 +1,19 @@
 package com.mrmannwood.hexlauncher.home
 
 import android.annotation.SuppressLint
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.core.content.edit
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
+import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerDialog
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerViewModel
-import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widget
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
@@ -27,7 +25,6 @@ class HomeArrangementFragment : WidgetHostFragment() {
 
     private lateinit var instructionMessage: TextView
     private lateinit var widgetContainer: FrameLayout
-    private var sharedPrefs : SharedPreferences? = null
 
     private val widgets = mutableMapOf<WidgetDescription, View>()
     private var viewBottom = 0
@@ -39,8 +36,8 @@ class HomeArrangementFragment : WidgetHostFragment() {
         return HomeViewDescription.ArrangementDescription(isLoading = false)
     }
 
-    override fun onWidgetLoaded(widgetView: View?, widgetName: String) {
-        val description = allWidgets[widgetName]!!
+    override fun onWidgetLoaded(widgetView: View?, widget: Widget) {
+        val description = allWidgets[widget]!!
         if (widgetView != null) {
             widgets[description] = widgetView
             onWidgetShown(description, widgetView)
@@ -51,10 +48,6 @@ class HomeArrangementFragment : WidgetHostFragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(databinder: FragmentHomeBinding, savedInstanceState: Bundle?) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            sharedPrefs = PreferencesRepository.getPrefs(requireContext())
-        }
-
         widgetContainer = databinder.container
         widgetContainer.addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, _ -> viewBottom = bottom }
         widgetContainer.setOnTouchListener(object : View.OnTouchListener {
@@ -176,17 +169,17 @@ class HomeArrangementFragment : WidgetHostFragment() {
 
     override fun onStop() {
         super.onStop()
-        sharedPrefs?.edit {
+        LauncherApplication.applicationScope.launch {
             allWidgets
                 .filter { !widgets.contains(it.value) }
                 .map { it.key }
                 .forEach { widget ->
-                    remove(Widgets.Position.key(widget))
-                    remove(Widgets.Color.key(widget))
+                    PreferencesRepository.writePref(widget.POSITION, null)
+                    PreferencesRepository.writePref(widget.COLOR, null)
                 }
             widgets.forEach { (widgetDescription, widgetView) ->
-                putFloat(Widgets.Position.key(widgetDescription.widget), widgetView.y)
-                putInt(Widgets.Color.key(widgetDescription.widget), (widgetView as TextView).currentTextColor)
+                PreferencesRepository.writePref(widgetDescription.widget.POSITION, widgetView.y)
+                PreferencesRepository.writePref(widgetDescription.widget.COLOR, (widgetView as TextView).currentTextColor)
             }
         }
     }
@@ -236,9 +229,9 @@ class HomeArrangementFragment : WidgetHostFragment() {
     }
 
     private val allWidgets = mapOf(
-        Widgets.DATE to WidgetDescription(Widgets.DATE, R.string.preferences_home_widgets_date_name, R.layout.widget_date),
-        Widgets.TIME to WidgetDescription(Widgets.TIME, R.string.preferences_home_widgets_time_name, R.layout.widget_time)
+        Widget.DATE to WidgetDescription(Widget.DATE, R.string.preferences_home_widgets_date_name, R.layout.widget_date),
+        Widget.TIME to WidgetDescription(Widget.TIME, R.string.preferences_home_widgets_time_name, R.layout.widget_time)
     )
 
-    private class WidgetDescription(val widget: String, val name: Int, val layout: Int)
+    private class WidgetDescription(val widget: Widget, val name: Int, val layout: Int)
 }

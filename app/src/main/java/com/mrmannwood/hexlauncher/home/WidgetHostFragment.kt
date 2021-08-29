@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
 
@@ -36,7 +37,7 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
 
     open fun onViewCreated(databinder: FragmentHomeBinding, savedInstanceState: Bundle?) {}
 
-    open fun onWidgetLoaded(widgetView: View?, widgetName: String) {}
+    open fun onWidgetLoaded(widgetView: View?, widgetName: PreferenceKeys.Home.Widget) {}
 
     fun onLoadingComplete() {
         databinder.description = makeDescription(false)

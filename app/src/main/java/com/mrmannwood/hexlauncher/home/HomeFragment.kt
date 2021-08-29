@@ -112,8 +112,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
 
     private fun showLauncherFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
-            val prefs = PreferencesRepository.getPrefs(requireContext())
-            if (prefs.getBoolean(PreferenceKeys.Apps.USE_HEX_GRID, false)) {
+            if(PreferencesRepository.getPref(PreferenceKeys.Apps.USE_HEX_GRID) == true) {
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.container, HexAppListFragment())
                     .addToBackStack("AppListFragment")

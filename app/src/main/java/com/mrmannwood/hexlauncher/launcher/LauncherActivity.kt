@@ -39,7 +39,7 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
         }
 
         lifecycleScope.launch {
-            if (checkShouldShowNux(PreferencesRepository.getPrefs(this@LauncherActivity))) {
+            if (checkShouldShowNux()) {
                 supportFragmentManager.beginTransaction()
                     .add(R.id.container, NUXHostFragment())
                     .commit()
@@ -64,14 +64,12 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
         return appListFragmentHost
     }
 
-    private fun checkShouldShowNux(prefs: SharedPreferences) : Boolean {
-        return prefs.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null)?.let { _ ->
+    private suspend fun checkShouldShowNux() : Boolean {
+        return PreferencesRepository.getPref(PreferenceKeys.Version.LAST_RUN_VERSION_NAME)?.let {
             // todo make this smarter, so new nuxes can be shown as necessary
             false
         } ?: run {
-            prefs.edit {
-                putString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, BuildConfig.VERSION_NAME)
-            }
+            PreferencesRepository.writePref(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, BuildConfig.VERSION_NAME)
             true
         }
     }

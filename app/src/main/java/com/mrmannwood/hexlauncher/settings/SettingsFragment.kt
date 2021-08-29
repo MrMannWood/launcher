@@ -211,7 +211,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             })
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_use_experimental_font)
-                setDefaultValue(false)
+                setDefaultValue(true)
                 key = PreferenceKeys.Font.USE_ATKINSON_HYPERLEGIBLE
                 setOnPreferenceClickListener {
                     FontHelper.useAtkinsonHyperlegible = it.isEnabled

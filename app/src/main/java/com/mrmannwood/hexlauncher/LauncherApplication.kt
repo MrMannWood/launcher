@@ -66,7 +66,7 @@ class LauncherApplication : Application() {
             key = PreferenceKeys.Font.USE_ATKINSON_HYPERLEGIBLE,
             extractor = PreferenceExtractor.BooleanExtractor
         )
-            .onEach { FontHelper.useAtkinsonHyperlegible = it == true }
+            .onEach { FontHelper.useAtkinsonHyperlegible = it != false }
             .launchIn(applicationScope)
 
         DB.init(this@LauncherApplication)

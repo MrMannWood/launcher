@@ -24,7 +24,7 @@ open class BaseActivity : AppCompatActivity() {
         usedHyperlegibleFontOnCreate = FontHelper.useAtkinsonHyperlegible
         super.onCreate(savedInstanceState)
         viewModel.useHyperlegibleFont.observe(this) { useHyperlegibleFont ->
-            if (usedHyperlegibleFontOnCreate != (useHyperlegibleFont == true)) {
+            if (usedHyperlegibleFontOnCreate != (useHyperlegibleFont != false)) {
                 recreate()
             }
         }

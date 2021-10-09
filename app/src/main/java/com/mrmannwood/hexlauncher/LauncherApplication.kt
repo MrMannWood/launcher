@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.FileProvider
+import androidx.lifecycle.asLiveData
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
 import com.mrmannwood.hexlauncher.applist.writeAppsToFile
 import com.mrmannwood.hexlauncher.font.FontHelper
@@ -48,10 +49,6 @@ class LauncherApplication : Application() {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
 
-        DB.init(this@LauncherApplication)
-
-        applicationScope.launch { PreferencesRepository.maybeConvertLegacyPrefs(this@LauncherApplication) }
-
         PreferencesRepository.watchPref(
             context = this@LauncherApplication,
             key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING,
@@ -72,7 +69,11 @@ class LauncherApplication : Application() {
             .onEach { FontHelper.useAtkinsonHyperlegible = it != false }
             .launchIn(applicationScope)
 
-        applicationScope.launch { AppListUpdater.updateAppList(applicationContext) }
+        DB.init(this@LauncherApplication)
+
+        applicationScope.launch {
+            AppListUpdater.updateAppList(applicationContext)
+        }
 
         registerReceiver(
                 PackageObserverBroadcastReceiver(),

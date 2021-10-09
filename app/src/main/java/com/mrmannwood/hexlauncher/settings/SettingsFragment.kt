@@ -43,8 +43,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 onSuccess = { appName, packageName ->
                     viewLifecycleOwner.lifecycleScope.launch {
                         PreferencesRepository.getPrefs(requireContext()).edit {
-                            putString(PreferenceKeys.Gesture.SwipeRight.APP_NAME.name, appName)
-                            putString(PreferenceKeys.Gesture.SwipeRight.PACKAGE_NAME.name, packageName)
+                            putString(PreferenceKeys.Gestures.SwipeRight.APP_NAME, appName)
+                            putString(PreferenceKeys.Gestures.SwipeRight.PACKAGE_NAME, packageName)
                         }
                     }
                 },
@@ -61,8 +61,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
             onSuccess = { appName, packageName ->
                 viewLifecycleOwner.lifecycleScope.launch {
                     PreferencesRepository.getPrefs(requireContext()).edit {
-                        putString(PreferenceKeys.Gesture.SwipeLeft.APP_NAME.name, appName)
-                        putString(PreferenceKeys.Gesture.SwipeLeft.PACKAGE_NAME.name, packageName)
+                        putString(PreferenceKeys.Gestures.SwipeLeft.APP_NAME, appName)
+                        putString(PreferenceKeys.Gestures.SwipeLeft.PACKAGE_NAME, packageName)
                     }
                 }
             },
@@ -123,7 +123,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             })
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_app_list_use_hex_grid)
-                key = PreferenceKeys.Apps.USE_HEX_GRID.name
+                key = PreferenceKeys.Apps.USE_HEX_GRID
                 setDefaultValue(false)
             })
         }
@@ -165,7 +165,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             })
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_debugging_logging_enable)
-                key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING.name
+                key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING
             })
         }
 
@@ -212,7 +212,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_use_experimental_font)
                 setDefaultValue(true)
-                key = PreferenceKeys.Font.USE_ATKINSON_HYPERLEGIBLE.name
+                key = PreferenceKeys.Font.USE_ATKINSON_HYPERLEGIBLE
                 setOnPreferenceClickListener {
                     FontHelper.useAtkinsonHyperlegible = it.isEnabled
                     true

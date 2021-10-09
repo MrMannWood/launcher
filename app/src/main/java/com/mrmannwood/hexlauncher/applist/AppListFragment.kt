@@ -248,7 +248,7 @@ fun searchApps(apps: List<AppInfo>?, term: String, maxReturn: Int) : List<AppInf
                     }
                 } else {
                     var smallestVal = Int.MAX_VALUE
-                    for (label in it.labelComponents) {
+                    for (label in it.searchTerms) {
                         if (length <= label.length) {
                             val result = term.qwertyMistakes(label.substring(0, length))
                             if (result < smallestVal) {

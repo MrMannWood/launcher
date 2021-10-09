@@ -13,5 +13,5 @@ data class AppInfo(
     val categories: List<String>
 ) {
     val lowerLabel = label.lowercase(Locale.ROOT)
-    val labelComponents = lowerLabel.split(' ')
+    val searchTerms = categories + lowerLabel.split(' ')
 }

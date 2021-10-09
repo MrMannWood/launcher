@@ -46,7 +46,6 @@ private fun makeLiveData(appContext: Application, showHidden: Boolean = false) :
 @MainThread
 private fun transformAppInfo(context: Context, app: DecoratedAppData) : AppInfo? {
     return try {
-        Timber.e("HELLO:: name=${app.appData.label}")
         AppInfo(
             packageName = app.appData.packageName,
             icon = context.packageManager.getApplicationIcon(app.appData.packageName),
@@ -64,7 +63,6 @@ private fun transformAppInfo(context: Context, app: DecoratedAppData) : AppInfo?
 
 @MainThread
 private fun getCategories(context: Context, category: Int): List<String> {
-    Timber.e("HELLO:: category=$category")
     return categoryMap.getOrPut(category) {
         context.resources.getStringArray(
             when (category) {

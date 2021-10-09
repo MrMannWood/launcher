@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -17,12 +18,15 @@ import com.mrmannwood.hexlauncher.colorpicker.ColorPickerViewModel
 import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
 import com.mrmannwood.hexlauncher.launcher.Adapter
 import com.mrmannwood.hexlauncher.launcher.AppInfo
+import com.mrmannwood.hexlauncher.textentrydialog.TextEntryDialog
+import com.mrmannwood.hexlauncher.textentrydialog.TextEntryDialogViewModel
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentAppCustomizationBinding
 import com.mrmannwood.launcher.databinding.ListAppCustomizationTagBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class AppCustomizationFragment : InstrumentedFragment() {
 
@@ -43,10 +47,11 @@ class AppCustomizationFragment : InstrumentedFragment() {
     private lateinit var binding: FragmentAppCustomizationBinding
     private lateinit var packageName: String
     private var appInfo: AppInfo? = null
-    private lateinit var tagsAdapter: Adapter<String>
+    private lateinit var tagsAdapter: Adapter<SearchTerm>
 
     private lateinit var  viewModel : AppCustomizationViewModel
     private val colorPickerViewModel : ColorPickerViewModel by activityViewModels()
+    private val textEntryDialogViewModel : TextEntryDialogViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +78,8 @@ class AppCustomizationFragment : InstrumentedFragment() {
             app?.let { info ->
                 binding.appInfo = info
                 appInfo = info
-                tagsAdapter.setData(String::class, app.categories)
+                tagsAdapter.setData(SearchTerm.Category::class, app.categories.map { SearchTerm.Category(it) })
+                tagsAdapter.setData(SearchTerm.Tag::class, app.tags.map { SearchTerm.Tag(it) })
             } ?: run {
                 parentFragmentManager.beginTransaction()
                     .remove(this@AppCustomizationFragment)
@@ -132,16 +138,54 @@ class AppCustomizationFragment : InstrumentedFragment() {
             }
         }
 
+        textEntryDialogViewModel.completionLiveData.observe(viewLifecycleOwner) { text ->
+            text?.split(" ")?.forEach { t ->
+                t.trim().takeIf { it.isNotBlank() }?.lowercase()?.let { tag ->
+                    if (tag.contains(",")) {
+                        Toast.makeText(requireContext(), R.string.text_entry_cannot_contain_comma, Toast.LENGTH_LONG).show()
+                    } else if (appInfo?.searchTerms?.contains(tag) != true) {
+                        updateAppInfo { dao ->
+                            dao.setTags(
+                                appInfo!!.packageName,
+                                ArrayList<String>().also {
+                                    it.addAll(appInfo!!.tags)
+                                    it.add(tag)
+                                }.joinToString(",") { it }
+                            )
+                        }
+                    }
+                    textEntryDialogViewModel.completionLiveData.value = null
+                }
+            }
+        }
+
+        binding.buttonAddTag.setOnClickListener {
+            TextEntryDialog().show(childFragmentManager, null)
+        }
+
         binding.tags.layoutManager = LinearLayoutManager(requireContext())
         tagsAdapter = Adapter(
             context = requireContext(),
-            order = arrayOf(String::class),
-            idFunc = { appInfo?.categories?.indexOf(it)?.toLong() ?: -1L },
+            order = arrayOf(SearchTerm.Category::class, SearchTerm.Tag::class),
+            idFunc = { appInfo?.categories?.indexOf(it.term)?.toLong() ?: -1L },
             viewFunc = { R.layout.list_app_customization_tag },
             bindFunc = {  vdb, tag ->
                 when(vdb) {
                     is ListAppCustomizationTagBinding -> {
-                        vdb.tag = tag
+                        vdb.tag = tag.term
+                        vdb.canDelete = tag is SearchTerm.Tag
+                        vdb.buttonTagDelete.setOnClickListener {
+                            Timber.e("DELETE ${tag.term} FROM ${appInfo!!.packageName}")
+                            updateAppInfo { dao ->
+                                dao.setTags(
+                                    appInfo!!.packageName,
+                                    ArrayList<String>().also {
+                                        it.addAll(appInfo!!.tags)
+                                        it.remove(tag.term)
+                                    }.joinToString(",") { it }
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -155,5 +199,10 @@ class AppCustomizationFragment : InstrumentedFragment() {
                 action(DB.get().appDataDao())
             }
         }
+    }
+
+    sealed class SearchTerm(val term: String) {
+        class Category(term: String): SearchTerm(term)
+        class Tag(term: String): SearchTerm(term)
     }
 }

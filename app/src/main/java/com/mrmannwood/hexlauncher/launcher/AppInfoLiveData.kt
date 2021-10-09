@@ -53,7 +53,8 @@ private fun transformAppInfo(context: Context, app: DecoratedAppData) : AppInfo?
             label = app.appData.label,
             hidden = app.decoration.hidden,
             backgroundHidden = app.decoration.backgroundHidden,
-            categories = getCategories(context, app.appData.category)
+            categories = getCategories(context, app.appData.category),
+            tags = app.decoration.tags
         )
     } catch (e: PackageManager.NameNotFoundException) {
         Timber.w(e, "Package manager error while loading apps")

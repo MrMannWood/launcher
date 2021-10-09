@@ -202,15 +202,34 @@
 
             </LinearLayout>
 
-            <com.google.android.material.textview.MaterialTextView
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:layout_marginStart="12dp"
-                android:layout_gravity="start|bottom"
-                android:textSize="18sp"
-                android:text="@string/customize_app_tags_label"
-                android:textColor="@color/colorOnPrimary"/>
+                android:layout_marginStart="12dp">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tags_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_alignParentStart="true"
+                    android:textSize="18sp"
+                    android:text="@string/customize_app_tags_label"
+                    android:textColor="@color/colorOnPrimary"/>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/button_add_tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignTop="@id/tags_label"
+                    android:layout_alignBottom="@id/tags_label"
+                    android:src="@drawable/outline_add"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"/>
+
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/tags"

@@ -42,4 +42,7 @@ interface AppDataDao {
 
     @Query("UPDATE app_data_decoration SET background_hidden = :backgroundHidden WHERE package_name_dec = :packageName")
     fun setBackgroundHidden(packageName: String, backgroundHidden: Boolean)
+
+    @Query("UPDATE app_data_decoration SET tags = :tag WHERE package_name_dec = :packageName")
+    fun setTags(packageName: String, tag: String)
 }

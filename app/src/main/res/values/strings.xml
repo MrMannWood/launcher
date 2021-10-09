@@ -88,6 +88,11 @@
     <string name="color_picker_button_positive">OK</string>
     <string name="color_picker_button_negative">Cancel</string>
 
+    <string name="text_entry_dialog_prompt">Enter New Tag</string>
+    <string name="text_entry_button_positive">OK</string>
+    <string name="text_entry_button_negative">Cancel</string>
+    <string name="text_entry_cannot_contain_comma">Tags cannot contain commas</string>
+
     <string name="rage_shake_email_body">DebugInfo:\n%s\n\nPlease describe the issue you\'re experiencing</string>
 
     <string name="customize_hide_app">Hide App</string>
@@ -127,7 +132,6 @@
     </string-array>
     <string-array name="APP_CATEGORY_SOCIAL">
         <item>social</item>
-        <item>social media</item>
     </string-array>
     <string-array name="APP_CATEGORY_NEWS">
         <item>news</item>

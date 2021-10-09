@@ -10,8 +10,9 @@ data class AppInfo(
     val label: String,
     val hidden: Boolean,
     val backgroundHidden: Boolean,
-    val categories: List<String>
+    val categories: List<String>,
+    val tags: List<String>
 ) {
     val lowerLabel = label.lowercase(Locale.ROOT)
-    val searchTerms = categories + lowerLabel.split(' ')
+    val searchTerms = lowerLabel.split(' ') + categories + tags
 }

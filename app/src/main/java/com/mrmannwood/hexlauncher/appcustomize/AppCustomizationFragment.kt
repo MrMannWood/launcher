@@ -9,14 +9,17 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.applist.AppDataDao
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerDialog
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerViewModel
 import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
+import com.mrmannwood.hexlauncher.launcher.Adapter
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentAppCustomizationBinding
+import com.mrmannwood.launcher.databinding.ListAppCustomizationTagBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -24,7 +27,7 @@ import kotlinx.coroutines.withContext
 class AppCustomizationFragment : InstrumentedFragment() {
 
     companion object {
-        private val PACKAGE_NAME = "package_name"
+        private const val PACKAGE_NAME = "package_name"
 
         fun forPackage(packageName: String) : AppCustomizationFragment {
             return AppCustomizationFragment().apply {
@@ -40,6 +43,7 @@ class AppCustomizationFragment : InstrumentedFragment() {
     private lateinit var binding: FragmentAppCustomizationBinding
     private lateinit var packageName: String
     private var appInfo: AppInfo? = null
+    private lateinit var tagsAdapter: Adapter<String>
 
     private lateinit var  viewModel : AppCustomizationViewModel
     private val colorPickerViewModel : ColorPickerViewModel by activityViewModels()
@@ -69,6 +73,7 @@ class AppCustomizationFragment : InstrumentedFragment() {
             app?.let { info ->
                 binding.appInfo = info
                 appInfo = info
+                tagsAdapter.setData(String::class, app.categories)
             } ?: run {
                 parentFragmentManager.beginTransaction()
                     .remove(this@AppCustomizationFragment)
@@ -126,6 +131,22 @@ class AppCustomizationFragment : InstrumentedFragment() {
                 }
             }
         }
+
+        binding.tags.layoutManager = LinearLayoutManager(requireContext())
+        tagsAdapter = Adapter(
+            context = requireContext(),
+            order = arrayOf(String::class),
+            idFunc = { appInfo?.categories?.indexOf(it)?.toLong() ?: -1L },
+            viewFunc = { R.layout.list_app_customization_tag },
+            bindFunc = {  vdb, tag ->
+                when(vdb) {
+                    is ListAppCustomizationTagBinding -> {
+                        vdb.tag = tag
+                    }
+                }
+            }
+        )
+        binding.tags.adapter = tagsAdapter
     }
 
     fun updateAppInfo(action: (dao: AppDataDao) -> Unit) {

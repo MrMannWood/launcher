@@ -93,8 +93,58 @@
     <string name="customize_hide_app">Hide App</string>
     <string name="customize_show_app">Un-Hide App</string>
     <string name="customize_app_icon">Icon</string>
+    <string name="customize_app_tags_label">Tags</string>
     <string name="customize_app_background_color">Background Color</string>
     <string name="customize_app_foreground_icon">Foreground Icon</string>
     <string name="customize_app_background_icon">Background Icon</string>
+
+    <!-- region app categories -->
+    <string-array name="APP_CATEGORY_UNDEFINED"/>
+    <string-array name="APP_CATEGORY_GAME">
+        <item>game</item>
+        <item>play</item>
+        <item>gaming</item>
+        <item>vidja</item>
+        <item>media</item>
+    </string-array>
+    <string-array name="APP_CATEGORY_AUDIO">
+        <item>audio</item>
+        <item>music</item>
+        <item>stream</item>
+        <item>media</item>
+    </string-array>
+    <string-array name="APP_CATEGORY_VIDEO">
+        <item>video</item>
+        <item>movie</item>
+        <item>stream</item>
+        <item>media</item>
+    </string-array>
+    <string-array name="APP_CATEGORY_IMAGE">
+        <item>image</item>
+        <item>photo</item>
+        <item>picture</item>
+        <item>media</item>
+    </string-array>
+    <string-array name="APP_CATEGORY_SOCIAL">
+        <item>social</item>
+        <item>social media</item>
+    </string-array>
+    <string-array name="APP_CATEGORY_NEWS">
+        <item>news</item>
+    </string-array>
+    <string-array name="APP_CATEGORY_MAPS">
+        <item>maps</item>
+        <item>directions</item>
+    </string-array>
+    <string-array name="APP_CATEGORY_PRODUCTIVITY">
+        <item>productivity</item>
+        <item>office</item>
+        <item>work</item>
+    </string-array>
+    <string-array name="APP_CATEGORY_ACCESSIBILITY">
+        <item>accessibility</item>
+        <item>help</item>
+    </string-array>
+    <!-- endregion -->
 
 </resources>

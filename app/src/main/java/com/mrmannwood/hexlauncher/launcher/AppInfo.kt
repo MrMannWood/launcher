@@ -10,6 +10,7 @@ data class AppInfo(
     val label: String,
     val hidden: Boolean,
     val backgroundHidden: Boolean,
+    val categories: List<String>
 ) {
     val lowerLabel = label.lowercase(Locale.ROOT)
     val labelComponents = lowerLabel.split(' ')

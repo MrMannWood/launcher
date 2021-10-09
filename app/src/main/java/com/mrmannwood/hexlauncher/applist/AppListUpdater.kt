@@ -86,7 +86,8 @@ object AppListUpdater {
                 packageName = packageName,
                 label = appInfo.loadLabel(pacman).toString(),
                 lastUpdateTime = packageInfo.lastUpdateTime,
-                backgroundColor = IconAdapter.INSTANCE.getBackgroundColor(icon)
+                backgroundColor = IconAdapter.INSTANCE.getBackgroundColor(icon),
+                category = appInfo.category
             )
         }
     }

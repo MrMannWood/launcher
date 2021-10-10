@@ -1,5 +1,7 @@
 package com.mrmannwood.hexlauncher.appcustomize
 
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,12 +12,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.applist.AppDataDao
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerDialog
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerViewModel
 import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
+import com.mrmannwood.hexlauncher.icon.IconAdapter
 import com.mrmannwood.hexlauncher.launcher.Adapter
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.hexlauncher.textentrydialog.TextEntryDialog
@@ -120,6 +124,33 @@ class AppCustomizationFragment : InstrumentedFragment() {
                     }
                 })
             ColorPickerDialog().show(childFragmentManager, null)
+
+            colorPickerViewModel.colorSuggestionLiveData.value = null
+            extractColorsForPicker(appInfo!!.icon) { iconAdapter, icon ->
+                listOf(iconAdapter.getBackgroundColor(icon))
+            }
+            extractColorsForPicker(appInfo!!.icon) { iconAdapter, icon ->
+                iconAdapter.getPalette(
+                    icon = icon,
+                    onPalette =  { palette: Palette ->
+                        addColorsToColorPickerSuggestions(
+                            listOfNotNull(
+                                palette.dominantSwatch,
+                                palette.darkVibrantSwatch,
+                                palette.lightVibrantSwatch,
+                                palette.vibrantSwatch,
+                                palette.darkMutedSwatch,
+                                palette.lightMutedSwatch,
+                                palette.mutedSwatch,
+                            )
+                                .filter { it.population > 25 }
+                                .map { it.rgb }
+                                .distinct()
+                        )
+                    }
+                )
+                emptyList()
+            }
         }
 
         binding.buttonHideApp.setOnClickListener {
@@ -175,7 +206,6 @@ class AppCustomizationFragment : InstrumentedFragment() {
                         vdb.tag = tag.term
                         vdb.canDelete = tag is SearchTerm.Tag
                         vdb.buttonTagDelete.setOnClickListener {
-                            Timber.e("DELETE ${tag.term} FROM ${appInfo!!.packageName}")
                             updateAppInfo { dao ->
                                 dao.setTags(
                                     appInfo!!.packageName,
@@ -199,6 +229,24 @@ class AppCustomizationFragment : InstrumentedFragment() {
                 action(DB.get().appDataDao())
             }
         }
+    }
+
+    private fun extractColorsForPicker(drawable: Drawable, action: (iconAdapter: IconAdapter, drawable: Drawable) -> List<Int>) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.Unconfined) {
+                addColorsToColorPickerSuggestions(action(IconAdapter.INSTANCE, drawable))
+            }
+        }
+    }
+
+    private fun addColorsToColorPickerSuggestions(colors: List<Int>) {
+        if (colors.isEmpty()) {
+            return
+        }
+        colorPickerViewModel.colorSuggestionLiveData.value =
+            (colorPickerViewModel.colorSuggestionLiveData.value?.toMutableList() ?: ArrayList()).also {
+                it.addAll(colors)
+            }
     }
 
     sealed class SearchTerm(val term: String) {

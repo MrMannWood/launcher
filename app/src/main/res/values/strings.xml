@@ -81,6 +81,7 @@
     <string name="home_arrangement_widget_color">Color</string>
     <string name="home_arrangement_widget_hide">Hide</string>
 
+    <string name="dialog_color_picker_suggested_swatch_content_description">suggestion for color</string>
     <string name="dialog_color_picker_swatch_content_description">color output</string>
     <string name="dialog_color_picker_red_content_description">red</string>
     <string name="dialog_color_picker_green_content_description">green</string>

@@ -6,11 +6,72 @@
     android:orientation="vertical"
     android:background="@color/colorPrimary">
 
-    <View
-        android:id="@+id/swatch"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="160dp"
-        android:contentDescription="@string/dialog_color_picker_swatch_content_description"/>
+        android:orientation="horizontal">
+
+        <View
+            android:id="@+id/controller_swatch"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:layout_toStartOf="@id/suggested_swatch_container"
+            android:contentDescription="@string/dialog_color_picker_swatch_content_description"/>
+
+        <LinearLayout
+            android:id="@+id/suggested_swatch_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <View
+                android:id="@+id/swatch_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:contentDescription="@string/dialog_color_picker_suggested_swatch_content_description"/>
+
+            <View
+                android:id="@+id/swatch_2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:contentDescription="@string/dialog_color_picker_suggested_swatch_content_description"/>
+
+            <View
+                android:id="@+id/swatch_3"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:contentDescription="@string/dialog_color_picker_suggested_swatch_content_description"/>
+
+
+            <View
+                android:id="@+id/swatch_4"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:contentDescription="@string/dialog_color_picker_suggested_swatch_content_description"/>
+
+
+            <View
+                android:id="@+id/swatch_5"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:contentDescription="@string/dialog_color_picker_suggested_swatch_content_description"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <Space
         android:layout_width="0dp"

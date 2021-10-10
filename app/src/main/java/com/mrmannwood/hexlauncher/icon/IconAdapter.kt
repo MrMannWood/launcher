@@ -6,6 +6,9 @@ import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.core.graphics.get
+import androidx.palette.graphics.Palette
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 interface IconAdapter {
 
@@ -23,6 +26,10 @@ interface IconAdapter {
 
     fun getBackgroundDrawable(icon: Drawable) : Drawable?
 
+    fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit)
+
+    fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit, onFailure: () -> Unit)
+
     private open class DefaultIconAdapter : IconAdapter {
 
         override fun isRecycled(icon: Drawable): Boolean {
@@ -38,12 +45,14 @@ interface IconAdapter {
 
         override fun getBackgroundColor(icon: Drawable) : Int {
             if (icon is AdaptiveIconDrawable) {
-                val result = drawableToBitmap(icon.background) { getDominantColor(it) }
+                val result = drawableToBitmap(icon.background, false) { bitmap, _ ->
+                    getDominantColor(bitmap)
+                }
                 if (result != null) {
                     return result
                 }
             }
-            return drawableToBitmap(icon) { bitmap -> getDominantColor(bitmap) } ?: 0xFFC1CC
+            return drawableToBitmap(icon, false) { bitmap, _ -> getDominantColor(bitmap) } ?: 0xFFC1CC
         }
 
         override fun getForegroundDrawable(icon: Drawable): Drawable? {
@@ -62,16 +71,41 @@ interface IconAdapter {
             }
         }
 
-        fun <T> drawableToBitmap(drawable: Drawable, func: (Bitmap) -> T) : T {
+        override fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit) {
+            getPalette(icon, onPalette, {})
+        }
+
+        override fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit, onFailure: () -> Unit) {
+            if (icon == null) {
+                onFailure()
+            } else {
+                drawableToBitmap(drawable = icon, selfClose = true) { bitmap, close ->
+                    getPalette(
+                        bitmap,
+                        onPalette = {
+                            close()
+                            onPalette(it)
+                        },
+                        onFailure = {
+                            close()
+                            onFailure()
+                        }
+                    )
+                }
+            }
+        }
+
+        fun <T> drawableToBitmap(drawable: Drawable, selfClose: Boolean, func: (Bitmap, () -> Unit) -> T) : T {
             if (drawable is BitmapDrawable && drawable.bitmap != null) {
-                return func(drawable.bitmap)
+                return func(drawable.bitmap) { }
             }
 
             val bitmap = drawableToBitmap(drawable)
-
-            val result = func(bitmap)
-            bitmap.recycle()
-            return result
+            return if (selfClose) {
+                func(bitmap) { bitmap.recycle() }
+            } else {
+                func(bitmap) { }
+            }
         }
 
         fun drawableToBitmap(drawable: Drawable) : Bitmap {
@@ -128,6 +162,10 @@ interface IconAdapter {
                 }
             }
             return color
+        }
+
+        fun getPalette(bitmap: Bitmap, onPalette: (Palette) -> Unit, onFailure: () -> Unit) {
+            Palette.Builder(bitmap).generate { it?.let { onPalette(it) } ?: run { onFailure() } }
         }
     }
 }

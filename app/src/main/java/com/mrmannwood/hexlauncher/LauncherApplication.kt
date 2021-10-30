@@ -8,13 +8,11 @@ import android.os.Build
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.FileProvider
-import androidx.lifecycle.asLiveData
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
 import com.mrmannwood.hexlauncher.applist.writeAppsToFile
 import com.mrmannwood.hexlauncher.font.FontHelper
 import com.mrmannwood.hexlauncher.foregrounddetection.ForegroundActivityListener
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
-import com.mrmannwood.hexlauncher.rageshake.ShakeManager
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository
@@ -85,18 +83,6 @@ class LauncherApplication : Application() {
         )
 
         ForegroundActivityListener.init(this)
-        val shakeManager = ShakeManager(3) {
-            ForegroundActivityListener.forCurrentForegroundActivity { activity ->
-                rageShakeThing(activity)
-            }
-        }
-        ForegroundActivityListener.registerForegroundUpdateListener { inForeground ->
-            if (inForeground) {
-                shakeManager.startRageShakeDetector(this@LauncherApplication)
-            } else {
-                shakeManager.stopRageShakeDetector()
-            }
-        }
         CoroutineScope(Dispatchers.IO).launch  {
             File(filesDir, "rage_shake").deleteRecursively()
         }

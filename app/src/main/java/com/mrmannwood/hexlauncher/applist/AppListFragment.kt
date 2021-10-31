@@ -23,10 +23,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
-import com.mrmannwood.hexlauncher.launcher.Adapter
-import com.mrmannwood.hexlauncher.launcher.AppInfo
-import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
-import com.mrmannwood.hexlauncher.launcher.LauncherViewModel
+import com.mrmannwood.hexlauncher.launcher.*
 import com.mrmannwood.hexlauncher.qwertyMistakes
 import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import com.mrmannwood.launcher.R
@@ -233,37 +230,38 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     }
 }
 
-
 fun searchApps(apps: List<AppInfo>?, term: String, maxReturn: Int) : List<AppInfo> {
-    return apps?.let { data ->
-        if (term.isEmpty()) {
-            Collections.emptyList()
-        } else {
-            val sorted = mutableMapOf<AppInfo, Int>()
-            val length = term.length
-            data.forEach {
-                if (term.contains(' ')) {
-                    if (length <= it.lowerLabel.length) {
-                        sorted[it] = term.qwertyMistakes(it.lowerLabel.substring(0, length))
-                    }
-                } else {
-                    var smallestVal = Int.MAX_VALUE
-                    for (label in it.searchTerms) {
-                        if (length <= label.length) {
-                            val result = term.qwertyMistakes(label.substring(0, length))
-                            if (result < smallestVal) {
-                                smallestVal = result
-                            }
-                        }
-                    }
-                    sorted[it] = smallestVal
+    if (apps == null || term.isEmpty()) {
+        return Collections.emptyList();
+    }
+    val matchingApps = mutableListOf<Triple<Int, SearchTermType, AppInfo>>()
+    val length = term.length
+    apps.forEach {
+        if (term.contains(' ')) {
+            if (length <= it.lowerLabel.length) {
+                val result = term.qwertyMistakes(it.lowerLabel.substring(0, length))
+                if (result != Int.MAX_VALUE) {
+                    matchingApps.add(Triple(result, SearchTermType.FullName, it))
                 }
             }
-            sorted.filter { it.value != Int.MAX_VALUE }
-                .toList()
-                .sortedWith(compareBy({ it.second }, { it.first.label }))
-                .map { it.first }
-                .take(maxReturn)
+        } else {
+            it.searchTerms.forEach { (label, type) ->
+                if (length <= label.length) {
+                    val result = term.qwertyMistakes(label.substring(0, length))
+                    if (result != Int.MAX_VALUE) {
+                        matchingApps.add(Triple(result, type, it))
+                    }
+                }
+            }
         }
-    } ?: Collections.emptyList()
+    }
+
+    return matchingApps.sortedWith(compareBy(
+        { it.first },
+        { it.second },
+        { it.third.label }
+    ))
+        .map { it.third }
+        .distinct()
+        .take(maxReturn)
 }

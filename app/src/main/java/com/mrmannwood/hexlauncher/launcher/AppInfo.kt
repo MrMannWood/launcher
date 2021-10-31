@@ -3,6 +3,13 @@ package com.mrmannwood.hexlauncher.launcher
 import android.graphics.drawable.Drawable
 import java.util.*
 
+enum class SearchTermType {
+    FullName,
+    Label,
+    Tag,
+    Category,
+}
+
 data class AppInfo(
     val packageName: String,
     val icon: Drawable,
@@ -14,5 +21,9 @@ data class AppInfo(
     val tags: List<String>
 ) {
     val lowerLabel = label.lowercase(Locale.ROOT)
-    val searchTerms = lowerLabel.split(' ') + categories + tags
+    val searchTerms : Map<String, SearchTermType> = (
+            categories.map { it to SearchTermType.Category } +
+                    tags.map { it to SearchTermType.Tag } +
+                    lowerLabel.split(' ').map { it to SearchTermType.Label }
+            ).toMap()
 }

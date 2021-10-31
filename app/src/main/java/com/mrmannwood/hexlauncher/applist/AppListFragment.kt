@@ -247,8 +247,9 @@ fun searchApps(apps: List<AppInfo>?, term: String, maxReturn: Int) : List<AppInf
         } else {
             it.searchTerms.forEach { (label, type) ->
                 if (length <= label.length) {
+                    val minAcceptable = if (type != SearchTermType.Label) 0 else Int.MAX_VALUE - 1
                     val result = term.qwertyMistakes(label.substring(0, length))
-                    if (result != Int.MAX_VALUE) {
+                    if (result <= minAcceptable) {
                         matchingApps.add(Triple(result, type, it))
                     }
                 }

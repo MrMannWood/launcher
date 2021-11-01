@@ -124,7 +124,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
             addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_app_list_use_hex_grid)
                 key = PreferenceKeys.Apps.USE_HEX_GRID
-                setDefaultValue(false)
+                setDefaultValue(true)
+            })
+            addPreference(SwitchPreference(activity).apply {
+                setTitle(R.string.preferences_app_list_enable_category_search)
+                key = PreferenceKeys.Apps.ENABLE_CATEGORY_SEARCH
+                setDefaultValue(true)
             })
         }
 

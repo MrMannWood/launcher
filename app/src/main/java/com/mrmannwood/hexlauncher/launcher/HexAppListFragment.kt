@@ -39,6 +39,7 @@ class HexAppListFragment : InstrumentedFragment(), HandleBackPressed {
 
     private val appBindings = mutableListOf<Pair<View, (AppInfo?) -> Unit>>()
     private var apps : List<AppInfo>? = null
+    private var enableCategorySearch : Boolean = true
     private var showKeyboardJob : Job? = null
 
     private fun getAppListHost() : AppListFragment.Host<*> {
@@ -114,6 +115,9 @@ class HexAppListFragment : InstrumentedFragment(), HandleBackPressed {
     }
 
     private fun startObservingLiveData() {
+        viewModel.enableCategorySearch.observe(viewLifecycleOwner, { enable ->
+            enableCategorySearch = enable != false
+        })
         viewModel.apps.observe(viewLifecycleOwner, { appList ->
             apps = appList
             performSearch()
@@ -168,7 +172,7 @@ class HexAppListFragment : InstrumentedFragment(), HandleBackPressed {
 
     private fun performSearch() {
         val search = searchView.text.toString().trim().lowercase(Locale.ROOT)
-        val filteredApps = searchApps(apps, search, 8)
+        val filteredApps = searchApps(apps, search, enableCategorySearch, 8)
         appBindings.forEachIndexed { i, binding ->
             filteredApps.getOrNull(i)?.let { app ->
                 binding.second.invoke(app)

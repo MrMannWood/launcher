@@ -25,6 +25,7 @@ object PreferenceKeys {
     }
     object Apps {
         const val USE_HEX_GRID = "apps_use_hex_grid"
+        const val ENABLE_CATEGORY_SEARCH = "enable_category_search"
     }
     object Font {
         const val USE_ATKINSON_HYPERLEGIBLE = "use_atkison_hyperlegible"

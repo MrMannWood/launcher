@@ -29,7 +29,6 @@ import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.util.*
 
 class AppListFragment : InstrumentedFragment(), HandleBackPressed {
@@ -62,6 +61,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     private val viewModel : LauncherViewModel by activityViewModels()
 
     private var apps : List<AppInfo>? = null
+    private var enableCategorySearch : Boolean = true
 
     private fun getAppListHost() : Host<*> {
         return (requireActivity() as AppListHostActivity).getAppListHost()
@@ -132,6 +132,9 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     }
 
     private fun startObservingLiveData() {
+        viewModel.enableCategorySearch.observe(viewLifecycleOwner, { enable ->
+            enableCategorySearch = enable != false
+        })
         viewModel.apps.observe(viewLifecycleOwner, { appList ->
             apps = appList
             performSearch()
@@ -225,12 +228,12 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         val search = searchView.text.toString().trim().lowercase(Locale.ROOT)
         resultListAdapter.setData(
             AppInfo::class,
-            searchApps(apps, search, numColumnsInAppList).map { it }
+            searchApps(apps, search, enableCategorySearch, numColumnsInAppList).map { it }
         )
     }
 }
 
-fun searchApps(apps: List<AppInfo>?, term: String, maxReturn: Int) : List<AppInfo> {
+fun searchApps(apps: List<AppInfo>?, term: String, searchCategories: Boolean, maxReturn: Int) : List<AppInfo> {
     if (apps == null || term.isEmpty()) {
         return Collections.emptyList();
     }
@@ -246,7 +249,7 @@ fun searchApps(apps: List<AppInfo>?, term: String, maxReturn: Int) : List<AppInf
             }
         } else {
             it.searchTerms.forEach { (label, type) ->
-                if (length <= label.length) {
+                if (length <= label.length && (searchCategories || type !=SearchTermType.Category)) {
                     val minAcceptable = if (type != SearchTermType.Label) 0 else Int.MAX_VALUE - 1
                     val result = term.qwertyMistakes(label.substring(0, length))
                     if (result <= minAcceptable) {

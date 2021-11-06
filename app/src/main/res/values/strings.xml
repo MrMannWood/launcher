@@ -105,6 +105,8 @@
     <string name="customize_app_foreground_icon">Foreground Icon</string>
     <string name="customize_app_background_icon">Background Icon</string>
 
+    <string name="error_cannot_change_wallpaper">Unable to set that wallpaper</string>
+
     <!-- region app categories -->
     <string-array name="APP_CATEGORY_UNDEFINED"/>
     <string-array name="APP_CATEGORY_GAME">

@@ -28,12 +28,15 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     private val wallpaperPickerContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
         if (result.data?.data == null) return@registerForActivityResult
-        startActivity(
-            WallpaperManager.getInstance(requireContext())
+        try {
+            startActivity(WallpaperManager.getInstance(requireContext())
                 .getCropAndSetWallpaperIntent(result.data!!.data!!).apply {
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
-        )
+            )
+        } catch (e: IllegalArgumentException) {
+            Toast.makeText(requireContext(), R.string.error_cannot_change_wallpaper, Toast.LENGTH_LONG).show()
+        }
     }
 
     private val viewModel: HomeViewModel by activityViewModels()

@@ -6,4 +6,6 @@ out/
 app/release/
 app/debug/
 
+*.jks
+
 local.properties

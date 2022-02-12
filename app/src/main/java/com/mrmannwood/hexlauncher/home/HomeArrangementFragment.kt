@@ -147,6 +147,14 @@ class HomeArrangementFragment : WidgetHostFragment() {
             private fun createAndShowWidget(widgetDescription: WidgetDescription) {
                 LayoutInflater.from(requireContext())
                     .inflate(widgetDescription.layout, widgetContainer, false).apply {
+                        val yPosition = widgets.values.firstOrNull()?.let {
+                            if (it.y > widgetContainer.height / 2) {
+                                0
+                            } else {
+                                it.y + it.height
+                            }
+                        } ?: 0
+
                         widgets[widgetDescription] = this
                         tag = widgetDescription
                         layoutParams = FrameLayout.LayoutParams(
@@ -154,6 +162,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                             Gravity.CENTER_HORIZONTAL
                         )
+                        this.y = yPosition.toFloat()
                         widgetContainer.addView(this)
                         onWidgetShown(widgetDescription, this)
                     }

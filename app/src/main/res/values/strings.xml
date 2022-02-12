@@ -74,7 +74,7 @@
     <string name="home_apps_still_loading">Apps are still loading</string>
 
     <string name="home_arrangement_tutorial_get_started">Long press the background to get started</string>
-    <string name="home_arrangement_tutorial_customize_widget">Long press a widget to customize it.</string>
+    <string name="home_arrangement_tutorial_customize_widget">Long press a widget to customize it.\nDrag to move it.</string>
 
     <string name="home_arrangement_widgets_menu_title">Widgets</string>
     <string name="home_arrangement_widget_color">Color</string>

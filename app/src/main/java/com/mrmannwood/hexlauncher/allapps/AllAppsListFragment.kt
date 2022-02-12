@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.hexlauncher.appcustomize.AppCustomizationFragment
 import com.mrmannwood.hexlauncher.applist.calculateNoOfColumnsForAppList
@@ -39,19 +40,15 @@ class AllAppsListFragment : Fragment() {
             adapter = resultListAdapter
         }
 
-        viewModel.apps.observe(viewLifecycleOwner, { appList ->
+        viewModel.apps.observe(viewLifecycleOwner) { appList ->
             resultListAdapter.setData(AppInfo::class, appList)
-        })
+        }
     }
 
-    private fun createResultLayoutManager() : GridLayoutManager {
-        return object : GridLayoutManager(
-            requireContext(),
-            calculateNoOfColumnsForAppList(resources),
-            RecyclerView.VERTICAL,
-            true /* reverseLayout */
-        ) {
-            override fun isLayoutRTL() : Boolean = true
+    private fun createResultLayoutManager() : RecyclerView.LayoutManager {
+        return LinearLayoutManager(requireContext()).apply {
+            reverseLayout = true
+            stackFromEnd = true
         }
     }
 

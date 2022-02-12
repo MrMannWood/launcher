@@ -11,17 +11,19 @@
             type="com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter" />
     </data>
 
-    <LinearLayout
-        android:layout_width="75dp"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_marginTop="12dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp">
 
         <FrameLayout
+            android:id="@+id/icon_parent"
             android:layout_width="@dimen/hex_view_height"
-            android:layout_height="75dp">
+            android:layout_height="75dp"
+            android:layout_alignParentEnd="true">
 
             <com.mrmannwood.hexlauncher.view.HexagonView
                 android:layout_width="match_parent"
@@ -63,14 +65,15 @@
         </FrameLayout>
 
         <com.google.android.material.textview.MaterialTextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|bottom"
-            android:gravity="center_horizontal"
+            android:layout_toStartOf="@+id/icon_parent"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
             android:text="@{appInfo.label}"
             android:maxLines="2"
             android:ellipsize="end"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </layout>

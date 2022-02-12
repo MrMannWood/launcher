@@ -100,16 +100,16 @@ class HexagonalGridLayoutManager: RecyclerView.LayoutManager() {
         current.right = positions[1].right - horizontalOffset
 
         current = positions[5]
-        current.bottom = positions[2].bottom - verticalOffset
-        current.right = positions[1].right
+        current.bottom = positions[1].bottom
+        current.right = positions[1].right - horizontalOffset * 2
 
         current = positions[6]
-        current.bottom = positions[1].bottom
-        current.right = positions[3].right - horizontalOffset
+        current.bottom = positions[0].bottom
+        current.right = positions[2].right - horizontalOffset * 2
 
         current = positions[7]
-        current.bottom = positions[0].bottom
-        current.right = positions[6].right - horizontalOffset
+        current.bottom = positions[3].bottom - verticalOffset
+        current.right = positions[1].right
 
         positions.forEach {
             it.top = it.bottom - decoratedHeight

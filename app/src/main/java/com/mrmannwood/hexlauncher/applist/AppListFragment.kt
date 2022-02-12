@@ -19,12 +19,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
 import com.mrmannwood.hexlauncher.launcher.*
 import com.mrmannwood.hexlauncher.qwertyMistakes
+import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager
 import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
@@ -83,7 +83,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         resultListAdapter = createResultAdapter()
         resultListView = view.findViewById<RecyclerView>(R.id.result_list).apply {
-            layoutManager = createResultLayoutManager()
+            layoutManager = HexagonalGridLayoutManager()
             adapter = resultListAdapter
         }
 
@@ -139,23 +139,6 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
             apps = appList
             performSearch()
         })
-    }
-
-    private fun createResultLayoutManager() : GridLayoutManager {
-        return object : GridLayoutManager(
-                requireContext(),
-                numColumnsInAppList,
-                RecyclerView.VERTICAL,
-                true /* reverseLayout */
-        ) {
-            override fun isLayoutRTL() : Boolean = true
-        }.apply {
-            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int {
-                    return 1
-                }
-            }
-        }
     }
 
     private fun createResultAdapter(): Adapter<AppInfo> {

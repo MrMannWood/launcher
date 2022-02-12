@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.FileProvider
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
 import com.mrmannwood.hexlauncher.applist.writeAppsToFile
-import com.mrmannwood.hexlauncher.font.FontHelper
 import com.mrmannwood.hexlauncher.foregrounddetection.ForegroundActivityListener
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
@@ -59,13 +58,6 @@ class LauncherApplication : Application() {
                     FileLoggerTree.get().disableDiskFlush()
                 }
             }.launchIn(applicationScope)
-        PreferencesRepository.watchPref(
-            context = this@LauncherApplication,
-            key = PreferenceKeys.Font.USE_ATKINSON_HYPERLEGIBLE,
-            extractor = PreferenceExtractor.BooleanExtractor
-        )
-            .onEach { FontHelper.useAtkinsonHyperlegible = it != false }
-            .launchIn(applicationScope)
 
         DB.init(this@LauncherApplication)
 

@@ -26,7 +26,6 @@
 
     <string name="preferences_category_app_list">Apps</string>
     <string name="preferences_app_list_show_all_apps">Show All Apps</string>
-    <string name="preferences_app_list_use_hex_grid">Use Experimental Hex Grid</string>
     <string name="preferences_app_list_enable_category_search">Enable Searching by App Category</string>
 
     <string name="preferences_category_gestures">Gestures</string>
@@ -44,7 +43,6 @@
     <string name="preferences_experimental_show">Enable Experimental Features</string>
 
     <string name="preferences_refresh_app_cache_title">Refresh App Cache</string>
-    <string name="preferences_use_experimental_font">Use experimental \'Hyperlegible\' Font</string>
 
     <string name="preferences_category_version_info">Version Info</string>
     <string name="preferences_version_name">App Version: %s</string>

@@ -10,17 +10,12 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.gesture.LauncherGestureDetectorListener
-import com.mrmannwood.hexlauncher.launcher.HexAppListFragment
-import com.mrmannwood.hexlauncher.settings.PreferenceKeys
-import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class HomeFragment : WidgetHostFragment(), HandleBackPressed {
@@ -114,20 +109,10 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     )
 
     private fun showLauncherFragment() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val prefs = PreferencesRepository.getPrefs(requireContext())
-            if (prefs.getBoolean(PreferenceKeys.Apps.USE_HEX_GRID, false)) {
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.container, HexAppListFragment())
-                    .addToBackStack("AppListFragment")
-                    .commit()
-            } else {
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.container, AppListFragment())
-                    .addToBackStack("AppListFragment")
-                    .commit()
-            }
-        }
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.container, AppListFragment())
+            .addToBackStack("AppListFragment")
+            .commit()
     }
 
     private fun tryLaunchPackage(packageName: String?) {

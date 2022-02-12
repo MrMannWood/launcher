@@ -20,7 +20,6 @@ import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
-import com.mrmannwood.hexlauncher.font.FontHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
 import com.mrmannwood.launcher.BuildConfig
@@ -122,11 +121,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
             })
             addPreference(SwitchPreference(activity).apply {
-                setTitle(R.string.preferences_app_list_use_hex_grid)
-                key = PreferenceKeys.Apps.USE_HEX_GRID
-                setDefaultValue(true)
-            })
-            addPreference(SwitchPreference(activity).apply {
                 setTitle(R.string.preferences_app_list_enable_category_search)
                 key = PreferenceKeys.Apps.ENABLE_CATEGORY_SEARCH
                 setDefaultValue(true)
@@ -211,15 +205,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             AppListUpdater.updateAppList(activity.applicationContext)
                         }
                     }
-                    true
-                }
-            })
-            addPreference(SwitchPreference(activity).apply {
-                setTitle(R.string.preferences_use_experimental_font)
-                setDefaultValue(true)
-                key = PreferenceKeys.Font.USE_ATKINSON_HYPERLEGIBLE
-                setOnPreferenceClickListener {
-                    FontHelper.useAtkinsonHyperlegible = it.isEnabled
                     true
                 }
             })

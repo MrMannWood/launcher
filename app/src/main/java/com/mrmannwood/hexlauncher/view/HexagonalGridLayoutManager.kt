@@ -8,6 +8,10 @@ import androidx.core.util.forEach
 import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.sqrt
 
+/**
+ * Heavily used as a reference:
+ * https://github.com/devunwired/recyclerview-playground/blob/299515e0cfe4caea78eaf7ba12f7c9cf926b6063/app/src/main/java/com/example/android/recyclerplayground/layout/FixedGridLayoutManager.java#L316
+ */
 class HexagonalGridLayoutManager: RecyclerView.LayoutManager() {
 
     private var positions =  Array(8) { Rect(-1, -1, -1, -1) }

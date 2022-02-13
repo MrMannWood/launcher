@@ -48,7 +48,6 @@ class AllAppsListFragment : Fragment() {
     private fun createResultLayoutManager() : RecyclerView.LayoutManager {
         return LinearLayoutManager(requireContext()).apply {
             reverseLayout = true
-            stackFromEnd = true
         }
     }
 

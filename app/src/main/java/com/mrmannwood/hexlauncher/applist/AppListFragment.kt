@@ -56,8 +56,6 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     private lateinit var resultListAdapter: Adapter<AppInfo>
     private var showKeyboardJob : Job? = null
 
-    private var numColumnsInAppList: Int = 0
-
     private val viewModel : LauncherViewModel by activityViewModels()
 
     private var apps : List<AppInfo>? = null
@@ -68,11 +66,6 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     }
 
     override val nameForInstrumentation = "AppListFragment"
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        numColumnsInAppList = calculateNoOfColumnsForAppList(resources)
-    }
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -211,7 +204,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         val search = searchView.text.toString().trim().lowercase(Locale.ROOT)
         resultListAdapter.setData(
             AppInfo::class,
-            searchApps(apps, search, enableCategorySearch, numColumnsInAppList).map { it }
+            searchApps(apps, search, enableCategorySearch, 8).map { it }
         )
     }
 }

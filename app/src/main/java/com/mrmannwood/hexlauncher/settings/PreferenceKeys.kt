@@ -26,8 +26,8 @@ object PreferenceKeys {
     object Apps {
         const val ENABLE_CATEGORY_SEARCH = "enable_category_search"
     }
-    object Font {
-        const val USE_ATKINSON_HYPERLEGIBLE = "use_atkison_hyperlegible"
+    object User {
+        const val LEFT_HANDED = "left_handed"
     }
     object Logging {
         const val ENABLE_DISK_LOGGING = "enable_disk_logging"

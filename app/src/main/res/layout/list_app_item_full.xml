@@ -9,6 +9,9 @@
         <variable
             name="adapter"
             type="com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter" />
+        <variable
+            name="leftHanded"
+            type="java.lang.Boolean" />
     </data>
 
     <RelativeLayout
@@ -23,7 +26,8 @@
             android:id="@+id/icon_parent"
             android:layout_width="@dimen/hex_view_height"
             android:layout_height="75dp"
-            android:layout_alignParentEnd="true">
+            android:layout_alignParentStart="@{leftHanded ? true : false}"
+            android:layout_alignParentEnd="@{leftHanded ? false : true}">
 
             <com.mrmannwood.hexlauncher.view.HexagonView
                 android:layout_width="match_parent"
@@ -67,7 +71,8 @@
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toStartOf="@+id/icon_parent"
+            android:layout_toStartOf="@{adapter.getLabelStartOf(leftHanded)}"
+            android:layout_toEndOf="@{adapter.getLabelEndOf(leftHanded)}"
             android:layout_centerVertical="true"
             android:gravity="center_vertical"
             android:text="@{appInfo.label}"

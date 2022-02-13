@@ -27,6 +27,8 @@ class AllAppsListFragment : Fragment() {
 
     private val viewModel : AllAppsViewModel by activityViewModels()
 
+    private var leftHandedLayout: Boolean = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,6 +44,12 @@ class AllAppsListFragment : Fragment() {
 
         viewModel.apps.observe(viewLifecycleOwner) { appList ->
             resultListAdapter.setData(AppInfo::class, appList)
+        }
+        viewModel.leftHandedLayout.observe(viewLifecycleOwner) { leftHanded ->
+            if (leftHanded == null) return@observe
+            if (leftHandedLayout == leftHanded) return@observe
+            leftHandedLayout = leftHanded
+            resultListAdapter.notifyDataSetChanged()
         }
     }
 
@@ -62,6 +70,7 @@ class AllAppsListFragment : Fragment() {
                 (vdb as ListAppItemFullBinding).apply {
                     appInfo = result
                     adapter = LauncherFragmentDatabindingAdapter
+                    leftHanded = leftHandedLayout
                 }
                 vdb.root.setOnCreateContextMenuListener { menu, _, _ ->
                     menu.setHeaderTitle(result.label)

@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.view.View
 import com.mrmannwood.hexlauncher.icon.IconAdapter
+import com.mrmannwood.launcher.R
 
 object LauncherFragmentDatabindingAdapter {
 
@@ -43,4 +44,8 @@ object LauncherFragmentDatabindingAdapter {
         if (!IconAdapter.INSTANCE.isAdaptive(appInfo.icon)) return View.GONE
         return if (appInfo.backgroundHidden) View.GONE else View.VISIBLE
     }
+
+    fun getLabelStartOf(leftHanded: Boolean): Int? = if (leftHanded) null else R.id.icon_parent
+
+    fun getLabelEndOf(leftHanded: Boolean): Int? = if (leftHanded) R.id.icon_parent else null
 }

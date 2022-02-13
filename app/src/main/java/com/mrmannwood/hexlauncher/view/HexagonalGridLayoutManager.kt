@@ -12,7 +12,14 @@ import kotlin.math.sqrt
  * Heavily used as a reference:
  * https://github.com/devunwired/recyclerview-playground/blob/299515e0cfe4caea78eaf7ba12f7c9cf926b6063/app/src/main/java/com/example/android/recyclerplayground/layout/FixedGridLayoutManager.java#L316
  */
-class HexagonalGridLayoutManager: RecyclerView.LayoutManager() {
+class HexagonalGridLayoutManager(private val corner: Corner): RecyclerView.LayoutManager() {
+
+    enum class Corner(val top: Boolean, val left: Boolean) {
+        TOP_LEFT(true, true),
+        TOP_RIGHT(true, false),
+        BOTTOM_LEFT(false, true),
+        BOTTOM_RIGHT(false, false)
+    }
 
     private var positions =  Array(8) { Rect(-1, -1, -1, -1) }
     private var viewCache = SparseArray<View>(positions.size)
@@ -80,8 +87,8 @@ class HexagonalGridLayoutManager: RecyclerView.LayoutManager() {
         detachAndScrapView(scrap, recycler)
 
         var current = positions[0]
-        current.bottom = getVerticalSpace()
-        current.right = getHorizontalSpace()
+        current.bottom = getStartingYPosition(decoratedHeight)
+        current.right = getStartingXPosition(decoratedWidth)
 
         current = positions[1]
         current.bottom = positions[0].bottom - verticalOffset
@@ -117,17 +124,27 @@ class HexagonalGridLayoutManager: RecyclerView.LayoutManager() {
         }
     }
 
+    private fun getStartingYPosition(height: Int): Int {
+        return if (corner.top) height else getVerticalSpace()
+    }
+
+    private fun getStartingXPosition(width: Int): Int {
+        return if (corner.left) width else getHorizontalSpace()
+    }
+
     private fun getHorizontalSpace() = width - paddingLeft - paddingRight
 
     private fun getVerticalSpace() = height - paddingTop - paddingBottom
 
     private fun getVerticalOffset(height: Int): Int {
         val sideLength = height / 2
-        return height - sideLength / 2
+        val offset = height - sideLength / 2
+        return if (corner.top) -1 * offset else offset
     }
 
     private fun getHorizontalOffset(height: Int): Int {
         val sideLength = height / 2
-        return (sqrt(3.0) / 2 * sideLength).toInt()
+        val offset = (sqrt(3.0) / 2 * sideLength).toInt()
+        return if (corner.left) -1 * offset else offset
     }
 }

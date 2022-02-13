@@ -109,6 +109,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
+            setTitle(R.string.preferences_category_preferences)
+            addPreference(SwitchPreference(activity).apply {
+                setTitle(R.string.preferences_preferences_left_handed)
+                key = PreferenceKeys.User.LEFT_HANDED
+                setDefaultValue(false)
+            })
+        }
+
+        PreferenceCategory(activity).apply {
+            screen.addPreference(this)
             setTitle(R.string.preferences_category_app_list)
             addPreference(Preference(activity).apply {
                 setTitle(R.string.preferences_app_list_show_all_apps)

@@ -25,6 +25,7 @@ import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
 import com.mrmannwood.hexlauncher.launcher.*
 import com.mrmannwood.hexlauncher.qwertyMistakes
 import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager
+import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager.Corner
 import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
@@ -60,6 +61,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
 
     private var apps : List<AppInfo>? = null
     private var enableCategorySearch : Boolean = true
+    private var leftHandedLayout : Boolean = false
 
     private fun getAppListHost() : Host<*> {
         return (requireActivity() as AppListHostActivity).getAppListHost()
@@ -76,7 +78,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         resultListAdapter = createResultAdapter()
         resultListView = view.findViewById<RecyclerView>(R.id.result_list).apply {
-            layoutManager = HexagonalGridLayoutManager()
+            layoutManager = createLayoutManager()
             adapter = resultListAdapter
         }
 
@@ -125,13 +127,25 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     }
 
     private fun startObservingLiveData() {
-        viewModel.enableCategorySearch.observe(viewLifecycleOwner, { enable ->
+        viewModel.enableCategorySearch.observe(viewLifecycleOwner) { enable ->
             enableCategorySearch = enable != false
-        })
-        viewModel.apps.observe(viewLifecycleOwner, { appList ->
+        }
+        viewModel.leftHandedLayout.observe(viewLifecycleOwner) { leftHanded ->
+            if (leftHanded == null) return@observe
+            if (leftHandedLayout == leftHanded) return@observe
+            leftHandedLayout = leftHanded
+            resultListView.layoutManager = createLayoutManager()
+        }
+        viewModel.apps.observe(viewLifecycleOwner) { appList ->
             apps = appList
             performSearch()
-        })
+        }
+    }
+
+    private fun createLayoutManager(): RecyclerView.LayoutManager {
+        return HexagonalGridLayoutManager(
+            if (leftHandedLayout) Corner.BOTTOM_LEFT else Corner.BOTTOM_RIGHT
+        )
     }
 
     private fun createResultAdapter(): Adapter<AppInfo> {

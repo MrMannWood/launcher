@@ -12,12 +12,12 @@ object LauncherFragmentDatabindingAdapter {
 
     fun getAdaptiveIconVisibility(appInfo: AppInfo?) : Int {
         if (appInfo == null) return View.GONE
-        return if (IconAdapter.INSTANCE.isAdaptive(appInfo.icon)) View.VISIBLE else View.GONE
+        return if (IconAdapter.INSTANCE.isAdaptive(appInfo.icon.get())) View.VISIBLE else View.GONE
     }
 
     fun getNonAdaptiveIconVisibility(appInfo: AppInfo?) : Int {
         if (appInfo == null) return View.GONE
-        return if (IconAdapter.INSTANCE.isAdaptive(appInfo.icon)) View.GONE else View.VISIBLE
+        return if (IconAdapter.INSTANCE.isAdaptive(appInfo.icon.get())) View.GONE else View.VISIBLE
     }
 
     fun getHiddenVisibility(appInfo: AppInfo?) : Int {
@@ -31,17 +31,20 @@ object LauncherFragmentDatabindingAdapter {
 
     fun getForegroundIcon(appInfo: AppInfo?) : Drawable? {
         if (appInfo == null) return null
-        return IconAdapter.INSTANCE.getForegroundDrawable(appInfo.icon) ?: appInfo.icon
+        val icon = appInfo.icon.get()
+        return IconAdapter.INSTANCE.getForegroundDrawable(icon) ?: icon
     }
 
     fun getBackgroundIcon(appInfo: AppInfo?) : Drawable? {
         if (appInfo == null) return null
-        return IconAdapter.INSTANCE.getBackgroundDrawable(appInfo.icon) ?: appInfo.icon
+        val icon = appInfo.icon.get()
+        return IconAdapter.INSTANCE.getBackgroundDrawable(icon) ?: icon
     }
 
     fun getBackgroundIconVisibility(appInfo: AppInfo?) : Int {
         if (appInfo == null) return View.GONE
-        if (!IconAdapter.INSTANCE.isAdaptive(appInfo.icon)) return View.GONE
+        val icon = appInfo.icon.get()
+        if (!IconAdapter.INSTANCE.isAdaptive(icon)) return View.GONE
         return if (appInfo.backgroundHidden) View.GONE else View.VISIBLE
     }
 

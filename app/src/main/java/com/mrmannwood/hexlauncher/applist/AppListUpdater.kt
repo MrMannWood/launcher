@@ -7,59 +7,61 @@ import android.content.pm.PackageManager
 import android.database.sqlite.SQLiteException
 import androidx.annotation.WorkerThread
 import com.mrmannwood.hexlauncher.DB
+import com.mrmannwood.hexlauncher.executors.diskExecutor
 import com.mrmannwood.hexlauncher.icon.IconAdapter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 object AppListUpdater {
 
-    suspend fun updateAppList(context: Context) {
-        updateAppListWithCount(context, 0)
+    fun updateAppList(context: Context) {
+        diskExecutor.execute {
+            updateAppListWithCount(context.applicationContext, 0)
+        }
     }
 
-    private suspend fun updateAppListWithCount(context: Context, count: Int) {
-        val appContext = context.applicationContext
-        withContext(Dispatchers.IO) {
-            var runAgain = false
-            try {
-                val installedApps = getInstalledApps(appContext)
-                val appDao = DB.get().appDataDao()
+    @WorkerThread
+    private fun updateAppListWithCount(context: Context, count: Int) {
+        var runAgain = false
+        try {
+            val installedApps = getInstalledApps(context)
+            val appDao = DB.get().appDataDao()
 
-                appDao.deleteNotIncluded(installedApps)
-                appDao.deleteNotIncludedDecoration(installedApps)
+            appDao.deleteNotIncluded(installedApps)
+            appDao.deleteNotIncludedDecoration(installedApps)
 
-                val appUpdateTimes = appDao.getLastUpdateTimeStamps().associateBy({ it.packageName }, { it.timestamp })
-                for (packageName in installedApps) {
-                    val packageInfo = context.packageManager.getPackageInfo(packageName, 0)
-                    val lastUpdateTime = appUpdateTimes.getOrElse(packageName, { -1L })
-                    if (lastUpdateTime >= packageInfo.lastUpdateTime) continue
-                    Timber.d("Inserting $packageName")
+            val appUpdateTimes = appDao.getLastUpdateTimeStamps().associateBy({ it.packageName }, { it.timestamp })
+            for (packageName in installedApps) {
+                val packageInfo = context.packageManager.getPackageInfo(packageName, 0)
+                val lastUpdateTime = appUpdateTimes.getOrElse(packageName, { -1L })
+                if (lastUpdateTime >= packageInfo.lastUpdateTime) continue
+                Timber.d("Inserting $packageName")
 
-                    loadAppDataFromPacman(packageInfo, context.packageManager)?.let { appData ->
-                        try {
-                            appDao.insert(appData)
-                            appDao.insert(AppDataDecoration(appData.packageName))
-                        } catch (e: SQLiteException) {
-                            Timber.e(e, "An error occurred while writing app to db: $appData")
-                        }
-                    } ?: run {
-                        runAgain = true
-                        Timber.d("$packageName had a null icon")
+                loadAppDataFromPacman(packageInfo, context.packageManager)?.let { appData ->
+                    try {
+                        appDao.insert(appData)
+                        appDao.insert(AppDataDecoration(appData.packageName))
+                    } catch (e: SQLiteException) {
+                        Timber.e(e, "An error occurred while writing app to db: $appData")
                     }
+                } ?: run {
+                    runAgain = true
+                    Timber.d("$packageName had a null icon")
                 }
-
-            } catch (e: Exception) {
-                Timber.e(e, "An error occurred while updating the app database")
             }
-            if (runAgain) {
-                if (count <= 5) {
-                    delay(100)
-                    updateAppListWithCount(appContext, count + 1)
-                } else {
-                    Timber.wtf("Cannot get an icon for at least one app")
-                }
+
+        } catch (e: Exception) {
+            Timber.e(e, "An error occurred while updating the app database")
+        }
+        if (runAgain) {
+            if (count <= 5) {
+                diskExecutor.schedule(
+                    { updateAppListWithCount(context, count + 1) },
+                    10,
+                    TimeUnit.MILLISECONDS
+                )
+            } else {
+                Timber.wtf("Cannot get an icon for at least one app")
             }
         }
     }

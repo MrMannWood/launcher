@@ -9,15 +9,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.applist.DecoratedAppData
-import timber.log.Timber
+import com.mrmannwood.hexlauncher.executors.PackageManagerExecutor
 import com.mrmannwood.launcher.R
+import timber.log.Timber
 
 private var appInfoLiveData : LiveData<List<AppInfo>>? = null
 private val categoryMap: MutableMap<Int, List<String>> = HashMap()
 
 fun getSingleAppLiveData(context: Context, packageName: String) : LiveData<AppInfo?> {
     return Transformations.map(DB.get().appDataDao().watchApp(packageName)) {
-        transformAppInfo(context, it)
+        transformAppInfo(context.applicationContext, it)
     }
 }
 
@@ -48,7 +49,7 @@ private fun transformAppInfo(context: Context, app: DecoratedAppData) : AppInfo?
     return try {
         AppInfo(
             packageName = app.appData.packageName,
-            icon = context.packageManager.getApplicationIcon(app.appData.packageName),
+            icon = Provider({ context.packageManager.getApplicationIcon(app.appData.packageName) }, PackageManagerExecutor.get()),
             backgroundColor = app.decoration.bgcOverride ?: app.appData.backgroundColor,
             label = app.appData.label,
             hidden = app.decoration.hidden,

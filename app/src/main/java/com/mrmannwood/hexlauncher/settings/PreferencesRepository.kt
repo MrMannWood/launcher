@@ -2,48 +2,60 @@ package com.mrmannwood.hexlauncher.settings
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
+import com.mrmannwood.hexlauncher.executors.diskExecutor
 
 object PreferencesRepository {
 
-    private val mutex = Mutex()
     @Volatile private var prefs : SharedPreferences? = null
 
-    suspend fun getPrefs(context: Context) : SharedPreferences {
+    fun getPrefs(context: Context, callback: (SharedPreferences) -> Unit) {
         val appContext = context.applicationContext
-        return withContext(Dispatchers.IO) {
-            if (prefs != null) {
-                prefs!!
-            } else {
-                mutex.withLock {
-                    var inPrefs = prefs
-                    if (inPrefs == null) {
-                        inPrefs = PreferenceManager.getDefaultSharedPreferences(appContext)
-                        prefs = inPrefs
+        if (prefs != null) {
+            callback(prefs!!)
+        } else {
+            diskExecutor.execute {
+                if (prefs != null) {
+                    callback(prefs!!)
+                } else {
+                    synchronized(this@PreferencesRepository) {
+                        if (prefs == null) {
+                            prefs = PreferenceManager.getDefaultSharedPreferences(appContext)
+                        }
                     }
-                    inPrefs!!
+                    callback(prefs!!)
                 }
             }
         }
     }
 
-    fun <T> watchPref(context: Context, key: String, extractor: PreferenceExtractor<T>) : Flow<T?> {
-        return callbackFlow {
-            val prefs = getPrefs(context)
-            trySend(extractor.getValue(prefs, key))
-            val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
-                if (changedKey != key) return@OnSharedPreferenceChangeListener
-                trySend(extractor.getValue(prefs, key))
+    fun <T> watchPref(context: Context, key: String, extractor: PreferenceExtractor<T>): LiveData<T?> {
+        return object : LiveData<T?>() {
+
+            private val listener = object : SharedPreferences.OnSharedPreferenceChangeListener {
+                override fun onSharedPreferenceChanged(
+                    prefs: SharedPreferences,
+                    changedKey: String
+                ) {
+                    if (changedKey != key) return
+                    postValue(extractor.getValue(prefs, key))
+                }
             }
-            prefs.registerOnSharedPreferenceChangeListener(listener)
-            awaitClose {
-                prefs.unregisterOnSharedPreferenceChangeListener(listener)
+
+            override fun onActive() {
+                super.onActive()
+                getPrefs(context) { prefs ->
+                    postValue(extractor.getValue(prefs, key))
+                    prefs.registerOnSharedPreferenceChangeListener(listener)
+                }
+            }
+
+            override fun onInactive() {
+                super.onInactive()
+                getPrefs(context) { prefs ->
+                    prefs.unregisterOnSharedPreferenceChangeListener(listener)
+                }
             }
         }
     }

@@ -1,11 +1,8 @@
 package com.mrmannwood.hexlauncher.appcustomize
 
 import android.content.res.Resources
-import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.view.View
 import androidx.core.content.res.ResourcesCompat
-import com.mrmannwood.hexlauncher.icon.IconAdapter
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
 import com.mrmannwood.launcher.R

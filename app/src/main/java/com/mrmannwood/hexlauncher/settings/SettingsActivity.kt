@@ -1,7 +1,6 @@
 package com.mrmannwood.hexlauncher.settings
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.mrmannwood.hexlauncher.activity.BaseActivity
 import com.mrmannwood.launcher.R
 

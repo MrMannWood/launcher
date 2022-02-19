@@ -1,6 +1,5 @@
 package com.mrmannwood.hexlauncher.appcustomize
 
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,26 +10,24 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.applist.AppDataDao
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerDialog
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerViewModel
+import com.mrmannwood.hexlauncher.executors.cpuBoundTaskExecutor
+import com.mrmannwood.hexlauncher.executors.diskExecutor
 import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
 import com.mrmannwood.hexlauncher.icon.IconAdapter
 import com.mrmannwood.hexlauncher.launcher.Adapter
 import com.mrmannwood.hexlauncher.launcher.AppInfo
+import com.mrmannwood.hexlauncher.launcher.Provider
 import com.mrmannwood.hexlauncher.textentrydialog.TextEntryDialog
 import com.mrmannwood.hexlauncher.textentrydialog.TextEntryDialogViewModel
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentAppCustomizationBinding
 import com.mrmannwood.launcher.databinding.ListAppCustomizationTagBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 class AppCustomizationFragment : InstrumentedFragment() {
 
@@ -117,12 +114,11 @@ class AppCustomizationFragment : InstrumentedFragment() {
                     }
                 }
             })
-            colorPickerViewModel.cancellationLiveData.observe(viewLifecycleOwner,
-                { canceled ->
-                    if (canceled) {
-                        binding.iconBgcOverride = null
-                    }
-                })
+            colorPickerViewModel.cancellationLiveData.observe(viewLifecycleOwner) { canceled ->
+                if (canceled) {
+                    binding.iconBgcOverride = null
+                }
+            }
             ColorPickerDialog().show(childFragmentManager, null)
 
             colorPickerViewModel.colorSuggestionLiveData.value = null
@@ -223,17 +219,15 @@ class AppCustomizationFragment : InstrumentedFragment() {
         binding.tags.adapter = tagsAdapter
     }
 
-    fun updateAppInfo(action: (dao: AppDataDao) -> Unit) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                action(DB.get().appDataDao())
-            }
+    private fun updateAppInfo(action: (dao: AppDataDao) -> Unit) {
+        diskExecutor.execute {
+            action(DB.get().appDataDao())
         }
     }
 
-    private fun extractColorsForPicker(drawable: Drawable, action: (iconAdapter: IconAdapter, drawable: Drawable) -> List<Int>) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            withContext(Dispatchers.Unconfined) {
+    private fun extractColorsForPicker(drawableProvider: Provider<Drawable>, action: (iconAdapter: IconAdapter, drawable: Drawable) -> List<Int>) {
+        drawableProvider.get { drawable ->
+            cpuBoundTaskExecutor.execute {
                 addColorsToColorPickerSuggestions(action(IconAdapter.INSTANCE, drawable))
             }
         }
@@ -243,10 +237,11 @@ class AppCustomizationFragment : InstrumentedFragment() {
         if (colors.isEmpty()) {
             return
         }
-        colorPickerViewModel.colorSuggestionLiveData.value =
+        colorPickerViewModel.colorSuggestionLiveData.postValue(
             (colorPickerViewModel.colorSuggestionLiveData.value?.toMutableList() ?: ArrayList()).also {
                 it.addAll(colors)
             }
+        )
     }
 
     sealed class SearchTerm(val term: String) {

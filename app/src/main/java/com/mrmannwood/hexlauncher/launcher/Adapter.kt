@@ -7,7 +7,6 @@ import androidx.annotation.MainThread
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
-import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass
 
 @MainThread

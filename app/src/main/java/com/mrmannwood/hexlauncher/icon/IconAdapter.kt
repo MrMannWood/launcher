@@ -5,10 +5,9 @@ import android.graphics.Canvas
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import androidx.annotation.WorkerThread
 import androidx.core.graphics.get
 import androidx.palette.graphics.Palette
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 interface IconAdapter {
 
@@ -26,9 +25,9 @@ interface IconAdapter {
 
     fun getBackgroundDrawable(icon: Drawable) : Drawable?
 
-    fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit)
+    @WorkerThread fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit)
 
-    fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit, onFailure: () -> Unit)
+    @WorkerThread fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit, onFailure: () -> Unit)
 
     private open class DefaultIconAdapter : IconAdapter {
 
@@ -71,10 +70,12 @@ interface IconAdapter {
             }
         }
 
+        @WorkerThread
         override fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit) {
             getPalette(icon, onPalette, {})
         }
 
+        @WorkerThread
         override fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit, onFailure: () -> Unit) {
             if (icon == null) {
                 onFailure()
@@ -164,8 +165,8 @@ interface IconAdapter {
             return color
         }
 
-        fun getPalette(bitmap: Bitmap, onPalette: (Palette) -> Unit, onFailure: () -> Unit) {
-            Palette.Builder(bitmap).generate { it?.let { onPalette(it) } ?: run { onFailure() } }
+        @WorkerThread fun getPalette(bitmap: Bitmap, onPalette: (Palette) -> Unit, onFailure: () -> Unit) {
+            Palette.Builder(bitmap).generate()?.let { onPalette(it) } ?: run { onFailure() }
         }
     }
 }

@@ -89,11 +89,11 @@ class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
         }
 
         viewModel.colorSuggestionLiveData.observe(viewLifecycleOwner) { suggestions ->
-            suggestions.take(suggestionSwatches.size).forEachIndexed { i, suggestion ->
+            suggestions?.take(suggestionSwatches.size)?.forEachIndexed { i, suggestion ->
                 suggestionSwatches[i].visibility = View.VISIBLE
                 suggestionSwatches[i].setBackgroundColor(suggestion)
             }
-            suggestionsContainer.visibility = if (suggestions.isEmpty()) { View.GONE } else { View.VISIBLE }
+            suggestionsContainer.visibility = if (suggestions.isNullOrEmpty()) { View.GONE } else { View.VISIBLE }
         }
     }
 

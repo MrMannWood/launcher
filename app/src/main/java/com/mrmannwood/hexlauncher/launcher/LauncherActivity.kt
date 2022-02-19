@@ -10,18 +10,17 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.content.edit
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.lifecycleScope
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.activity.BaseActivity
 import com.mrmannwood.hexlauncher.appcustomize.AppCustomizationFragment
 import com.mrmannwood.hexlauncher.applist.AppListFragment
+import com.mrmannwood.hexlauncher.executors.OriginalThreadCallback
 import com.mrmannwood.hexlauncher.home.HomeFragment
 import com.mrmannwood.hexlauncher.nux.NUXHostFragment
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
-import kotlinx.coroutines.launch
 
 class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
 
@@ -38,13 +37,15 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
                 .commit()
         }
 
-        lifecycleScope.launch {
-            if (checkShouldShowNux(PreferencesRepository.getPrefs(this@LauncherActivity))) {
-                supportFragmentManager.beginTransaction()
-                    .add(R.id.container, NUXHostFragment())
-                    .commit()
-            }
-        }
+        PreferencesRepository.getPrefs(
+            this,
+            OriginalThreadCallback.create { prefs ->
+                if (checkShouldShowNux(prefs)) {
+                    supportFragmentManager.beginTransaction()
+                        .add(R.id.container, NUXHostFragment())
+                        .commit()
+                }
+            })
     }
 
     override fun onBackPressed() {

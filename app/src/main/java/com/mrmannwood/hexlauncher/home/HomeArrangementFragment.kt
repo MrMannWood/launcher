@@ -12,14 +12,12 @@ import androidx.core.content.edit
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerDialog
 import com.mrmannwood.hexlauncher.colorpicker.ColorPickerViewModel
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
-import kotlinx.coroutines.launch
 
 class HomeArrangementFragment : WidgetHostFragment() {
 
@@ -51,9 +49,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(databinder: FragmentHomeBinding, savedInstanceState: Bundle?) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            sharedPrefs = PreferencesRepository.getPrefs(requireContext())
-        }
+        PreferencesRepository.getPrefs(requireContext()) { sharedPrefs = it }
 
         widgetContainer = databinder.container
         widgetContainer.addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, _ -> viewBottom = bottom }

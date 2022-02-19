@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.FileProvider
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
 import com.mrmannwood.hexlauncher.applist.writeAppsToFile
+import com.mrmannwood.hexlauncher.executors.diskExecutor
 import com.mrmannwood.hexlauncher.foregrounddetection.ForegroundActivityListener
 import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
@@ -18,12 +19,12 @@ import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.hexlauncher.timber.FileLoggerTree
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
-import java.util.ArrayList
 import java.util.concurrent.CountDownLatch
 
 class LauncherApplication : Application() {
@@ -50,20 +51,17 @@ class LauncherApplication : Application() {
             context = this@LauncherApplication,
             key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING,
             extractor = PreferenceExtractor.BooleanExtractor
-        )
-            .onEach { enable ->
-                if (enable == true) {
-                    FileLoggerTree.get().enableDiskFlush()
-                } else {
-                    FileLoggerTree.get().disableDiskFlush()
-                }
-            }.launchIn(applicationScope)
+        ).observeForever { enable ->
+            if (enable == true) {
+                FileLoggerTree.get().enableDiskFlush()
+            } else {
+                FileLoggerTree.get().disableDiskFlush()
+            }
+        }
 
         DB.init(this@LauncherApplication)
 
-        applicationScope.launch {
-            AppListUpdater.updateAppList(applicationContext)
-        }
+        AppListUpdater.updateAppList(applicationContext)
 
         registerReceiver(
                 PackageObserverBroadcastReceiver(),
@@ -91,7 +89,7 @@ class LauncherApplication : Application() {
     }
 
     fun rageShakeThing(activity: Activity) {
-        CoroutineScope(Dispatchers.IO).launch {
+        diskExecutor.execute {
             val rageShakeDir = File(filesDir, "rage_shake")
             writeAppsToFile(rageShakeDir)
 

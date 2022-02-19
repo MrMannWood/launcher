@@ -3,7 +3,6 @@ package com.mrmannwood.hexlauncher.allapps
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.asLiveData
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.hexlauncher.launcher.getAppInfoLiveData
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
@@ -16,5 +15,5 @@ class AllAppsViewModel(app: Application): AndroidViewModel(app) {
         context = getApplication(),
         key = PreferenceKeys.User.LEFT_HANDED,
         extractor = PreferenceExtractor.BooleanExtractor
-    ).asLiveData()
+    )
 }

@@ -11,8 +11,10 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.role.RoleManagerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.preference.*
+import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
@@ -20,14 +22,12 @@ import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
+import com.mrmannwood.hexlauncher.executors.OriginalThreadCallback
+import com.mrmannwood.hexlauncher.executors.diskExecutor
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -40,12 +40,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
     ) { result ->
         result.data.onAppListResult(
                 onSuccess = { appName, packageName ->
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        PreferencesRepository.getPrefs(requireContext()).edit {
+                    PreferencesRepository.getPrefs(requireContext(), OriginalThreadCallback.create {
+                        it.edit {
                             putString(PreferenceKeys.Gestures.SwipeRight.APP_NAME, appName)
                             putString(PreferenceKeys.Gestures.SwipeRight.PACKAGE_NAME, packageName)
                         }
-                    }
+                    })
                 },
                 onFailure = {
                     Toast.makeText(requireContext(), R.string.no_app_selected, Toast.LENGTH_LONG).show()
@@ -58,12 +58,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
     ) { result ->
         result.data.onAppListResult(
             onSuccess = { appName, packageName ->
-                viewLifecycleOwner.lifecycleScope.launch {
-                    PreferencesRepository.getPrefs(requireContext()).edit {
+                PreferencesRepository.getPrefs(requireContext(), OriginalThreadCallback.create {
+                    it.edit {
                         putString(PreferenceKeys.Gestures.SwipeLeft.APP_NAME, appName)
                         putString(PreferenceKeys.Gestures.SwipeLeft.PACKAGE_NAME, packageName)
                     }
-                }
+                })
             },
             onFailure = {
                 Toast.makeText(requireContext(), R.string.no_app_selected, Toast.LENGTH_LONG).show()
@@ -209,11 +209,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             addPreference(Preference(activity).apply {
                 setTitle(R.string.preferences_refresh_app_cache_title)
                 setOnPreferenceClickListener {
-                    GlobalScope.launch {
-                        withContext(Dispatchers.IO) {
-                            DB.get().appDataDao().zeroAllLastUpdateTimeStamps()
-                            AppListUpdater.updateAppList(activity.applicationContext)
-                        }
+                    val appContext = activity.applicationContext
+                    diskExecutor.execute {
+                        DB.get().appDataDao().zeroAllLastUpdateTimeStamps()
+                        AppListUpdater.updateAppList(appContext)
                     }
                     true
                 }

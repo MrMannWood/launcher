@@ -14,7 +14,6 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.collections.ArrayList
 
 class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
 

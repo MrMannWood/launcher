@@ -1,6 +1,6 @@
 package com.mrmannwood.hexlauncher.timber
 
-import java.util.Date
+import java.util.*
 
 data class Log(
     val date: Date,

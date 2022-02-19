@@ -199,6 +199,8 @@ class AppCustomizationFragment : InstrumentedFragment() {
             bindFunc = {  vdb, tag ->
                 when(vdb) {
                     is ListAppCustomizationTagBinding -> {
+                        vdb.resources = resources
+                        vdb.adapter = CustomizationFragmentDatabindingAdapter
                         vdb.tag = tag.term
                         vdb.canDelete = tag is SearchTerm.Tag
                         vdb.buttonTagDelete.setOnClickListener {

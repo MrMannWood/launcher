@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="160dp"
+        android:layout_height="240dp"
         android:orientation="horizontal">
 
         <View
@@ -16,9 +16,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="3"
-            android:layout_toStartOf="@id/suggested_swatch_container"
             android:contentDescription="@string/dialog_color_picker_swatch_content_description"/>
-
+        
         <LinearLayout
             android:id="@+id/suggested_swatch_container"
             android:layout_width="0dp"
@@ -32,24 +31,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:visibility="gone"
-                android:contentDescription="@string/dialog_color_picker_suggested_swatch_content_description"/>
+                android:visibility="gone"/>
 
             <View
                 android:id="@+id/swatch_2"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:visibility="gone"
-                android:contentDescription="@string/dialog_color_picker_suggested_swatch_content_description"/>
+                android:visibility="gone"/>
 
             <View
                 android:id="@+id/swatch_3"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:visibility="gone"
-                android:contentDescription="@string/dialog_color_picker_suggested_swatch_content_description"/>
+                android:visibility="gone"/>
 
 
             <View
@@ -57,8 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:visibility="gone"
-                android:contentDescription="@string/dialog_color_picker_suggested_swatch_content_description"/>
+                android:visibility="gone"/>
 
 
             <View
@@ -66,12 +61,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:visibility="gone"
-                android:contentDescription="@string/dialog_color_picker_suggested_swatch_content_description"/>
+                android:visibility="gone"/>
 
         </LinearLayout>
 
     </LinearLayout>
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="12dp"/>
+
+    <TextView
+        android:id="@+id/hex_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"/>
 
     <Space
         android:layout_width="0dp"

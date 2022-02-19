@@ -9,27 +9,33 @@
         <variable
             name="canDelete"
             type="java.lang.Boolean" />
+        <variable
+            name="adapter"
+            type="com.mrmannwood.hexlauncher.appcustomize.CustomizationFragmentDatabindingAdapter" />
+        <variable
+            name="resources"
+            type="android.content.res.Resources"/>
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="6dp">
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/button_tag_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
+            android:padding="6dp"
             android:src="@drawable/outline_close"
+            android:contentDescription="@{adapter.getTagRemoveButtonContentDescription(resources, tag)}"
             android:visibility="@{canDelete ? View.VISIBLE : View.INVISIBLE}"/>
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:layout_toStartOf="@id/button_tag_delete"
             android:maxLines="1"
             android:text="@{tag}"/>

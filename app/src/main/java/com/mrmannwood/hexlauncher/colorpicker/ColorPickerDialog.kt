@@ -5,6 +5,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.slider.Slider
@@ -21,6 +22,7 @@ class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
     private lateinit var redSlider: Slider
     private lateinit var greenSlider: Slider
     private lateinit var blueSlider: Slider
+    private lateinit var hexCodeView: TextView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -57,6 +59,9 @@ class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
                 updateSwatch(swatch)
             }
         }
+        hexCodeView = view.findViewById<TextView>(R.id.hex_code).apply {
+            text = getHexCode()
+        }
 
         view.findViewById<View>(R.id.button_positive).setOnClickListener {
             viewModel.completionLiveData.value = true
@@ -92,6 +97,9 @@ class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
             suggestions?.take(suggestionSwatches.size)?.forEachIndexed { i, suggestion ->
                 suggestionSwatches[i].visibility = View.VISIBLE
                 suggestionSwatches[i].setBackgroundColor(suggestion)
+                suggestionSwatches[i].contentDescription = getString(
+                    R.string.dialog_color_picker_suggested_swatch_content_description,
+                    getString(ColorUtil.getColorNameFromHex(suggestion)))
             }
             suggestionsContainer.visibility = if (suggestions.isNullOrEmpty()) { View.GONE } else { View.VISIBLE }
         }
@@ -106,10 +114,17 @@ class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
 
     private fun updateSwatch(swatch: View) {
         val color = getColor()
+
+        hexCodeView.text = getHexCode()
+
         redSlider.value = redValue.toFloat()
         greenSlider.value = greenValue.toFloat()
         blueSlider.value = blueValue.toFloat()
         swatch.setBackgroundColor(color)
         viewModel.colorLiveData.value = color
+    }
+
+    private fun getHexCode() : String {
+        return String.format("#%02X%02X%02X", redValue, greenValue, blueValue)
     }
 }

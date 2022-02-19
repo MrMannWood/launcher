@@ -83,7 +83,7 @@
     <string name="home_arrangement_widget_color">Color</string>
     <string name="home_arrangement_widget_hide">Hide</string>
 
-    <string name="dialog_color_picker_suggested_swatch_content_description">suggestion for color</string>
+    <string name="dialog_color_picker_suggested_swatch_content_description">swatch with color suggestion: %s</string>
     <string name="dialog_color_picker_swatch_content_description">color output</string>
     <string name="dialog_color_picker_red_content_description">red</string>
     <string name="dialog_color_picker_green_content_description">green</string>
@@ -102,9 +102,12 @@
     <string name="customize_show_app">Un-Hide App</string>
     <string name="customize_app_icon">Icon</string>
     <string name="customize_app_tags_label">Tags</string>
+    <string name="customize_app_tags_add_content_description">Add new tag</string>
+    <string name="customize_app_tags_results_content_description">App tags and categories list</string>
     <string name="customize_app_background_color">Background Color</string>
     <string name="customize_app_foreground_icon">Foreground Icon</string>
     <string name="customize_app_background_icon">Background Icon</string>
+    <string name="customize_app_tags_delete_tag_content_description">Delete tag %s</string>
 
     <string name="error_cannot_change_wallpaper">Unable to set that wallpaper</string>
 
@@ -140,8 +143,157 @@
     </string-array>
     <string-array name="APP_CATEGORY_ACCESSIBILITY">
         <item>accessibility</item>
-        <item>help</item>
     </string-array>
     <!-- endregion -->
+
+    <!-- region color names -->
+    <string name="a"></string>
+    <!-- endregion -->
+
+    <string-array name="colors">
+        <item>alice_blue</item>
+    </string-array>
+
+    <string name="alice_blue">Alice Blue</string>
+    <string name="antique_white">Antique White</string>
+    <string name="aqua">Aqua</string>
+    <string name="aquamarine">Aquamarine</string>
+    <string name="azure">Azure</string>
+    <string name="beige">Beige</string>
+    <string name="bisque">Bisque</string>
+    <string name="black">Black</string>
+    <string name="blanched_almond">Blanched Almond</string>
+    <string name="blue">Blue</string>
+    <string name="blue_violet">Blue Violet</string>
+    <string name="brown">Brown</string>
+    <string name="burly_wood">Burly Wood</string>
+    <string name="cadet_blue">Cadet Blue</string>
+    <string name="chartreuse">Chartreuse</string>
+    <string name="chocolate">Chocolate</string>
+    <string name="coral">Coral</string>
+    <string name="cornflower_blue">Cornflower Blue</string>
+    <string name="cornsilk">Cornsilk</string>
+    <string name="crimson">Crimson</string>
+    <string name="cyan">Cyan</string>
+    <string name="dark_blue">Dark Blue</string>
+    <string name="dark_cyan">Dark Cyan</string>
+    <string name="dark_goldenrod">Dark Goldenrod</string>
+    <string name="dark_gray">Dark Gray</string>
+    <string name="dark_green">Dark Green</string>
+    <string name="dark_khaki">Dark Khaki</string>
+    <string name="dark_magenta">Dark Magenta</string>
+    <string name="dark_olive_green">Dark Olive Green</string>
+    <string name="dark_orange">Dark Orange</string>
+    <string name="dark_orchid">Dark Orchid</string>
+    <string name="dark_red">Dark Red</string>
+    <string name="dark_salmon">Dark Salmon</string>
+    <string name="dark_sea_green">Dark Sea Green</string>
+    <string name="dark_slate_blue">Dark Slate Blue</string>
+    <string name="dark_slate_gray">Dark Slate Gray</string>
+    <string name="dark_turquoise">Dark Turquoise</string>
+    <string name="dark_violet">Dark Violet</string>
+    <string name="deep_pink">Deep Pink</string>
+    <string name="deep_sky_blue">Deep Sky Blue</string>
+    <string name="dim_gray">Dim Gray</string>
+    <string name="dodger_blue">Dodger Blue</string>
+    <string name="fire_brick">Fire Brick</string>
+    <string name="floral_white">Floral White</string>
+    <string name="forest_green">Forest Green</string>
+    <string name="fuchsia">Fuchsia</string>
+    <string name="gainsboro">Gainsboro</string>
+    <string name="ghost_white">Ghost White</string>
+    <string name="gold">Gold</string>
+    <string name="goldenrod">Goldenrod</string>
+    <string name="gray">Gray</string>
+    <string name="green">Green</string>
+    <string name="green_yellow">Green Yellow</string>
+    <string name="honey_dew">Honey Dew</string>
+    <string name="hot_pink">Hot Pink</string>
+    <string name="indian_red">Indian Red</string>
+    <string name="indigo">Indigo</string>
+    <string name="ivory">Ivory</string>
+    <string name="khaki">Khaki</string>
+    <string name="lavender">Lavender</string>
+    <string name="lavender_blush">Lavender Blush</string>
+    <string name="lawn_green">Lawn Green</string>
+    <string name="lemon_chiffon">Lemon Chiffon</string>
+    <string name="light_blue">Light Blue</string>
+    <string name="light_coral">Light Coral</string>
+    <string name="light_cyan">Light Cyan</string>
+    <string name="light_goldenrod_yellow">Light Goldenrod Yellow</string>
+    <string name="light_gray">Light Gray</string>
+    <string name="light_green">Light Green</string>
+    <string name="light_pink">Light Pink</string>
+    <string name="light_salmon">Light Salmon</string>
+    <string name="light_sea_green">Light Sea Green</string>
+    <string name="light_sky_blue">Light Sky Blue</string>
+    <string name="light_slate_gray">Light Slate Gray</string>
+    <string name="light_steel_blue">Light Steel Blue</string>
+    <string name="light_yellow">Light Yellow</string>
+    <string name="lime">Lime</string>
+    <string name="lime_green">Lime Green</string>
+    <string name="linen">Linen</string>
+    <string name="magenta">Magenta</string>
+    <string name="maroon">Maroon</string>
+    <string name="medium_aqua_marine">Medium Aqua Marine</string>
+    <string name="medium_blue">Medium Blue</string>
+    <string name="medium_orchid">Medium Orchid</string>
+    <string name="medium_purple">Medium Purple</string>
+    <string name="medium_sea_green">Medium Sea Green</string>
+    <string name="medium_slate_blue">Medium Slate Blue</string>
+    <string name="medium_spring_green">Medium Spring Green</string>
+    <string name="medium_turquoise">Medium Turquoise</string>
+    <string name="medium_violet_red">Medium Violet Red</string>
+    <string name="midnight_blue">Midnight Blue</string>
+    <string name="mint_cream">Mint Cream</string>
+    <string name="misty_rose">Misty Rose</string>
+    <string name="moccasin">Moccasin</string>
+    <string name="navajo_white">Navajo White</string>
+    <string name="navy">Navy</string>
+    <string name="old_lace">Old Lace</string>
+    <string name="olive">Olive</string>
+    <string name="olive_drab">Olive Drab</string>
+    <string name="orange">Orange</string>
+    <string name="orange_red">Orange Red</string>
+    <string name="orchid">Orchid</string>
+    <string name="pale_goldenrod">Pale Goldenrod</string>
+    <string name="pale_green">Pale Green</string>
+    <string name="pale_turquoise">Pale Turquoise</string>
+    <string name="pale_violet_red">Pale Violet Red</string>
+    <string name="papaya_whip">Papaya Whip</string>
+    <string name="peach_puff">Peach Puff</string>
+    <string name="peru">Peru</string>
+    <string name="pink">Pink</string>
+    <string name="plum">Plum</string>
+    <string name="powder_blue">Powder Blue</string>
+    <string name="purple">Purple</string>
+    <string name="red">Red</string>
+    <string name="rosy_brown">Rosy Brown</string>
+    <string name="royal_blue">Royal Blue</string>
+    <string name="saddle_brown">Saddle Brown</string>
+    <string name="salmon">Salmon</string>
+    <string name="sandy_brown">Sandy Brown</string>
+    <string name="sea_green">Sea Green</string>
+    <string name="sea_shell">Sea Shell</string>
+    <string name="sienna">Sienna</string>
+    <string name="silver">Silver</string>
+    <string name="sky_blue">Sky Blue</string>
+    <string name="slate_blue">Slate Blue</string>
+    <string name="slate_gray">Slate Gray</string>
+    <string name="snow">Snow</string>
+    <string name="spring_green">Spring Green</string>
+    <string name="steel_blue">Steel Blue</string>
+    <string name="tan">Tan</string>
+    <string name="teal">Teal</string>
+    <string name="thistle">Thistle</string>
+    <string name="tomato">Tomato</string>
+    <string name="turquoise">Turquoise</string>
+    <string name="violet">Violet</string>
+    <string name="wheat">Wheat</string>
+    <string name="white">White</string>
+    <string name="white_smoke">White Smoke</string>
+    <string name="yellow">Yellow</string>
+    <string name="yellow_green">Yellow Green</string>
+    <string name="no_matching_color">Unable to find matching color name</string>
 
 </resources>

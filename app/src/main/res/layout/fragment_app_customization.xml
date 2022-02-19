@@ -206,7 +206,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:layout_marginStart="12dp">
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp">
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/tags_label"
@@ -214,6 +215,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
                     android:textSize="18sp"
                     android:text="@string/customize_app_tags_label"
                     android:textColor="@color/colorOnPrimary"/>
@@ -223,11 +225,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:layout_alignTop="@id/tags_label"
-                    android:layout_alignBottom="@id/tags_label"
+                    android:contentDescription="@string/customize_app_tags_add_content_description"
                     android:src="@drawable/outline_add"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"/>
+                    android:padding="12dp"
+                    android:paddingEnd="6dp"
+                    android:paddingStart="6dp"/>
 
             </RelativeLayout>
 
@@ -237,7 +239,8 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="12dp"
                 android:layout_marginStart="24dp"
-                android:layout_marginEnd="12dp"/>
+                android:layout_marginEnd="12dp"
+                android:contentDescription="@string/customize_app_tags_results_content_description"/>
 
         </LinearLayout>
 

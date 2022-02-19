@@ -52,4 +52,8 @@ object CustomizationFragmentDatabindingAdapter {
             }
         }
     }
+
+    fun getTagRemoveButtonContentDescription(res: Resources, tag: String): String {
+        return res.getString(R.string.customize_app_tags_delete_tag_content_description, tag)
+    }
 }

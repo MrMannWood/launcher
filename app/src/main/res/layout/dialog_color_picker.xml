@@ -17,7 +17,7 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:contentDescription="@string/dialog_color_picker_swatch_content_description"/>
-        
+
         <LinearLayout
             android:id="@+id/suggested_swatch_container"
             android:layout_width="0dp"

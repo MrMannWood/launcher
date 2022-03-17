@@ -211,7 +211,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 setOnPreferenceClickListener {
                     val appContext = activity.applicationContext
                     diskExecutor.execute {
-                        DB.get().appDataDao().zeroAllLastUpdateTimeStamps()
+                        DB.get(requireContext()).appDataDao().zeroAllLastUpdateTimeStamps()
                         AppListUpdater.updateAppList(appContext)
                     }
                     true

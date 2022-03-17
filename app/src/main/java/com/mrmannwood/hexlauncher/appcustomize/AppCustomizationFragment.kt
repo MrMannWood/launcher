@@ -223,7 +223,7 @@ class AppCustomizationFragment : InstrumentedFragment() {
 
     private fun updateAppInfo(action: (dao: AppDataDao) -> Unit) {
         diskExecutor.execute {
-            action(DB.get().appDataDao())
+            action(DB.get(requireContext()).appDataDao())
         }
     }
 

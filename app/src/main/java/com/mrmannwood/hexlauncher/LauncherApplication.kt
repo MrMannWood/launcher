@@ -59,7 +59,7 @@ class LauncherApplication : Application() {
             }
         }
 
-        DB.init(this@LauncherApplication)
+        DB.get(this@LauncherApplication)
 
         AppListUpdater.updateAppList(applicationContext)
 
@@ -91,7 +91,7 @@ class LauncherApplication : Application() {
     fun rageShakeThing(activity: Activity) {
         diskExecutor.execute {
             val rageShakeDir = File(filesDir, "rage_shake")
-            writeAppsToFile(rageShakeDir)
+            writeAppsToFile(activity, rageShakeDir)
 
             val latch = CountDownLatch(1)
 

@@ -25,7 +25,7 @@ object AppListUpdater {
         var runAgain = false
         try {
             val installedApps = getInstalledApps(context)
-            val appDao = DB.get().appDataDao()
+            val appDao = DB.get(context).appDataDao()
 
             appDao.deleteNotIncluded(installedApps)
             appDao.deleteNotIncludedDecoration(installedApps)

@@ -1,5 +1,6 @@
 package com.mrmannwood.hexlauncher.applist
 
+import android.content.Context
 import androidx.annotation.WorkerThread
 import com.mrmannwood.hexlauncher.DB
 import timber.log.Timber
@@ -8,10 +9,10 @@ import java.io.FileWriter
 import java.io.IOException
 
 @WorkerThread
-fun writeAppsToFile(out: File) {
+fun writeAppsToFile(context: Context, out: File) {
     if (!out.exists()) out.mkdirs()
 
-    val apps = DB.get().appDataDao().getApps()
+    val apps = DB.get(context).appDataDao().getApps()
     try {
         FileWriter(File(out, "db_dump.txt")).use { writer ->
             apps.forEach { app ->

@@ -17,7 +17,7 @@ private var appInfoLiveData : LiveData<List<AppInfo>>? = null
 private val categoryMap: MutableMap<Int, List<String>> = HashMap()
 
 fun getSingleAppLiveData(context: Context, packageName: String) : LiveData<AppInfo?> {
-    return Transformations.map(DB.get().appDataDao().watchApp(packageName)) {
+    return Transformations.map(DB.get(context).appDataDao().watchApp(packageName)) {
         transformAppInfo(context.applicationContext, it)
     }
 }
@@ -33,7 +33,7 @@ fun getAppInfoLiveData(appContext: Application, showHidden: Boolean = false) : L
 }
 
 private fun makeLiveData(appContext: Application, showHidden: Boolean = false) : LiveData<List<AppInfo>> {
-    return Transformations.map(DB.get().appDataDao().watchApps()) { apps ->
+    return Transformations.map(DB.get(appContext).appDataDao().watchApps()) { apps ->
         apps.filter {
             if (showHidden) {
                 true

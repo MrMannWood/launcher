@@ -14,6 +14,7 @@ object PreferenceKeys {
         }
     }
     object Gestures {
+        val GESTURE_UNWANTED = "unwanted"
         object SwipeRight {
             const val APP_NAME = "gestures_swipe_right_app_name"
             const val PACKAGE_NAME = "gestures_swipe_right_package_name"

@@ -5,7 +5,11 @@
 
     <string name="unable_to_start_app">Unable to start app</string>
     <string name="no_app_selected">No app selected</string>
-    <string name="gesture_no_action_selected">Gestures can be bound in Settings</string>
+
+    <string name="gesture_not_bound_title">Gesture not bound</string>
+    <string name="gesture_not_bound_message">Gestures can be bound in settings. Would you like to go to settings?</string>
+    <string name="gesture_not_bound_button_positive">Go to Settings</string>
+    <string name="gesture_not_bound_button_negative">Ignore this Gesture</string>
 
     <string name="menu_item_home_choose_wallpaper">Change Wallpaper</string>
     <string name="menu_item_home_manage_widgets">Manage Widgets</string>

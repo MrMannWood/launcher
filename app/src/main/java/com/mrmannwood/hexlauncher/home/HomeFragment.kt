@@ -9,11 +9,15 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.edit
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.gesture.LauncherGestureDetectorListener
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys
+import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
@@ -37,8 +41,8 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
 
     private val viewModel: HomeViewModel by activityViewModels()
 
-    private var swipeRightPackage : String? = null
-    private var swipeLeftPackage : String? = null
+    private var swipeRightGesture : Gesture? = null
+    private var swipeLeftGesture : Gesture? = null
 
     override val nameForInstrumentation = "HomeFragment"
 
@@ -73,10 +77,10 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
 
         viewModel.appListLiveData.observe(viewLifecycleOwner) { onLoadingComplete() }
         viewModel.swipeRightLiveData.observe(viewLifecycleOwner) { packageName ->
-            swipeRightPackage = packageName
+            swipeRightGesture = Gesture(Gesture.Type.SWIPE_RIGHT, PreferenceKeys.Gestures.SwipeRight.PACKAGE_NAME, packageName)
         }
         viewModel.swipeLeftLiveData.observe(viewLifecycleOwner) { packageName ->
-            swipeLeftPackage = packageName
+            swipeLeftGesture = Gesture(Gesture.Type.SWIPE_LEFT, PreferenceKeys.Gestures.SwipeLeft.PACKAGE_NAME, packageName)
         }
     }
 
@@ -96,11 +100,11 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             override fun onSwipeDown() { }
 
             override fun onSwipeRight() {
-                tryLaunchPackage(swipeRightPackage)
+                onGestureAttempted(swipeRightGesture)
             }
 
             override fun onSwipeLeft() {
-                tryLaunchPackage(swipeLeftPackage)
+                onGestureAttempted(swipeLeftGesture)
             }
 
             override fun onLongPress(x: Float, y: Float) {
@@ -116,18 +120,42 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             .commit()
     }
 
-    private fun tryLaunchPackage(packageName: String?) {
-        if (packageName == null) {
-            Toast.makeText(requireContext(), R.string.gesture_no_action_selected, Toast.LENGTH_SHORT).show()
-        } else {
+    private fun onGestureAttempted(gesture: Gesture?) {
+        if (gesture == null || gesture.isUnwanted()) return
+
+        var startedPackage = false
+        gesture.packageName?.let { packageName ->
             requireActivity().packageManager.getLaunchIntentForPackage(packageName)?.let { intent ->
                 try {
                     startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                    startedPackage = true
                 } catch (e: Exception) {
                     Timber.e(e, "Unable to open package: $packageName")
-                    Toast.makeText(requireContext(), R.string.unable_to_start_app, Toast.LENGTH_SHORT).show()
                 }
             }
         }
+        if (!startedPackage) {
+            MaterialAlertDialogBuilder(requireActivity())
+                .setTitle(R.string.gesture_not_bound_title)
+                .setMessage(R.string.gesture_not_bound_message)
+                .setPositiveButton(R.string.gesture_not_bound_button_positive) { _, _ ->
+                    startActivity(Intent(requireActivity(), SettingsActivity::class.java))
+                }
+                .setNegativeButton(R.string.gesture_not_bound_button_negative) { _, _ ->
+                    PreferencesRepository.getPrefs(requireContext()) { prefs -> prefs.edit {
+                        putString(gesture.prefKey, PreferenceKeys.Gestures.GESTURE_UNWANTED)
+                    } }
+                }
+                .show()
+        }
+    }
+
+    private data class Gesture(val type: Type, val prefKey: String, val packageName: String?) {
+        enum class Type {
+            SWIPE_LEFT,
+            SWIPE_RIGHT
+        }
+
+        fun isUnwanted() = packageName == PreferenceKeys.Gestures.GESTURE_UNWANTED
     }
 }

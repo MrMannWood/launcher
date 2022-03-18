@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Hex Launcher</string>
     <string name="dev_email">intentionalhexlauncher@gmail.com</string>
+    <string name="file_provider_name">com.mrmannwood.hexlauncher.fileprovider</string>
 
     <string name="unable_to_start_app">Unable to start app</string>
     <string name="no_app_selected">No app selected</string>

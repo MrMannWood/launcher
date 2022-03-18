@@ -36,11 +36,9 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            resValue "string", "file_provider_name", "${defaultConfig.applicationId}.fileprovider"
         }
         debug {
             applicationIdSuffix ".debug"
-            resValue "string", "file_provider_name", "${defaultConfig.applicationId}.fileprovider"
         }
     }
 }
@@ -65,4 +63,23 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.palette:palette-ktx:1.0.0"
+
+
+    // Testing-only dependencies
+    testImplementation 'androidx.test:core:1.4.1-alpha04'
+    testImplementation 'androidx.test.ext:junit:1.1.4-alpha04'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.6.1'
+    testImplementation 'androidx.test.espresso:espresso-core:3.5.0-alpha04'
+    testImplementation 'androidx.test.espresso:espresso-intents:3.5.0-alpha04'
+    testImplementation 'androidx.test.ext:truth:1.5.0-alpha04'
+
+    androidTestImplementation 'androidx.test:core:1.4.1-alpha04'
+    androidTestImplementation 'androidx.test:core-ktx:1.4.1-alpha04'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4-alpha04'
+    androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.4-alpha04'
+    androidTestImplementation 'androidx.test:runner:1.5.0-alpha01'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0-alpha04'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.0-alpha04'
+    androidTestImplementation 'tools.fastlane:screengrab:2.1.1'
 }

@@ -9,6 +9,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
@@ -113,7 +114,8 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         })
     )
 
-    private fun showLauncherFragment() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun showLauncherFragment() {
         parentFragmentManager.beginTransaction()
             .replace(R.id.container, AppListFragment())
             .addToBackStack("AppListFragment")

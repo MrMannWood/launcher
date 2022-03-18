@@ -36,7 +36,7 @@ object PreferencesRepository {
             private val listener = object : SharedPreferences.OnSharedPreferenceChangeListener {
                 override fun onSharedPreferenceChanged(
                     prefs: SharedPreferences,
-                    changedKey: String
+                    changedKey: String?
                 ) {
                     if (changedKey != key) return
                     postValue(extractor.getValue(prefs, key))

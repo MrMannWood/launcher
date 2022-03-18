@@ -2,6 +2,7 @@
 .idea/
 
 build/
+credentials/
 out/
 app/release/
 app/debug/

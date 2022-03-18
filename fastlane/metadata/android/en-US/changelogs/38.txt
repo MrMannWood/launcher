@@ -1,1 +1,0 @@
-Introducing Hex Launcher to FDroid!

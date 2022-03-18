@@ -64,7 +64,6 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.palette:palette-ktx:1.0.0"
 
-
     // Testing-only dependencies
     testImplementation 'androidx.test:core:1.4.1-alpha04'
     testImplementation 'androidx.test.ext:junit:1.1.4-alpha04'

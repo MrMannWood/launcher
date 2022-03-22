@@ -213,35 +213,35 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         val search = searchView.text.toString().trim().lowercase(Locale.ROOT)
         resultListAdapter.setData(
             AppInfo::class,
-            searchApps(apps, search, enableCategorySearch, 8).map { it }
+            searchApps(apps, search).map { it }
         )
     }
-}
 
-fun searchApps(apps: List<AppInfo>?, term: String, searchCategories: Boolean, maxReturn: Int) : List<AppInfo> {
-    if (apps == null || term.isEmpty()) {
-        return Collections.emptyList();
-    }
-    val matchingApps = mutableListOf<Triple<Int, SearchTermType, AppInfo>>()
-    val length = term.length
-    apps.forEach { app ->
-        app.searchTerms.forEach { (label, type) ->
-            if (length <= label.length && (searchCategories || type != SearchTermType.Category)) {
-                val minAcceptable = if (type != SearchTermType.Label) 0 else (length / 3)
-                val result = term.levenshtein(label.substring(0, length))
-                if (result <= minAcceptable) {
-                    matchingApps.add(Triple(result, type, app))
+    private fun searchApps(apps: List<AppInfo>?, term: String) : List<AppInfo> {
+        if (apps == null || term.isEmpty()) {
+            return Collections.emptyList();
+        }
+        val matchingApps = mutableListOf<Triple<Int, SearchTermType, AppInfo>>()
+        val length = term.length
+        apps.forEach { app ->
+            app.searchTerms.forEach { (label, type) ->
+                if (length <= label.length && (enableCategorySearch || type != SearchTermType.Category)) {
+                    val minAcceptable = if (type != SearchTermType.Label) 0 else (length / 3)
+                    val result = term.levenshtein(label.substring(0, length))
+                    if (result <= minAcceptable) {
+                        matchingApps.add(Triple(result, type, app))
+                    }
                 }
             }
         }
-    }
 
-    return matchingApps.sortedWith(compareBy(
-        { it.first },
-        { it.second },
-        { it.third.label }
-    ))
-        .map { it.third }
-        .distinct()
-        .take(maxReturn)
+        return matchingApps.sortedWith(compareBy(
+            { it.first },
+            { it.second },
+            { it.third.label }
+        ))
+            .map { it.third }
+            .distinct()
+            .take(8)
+    }
 }

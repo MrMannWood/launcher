@@ -2,6 +2,7 @@ package com.mrmannwood.hexlauncher.launcher
 
 import android.graphics.drawable.Drawable
 import com.mrmannwood.hexlauncher.executors.InlineExecutor
+import com.mrmannwood.hexlauncher.removeChars
 import java.util.*
 import java.util.concurrent.Executor
 
@@ -24,9 +25,10 @@ data class AppInfo(
 ) {
     val lowerLabel = label.lowercase(Locale.ROOT)
     val searchTerms : Map<String, SearchTermType> = (
-            categories.map { it to SearchTermType.Category } +
-                    tags.map { it to SearchTermType.Tag } +
-                    lowerLabel.split(' ').map { it to SearchTermType.Label }
+            categories.map { it to SearchTermType.Category }
+                    + tags.map { it to SearchTermType.Tag }
+                    + listOf(lowerLabel.removeChars(charArrayOf(' ','-','_')) to SearchTermType.Label)
+                    + lowerLabel.split(' ').map { it to SearchTermType.Label }
             ).toMap()
 }
 

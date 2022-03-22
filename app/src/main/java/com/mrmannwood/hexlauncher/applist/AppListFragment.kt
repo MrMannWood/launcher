@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
 import com.mrmannwood.hexlauncher.launcher.*
-import com.mrmannwood.hexlauncher.qwertyMistakes
+import com.mrmannwood.hexlauncher.levenshtein
 import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager
 import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager.Corner
 import com.mrmannwood.hexlauncher.view.KeyboardEditText
@@ -224,22 +224,13 @@ fun searchApps(apps: List<AppInfo>?, term: String, searchCategories: Boolean, ma
     }
     val matchingApps = mutableListOf<Triple<Int, SearchTermType, AppInfo>>()
     val length = term.length
-    apps.forEach {
-        if (term.contains(' ')) {
-            if (length <= it.lowerLabel.length) {
-                val result = term.qwertyMistakes(it.lowerLabel.substring(0, length))
-                if (result != Int.MAX_VALUE) {
-                    matchingApps.add(Triple(result, SearchTermType.FullName, it))
-                }
-            }
-        } else {
-            it.searchTerms.forEach { (label, type) ->
-                if (length <= label.length && (searchCategories || type !=SearchTermType.Category)) {
-                    val minAcceptable = if (type != SearchTermType.Label) 0 else Int.MAX_VALUE - 1
-                    val result = term.qwertyMistakes(label.substring(0, length))
-                    if (result <= minAcceptable) {
-                        matchingApps.add(Triple(result, type, it))
-                    }
+    apps.forEach { app ->
+        app.searchTerms.forEach { (label, type) ->
+            if (length <= label.length && (searchCategories || type != SearchTermType.Category)) {
+                val minAcceptable = if (type != SearchTermType.Label) 0 else (length / 3)
+                val result = term.levenshtein(label.substring(0, length))
+                if (result <= minAcceptable) {
+                    matchingApps.add(Triple(result, type, app))
                 }
             }
         }

@@ -23,7 +23,6 @@
             android:name="com.mrmannwood.hexlauncher.launcher.LauncherActivity"
             android:launchMode="singleInstance"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,8 +35,7 @@
         <activity
             android:name="com.mrmannwood.hexlauncher.settings.SettingsActivity"
             android:theme="@style/NonFullScreenTheme" />
-        <activity android:name="com.mrmannwood.hexlauncher.home.HomeArrangementActivity"
-            android:screenOrientation="portrait"/>
+        <activity android:name="com.mrmannwood.hexlauncher.home.HomeArrangementActivity"/>
         <activity
             android:name="com.mrmannwood.hexlauncher.launcher.FakeLauncherActivity"
             android:exported="true"

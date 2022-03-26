@@ -3,6 +3,7 @@ package com.mrmannwood.hexlauncher.launcher
 import android.app.SearchManager
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -17,10 +18,13 @@ import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.executors.OriginalThreadCallback
 import com.mrmannwood.hexlauncher.home.HomeFragment
 import com.mrmannwood.hexlauncher.nux.NUXHostFragment
+import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository
+import com.mrmannwood.hexlauncher.settings.PreferencesRepository.watchPref
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
+import timber.log.Timber
 
 class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
 
@@ -46,6 +50,13 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
                         .commit()
                 }
             })
+        watchPref(
+            context = applicationContext,
+            key = PreferenceKeys.Home.ORIENTATION,
+            extractor = PreferenceExtractor.StringExtractor
+        ).observe(this) { orientation ->
+            requestedOrientation = orientation?.toIntOrNull() ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
     }
 
     override fun onBackPressed() {

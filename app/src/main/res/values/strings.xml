@@ -29,6 +29,13 @@
     <string name="preferences_home_widgets_date_name">Date</string>
     <string name="preferences_home_widgets_time_name">Time</string>
 
+    <string name="preferences_home_orientation">Home Screen Orientation</string>
+    <string-array name="preferences_home_orientation_options">
+        <item>Auto Rotate</item>
+        <item>Portrait</item>
+        <item>Landscape</item>
+    </string-array>
+
     <string name="preferences_category_app_list">Apps</string>
     <string name="preferences_app_list_show_all_apps">Show All Apps</string>
     <string name="preferences_app_list_enable_category_search">Enable Searching by App Category</string>

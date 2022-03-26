@@ -12,6 +12,7 @@ object PreferenceKeys {
                 fun key(widget: String) = "${widget}_color"
             }
         }
+        const val ORIENTATION = "orientation"
     }
     object Gestures {
         val GESTURE_UNWANTED = "unwanted"

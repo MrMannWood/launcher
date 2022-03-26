@@ -1,6 +1,7 @@
 package com.mrmannwood.hexlauncher.settings
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -11,10 +12,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.role.RoleManagerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
-import androidx.preference.Preference
-import androidx.preference.PreferenceCategory
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreference
+import androidx.preference.*
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
@@ -114,6 +112,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 setTitle(R.string.preferences_preferences_left_handed)
                 key = PreferenceKeys.User.LEFT_HANDED
                 setDefaultValue(false)
+            })
+            addPreference(ListPreference(activity).apply {
+                setTitle(R.string.preferences_home_orientation)
+                key = PreferenceKeys.Home.ORIENTATION
+                setDefaultValue(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT.toString())
+                setEntries(R.array.preferences_home_orientation_options)
+                entryValues = arrayOf(
+                    ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED.toString(),
+                    ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT.toString(),
+                    ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE.toString())
             })
         }
 

@@ -8,44 +8,44 @@ import com.mrmannwood.launcher.R
 
 object LauncherFragmentDatabindingAdapter {
 
-    fun getAppName(appInfo: AppInfo?) = appInfo?.label ?: ""
+    fun getAppName(hexItem: HexItem?) = hexItem?.label ?: ""
 
-    fun getAdaptiveIconVisibility(appInfo: AppInfo?) : Int {
-        if (appInfo == null) return View.GONE
-        return if (IconAdapter.INSTANCE.isAdaptive(appInfo.icon.get())) View.VISIBLE else View.GONE
+    fun getAdaptiveIconVisibility(hexItem: HexItem?) : Int {
+        if (hexItem == null) return View.GONE
+        return if (IconAdapter.INSTANCE.isAdaptive(hexItem.icon.get())) View.VISIBLE else View.GONE
     }
 
-    fun getNonAdaptiveIconVisibility(appInfo: AppInfo?) : Int {
-        if (appInfo == null) return View.GONE
-        return if (IconAdapter.INSTANCE.isAdaptive(appInfo.icon.get())) View.GONE else View.VISIBLE
+    fun getNonAdaptiveIconVisibility(hexItem: HexItem?) : Int {
+        if (hexItem == null) return View.GONE
+        return if (IconAdapter.INSTANCE.isAdaptive(hexItem.icon.get())) View.GONE else View.VISIBLE
     }
 
-    fun getHiddenVisibility(appInfo: AppInfo?) : Int {
-        if (appInfo == null) return View.GONE
-        return if (appInfo.hidden) View.VISIBLE else View.GONE
+    fun getHiddenVisibility(hexItem: HexItem?) : Int {
+        if (hexItem == null) return View.GONE
+        return if (hexItem.hidden) View.VISIBLE else View.GONE
     }
 
-    fun getBackgroundColor(appInfo: AppInfo?) : Int {
-        return appInfo?.backgroundColor ?: Color.WHITE
+    fun getBackgroundColor(hexItem: HexItem?) : Int {
+        return hexItem?.backgroundColor ?: Color.WHITE
     }
 
-    fun getForegroundIcon(appInfo: AppInfo?) : Drawable? {
-        if (appInfo == null) return null
-        val icon = appInfo.icon.get()
+    fun getForegroundIcon(hexItem: HexItem?) : Drawable? {
+        if (hexItem == null) return null
+        val icon = hexItem.icon.get()
         return IconAdapter.INSTANCE.getForegroundDrawable(icon) ?: icon
     }
 
-    fun getBackgroundIcon(appInfo: AppInfo?) : Drawable? {
-        if (appInfo == null) return null
-        val icon = appInfo.icon.get()
+    fun getBackgroundIcon(hexItem: HexItem?) : Drawable? {
+        if (hexItem == null) return null
+        val icon = hexItem.icon.get()
         return IconAdapter.INSTANCE.getBackgroundDrawable(icon) ?: icon
     }
 
-    fun getBackgroundIconVisibility(appInfo: AppInfo?) : Int {
-        if (appInfo == null) return View.GONE
-        val icon = appInfo.icon.get()
+    fun getBackgroundIconVisibility(hexItem: HexItem?) : Int {
+        if (hexItem == null) return View.GONE
+        val icon = hexItem.icon.get()
         if (!IconAdapter.INSTANCE.isAdaptive(icon)) return View.GONE
-        return if (appInfo.backgroundHidden) View.GONE else View.VISIBLE
+        return if (hexItem.backgroundHidden) View.GONE else View.VISIBLE
     }
 
     fun getLabelStartOf(leftHanded: Boolean): Int? = if (leftHanded) null else R.id.icon_parent

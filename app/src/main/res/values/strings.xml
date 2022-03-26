@@ -7,11 +7,6 @@
     <string name="unable_to_start_app">Unable to start app</string>
     <string name="no_app_selected">No app selected</string>
 
-    <string name="gesture_not_bound_title">Gesture not bound</string>
-    <string name="gesture_not_bound_message">Gestures can be bound in settings. Would you like to go to settings?</string>
-    <string name="gesture_not_bound_button_positive">Go to Settings</string>
-    <string name="gesture_not_bound_button_negative">Ignore this Gesture</string>
-
     <string name="menu_item_home_choose_wallpaper">Change Wallpaper</string>
     <string name="menu_item_home_manage_widgets">Manage Widgets</string>
     <string name="menu_item_home_settings">Settings</string>
@@ -42,13 +37,6 @@
 
     <string name="preferences_category_preferences">Preferences</string>
     <string name="preferences_preferences_left_handed">Left Handed</string>
-
-    <string name="preferences_category_gestures">Gestures</string>
-    <string name="preferences_gestures_swipe_right">Swipe Right</string>
-    <string name="preferences_gestures_swipe_right_chooser_title">Choose App - Swipe Right</string>
-    <string name="preferences_gestures_swipe_left">Swipe Left</string>
-    <string name="preferences_gestures_swipe_left_chooser_title">Choose App - Swipe Left</string>
-    <string name="preferences_gestures_unset">Not Set</string>
 
     <string name="preferences_category_legal">Legal</string>
     <string name="preferences_privacy_policy">Privacy Policy</string>
@@ -87,6 +75,10 @@
     <string name="home_time_content_description">Time</string>
     <string name="home_date_content_description">Date</string>
     <string name="home_apps_still_loading">Apps are still loading</string>
+
+    <string name="gesture_search_apps">Search Apps</string>
+    <string name="gesture_set_quick_access_item">Set Quick Access Item</string>
+    <string name="gesture_app_chooser_title">Choose An App</string>
 
     <string name="home_arrangement_tutorial_get_started">Long press the background to get started</string>
     <string name="home_arrangement_tutorial_customize_widget">Long press a widget to customize it.\nDrag to move it.</string>

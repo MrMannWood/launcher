@@ -51,22 +51,7 @@ object InlineExecutor: Executor {
     override fun execute(command: Runnable) = command.run()
 }
 
-class PackageManagerExecutor private constructor(): Executor {
-
-    companion object {
-        private var instance: PackageManagerExecutor? = null
-
-        fun get(): PackageManagerExecutor {
-            if (instance == null) {
-                synchronized(this) {
-                    if (instance == null) {
-                        instance = PackageManagerExecutor()
-                    }
-                }
-            }
-            return instance!!
-        }
-    }
+object PackageManagerExecutor: Executor {
 
     private val thread = HandlerThread("PackageManagerThread").apply { start() }
     private val handler = Handler(thread.looper)

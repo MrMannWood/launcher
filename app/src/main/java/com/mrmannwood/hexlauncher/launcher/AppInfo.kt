@@ -13,16 +13,24 @@ enum class SearchTermType {
     Category,
 }
 
+interface HexItem {
+    val label: String
+    val icon: Provider<Drawable>
+    val hidden: Boolean
+    val backgroundColor: Int
+    val backgroundHidden: Boolean
+}
+
 data class AppInfo(
     val packageName: String,
-    val icon: Provider<Drawable>,
-    val backgroundColor: Int,
-    val label: String,
-    val hidden: Boolean,
-    val backgroundHidden: Boolean,
+    override val icon: Provider<Drawable>,
+    override val backgroundColor: Int,
+    override val label: String,
+    override val hidden: Boolean,
+    override val backgroundHidden: Boolean,
     val categories: List<String>,
     val tags: List<String>
-) {
+): HexItem {
     val lowerLabel = label.lowercase(Locale.ROOT)
     val searchTerms : Map<String, SearchTermType> = (
             categories.map { it to SearchTermType.Category }

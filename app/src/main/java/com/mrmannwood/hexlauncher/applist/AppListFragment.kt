@@ -152,7 +152,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
                 viewFunc = { R.layout.list_app_item },
                 bindFunc = { vdb, appInfo ->
                     (vdb as ListAppItemBinding).apply {
-                        this.appInfo = appInfo
+                        this.hexItem = appInfo
                         this.adapter = LauncherFragmentDatabindingAdapter
                     }
                     getAppListHost().onAppInfoBinding(vdb.root, appInfo)

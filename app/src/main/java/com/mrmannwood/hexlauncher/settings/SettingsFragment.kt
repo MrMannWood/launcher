@@ -5,22 +5,15 @@ import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.edit
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.role.RoleManagerCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.activityViewModels
 import androidx.preference.*
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
-import com.mrmannwood.hexlauncher.applist.AppListActivity
-import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
-import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.onAppListResult
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
-import com.mrmannwood.hexlauncher.executors.OriginalThreadCallback
 import com.mrmannwood.hexlauncher.executors.diskExecutor
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
@@ -33,65 +26,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         ActivityResultContracts.StartActivityForResult()
     ) { updateHomeRolePreference(requireActivity()) }
 
-    private val preferenceSwipeRightResultContract = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        result.data.onAppListResult(
-                onSuccess = { appName, packageName ->
-                    PreferencesRepository.getPrefs(requireContext(), OriginalThreadCallback.create {
-                        it.edit {
-                            putString(PreferenceKeys.Gestures.SwipeRight.APP_NAME, appName)
-                            putString(PreferenceKeys.Gestures.SwipeRight.PACKAGE_NAME, packageName)
-                        }
-                    })
-                },
-                onFailure = {
-                    Toast.makeText(requireContext(), R.string.no_app_selected, Toast.LENGTH_LONG).show()
-                }
-        )
-    }
-
-    private val preferenceSwipeLeftResultContract = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        result.data.onAppListResult(
-            onSuccess = { appName, packageName ->
-                PreferencesRepository.getPrefs(requireContext(), OriginalThreadCallback.create {
-                    it.edit {
-                        putString(PreferenceKeys.Gestures.SwipeLeft.APP_NAME, appName)
-                        putString(PreferenceKeys.Gestures.SwipeLeft.PACKAGE_NAME, packageName)
-                    }
-                })
-            },
-            onFailure = {
-                Toast.makeText(requireContext(), R.string.no_app_selected, Toast.LENGTH_LONG).show()
-            }
-        )
-    }
-
-    private val settingsViewModel : SettingsViewModel by activityViewModels()
-
     private lateinit var homeRolePreference: Preference
-    private lateinit var swipeRightAppPreference: Preference
-    private lateinit var swipeLeftAppPreference: Preference
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        settingsViewModel.swipeRightLiveData.observe(this) { appName ->
-            if (appName != null) {
-                swipeRightAppPreference.summary = appName
-            } else {
-                swipeRightAppPreference.setSummary(R.string.preferences_gestures_unset)
-            }
-        }
-        settingsViewModel.swipeLeftLiveData.observe(this) { appName ->
-            if (appName != null) {
-                swipeLeftAppPreference.summary = appName
-            } else {
-                swipeLeftAppPreference.setSummary(R.string.preferences_gestures_unset)
-            }
-        }
-    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val activity = requireActivity()
@@ -142,31 +77,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 setTitle(R.string.preferences_app_list_enable_category_search)
                 key = PreferenceKeys.Apps.ENABLE_CATEGORY_SEARCH
                 setDefaultValue(true)
-            })
-        }
-
-        PreferenceCategory(activity).apply {
-            screen.addPreference(this)
-            setTitle(R.string.preferences_category_gestures)
-            addPreference(Preference(activity).apply {
-                swipeRightAppPreference = this
-                setTitle(R.string.preferences_gestures_swipe_right)
-                setOnPreferenceClickListener {
-                    preferenceSwipeRightResultContract.launch(
-                            Intent(activity, AppListActivity::class.java)
-                                    .decorateForAppListLaunch(R.string.preferences_gestures_swipe_right_chooser_title))
-                    true
-                }
-            })
-            addPreference(Preference(activity).apply {
-                swipeLeftAppPreference = this
-                setTitle(R.string.preferences_gestures_swipe_left)
-                setOnPreferenceClickListener {
-                    preferenceSwipeLeftResultContract.launch(
-                            Intent(activity, AppListActivity::class.java)
-                                    .decorateForAppListLaunch(R.string.preferences_gestures_swipe_left_chooser_title))
-                    true
-                }
             })
         }
 

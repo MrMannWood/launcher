@@ -49,7 +49,7 @@ private fun transformAppInfo(context: Context, app: DecoratedAppData) : AppInfo?
     return try {
         AppInfo(
             packageName = app.appData.packageName,
-            icon = Provider({ context.packageManager.getApplicationIcon(app.appData.packageName) }, PackageManagerExecutor.get()),
+            icon = Provider({ context.packageManager.getApplicationIcon(app.appData.packageName) }, PackageManagerExecutor),
             backgroundColor = app.decoration.bgcOverride ?: app.appData.backgroundColor,
             label = app.appData.label,
             hidden = app.decoration.hidden,

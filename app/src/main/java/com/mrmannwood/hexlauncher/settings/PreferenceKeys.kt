@@ -16,13 +16,29 @@ object PreferenceKeys {
     }
     object Gestures {
         val GESTURE_UNWANTED = "unwanted"
-        object SwipeRight {
-            const val APP_NAME = "gestures_swipe_right_app_name"
+        object SwipeNorthEast {
+            const val PACKAGE_NAME = "gestures_swipe_north_east_package_name"
+        }
+        object SwipeNorth {
+            const val PACKAGE_NAME = "gestures_swipe_north_package_name"
+        }
+        object SwipeNorthWest {
+            const val PACKAGE_NAME = "gestures_swipe_north_west_package_name"
+        }
+        object SwipeEast {
             const val PACKAGE_NAME = "gestures_swipe_right_package_name"
         }
-        object SwipeLeft {
-            const val APP_NAME = "gestures_swipe_left_app_name"
+        object SwipeWest {
             const val PACKAGE_NAME = "gestures_swipe_left_package_name"
+        }
+        object SwipeSouthEast {
+            const val PACKAGE_NAME = "gestures_swipe_south_east_package_name"
+        }
+        object SwipeSouth {
+            const val PACKAGE_NAME = "gestures_swipe_south_package_name"
+        }
+        object SwipeSouthWest {
+            const val PACKAGE_NAME = "gestures_swipe_south_west_package_name"
         }
     }
     object Apps {

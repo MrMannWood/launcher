@@ -55,7 +55,7 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
             key = PreferenceKeys.Home.ORIENTATION,
             extractor = PreferenceExtractor.StringExtractor
         ).observe(this) { orientation ->
-            requestedOrientation = orientation?.toIntOrNull() ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            requestedOrientation = orientation?.toIntOrNull() ?: ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT
         }
     }
 

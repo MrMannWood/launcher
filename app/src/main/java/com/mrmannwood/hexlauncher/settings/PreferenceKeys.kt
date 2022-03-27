@@ -16,6 +16,7 @@ object PreferenceKeys {
     }
     object Gestures {
         val GESTURE_UNWANTED = "unwanted"
+        val OPACITY = "gestures_opacity"
         object SwipeNorthEast {
             const val PACKAGE_NAME = "gestures_swipe_north_east_package_name"
         }

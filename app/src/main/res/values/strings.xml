@@ -38,6 +38,11 @@
     <string name="preferences_category_preferences">Preferences</string>
     <string name="preferences_preferences_left_handed">Left Handed</string>
 
+    <string name="preferences_category_gestures">Gestures</string>
+    <string name="preferences_gestures_opacity">Gesture Wheel Opacity</string>
+    <string name="preferences_gestures_reset_disabled">Reset Disabled Items</string>
+    <string name="preferences_gestures_disable_all">Disable All Items</string>
+
     <string name="preferences_category_legal">Legal</string>
     <string name="preferences_privacy_policy">Privacy Policy</string>
 
@@ -79,6 +84,8 @@
     <string name="gesture_search_apps">Search Apps</string>
     <string name="gesture_set_quick_access_item">Set Quick Access Item</string>
     <string name="gesture_app_chooser_title">Choose An App</string>
+    <string name="gesture_item_menu_change">Change Item</string>
+    <string name="gesture_item_menu_disable">Disable Item</string>
 
     <string name="home_arrangement_tutorial_get_started">Long press the background to get started</string>
     <string name="home_arrangement_tutorial_customize_widget">Long press a widget to customize it.\nDrag to move it.</string>
@@ -149,14 +156,6 @@
         <item>accessibility</item>
     </string-array>
     <!-- endregion -->
-
-    <!-- region color names -->
-    <string name="a"></string>
-    <!-- endregion -->
-
-    <string-array name="colors">
-        <item>alice_blue</item>
-    </string-array>
 
     <string name="alice_blue">Alice Blue</string>
     <string name="antique_white">Antique White</string>

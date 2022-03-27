@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.edit
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.role.RoleManagerCompat
 import androidx.fragment.app.FragmentActivity
@@ -77,6 +78,62 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 setTitle(R.string.preferences_app_list_enable_category_search)
                 key = PreferenceKeys.Apps.ENABLE_CATEGORY_SEARCH
                 setDefaultValue(true)
+            })
+        }
+
+        PreferenceCategory(activity).apply {
+            screen.addPreference(this)
+            setTitle(R.string.preferences_category_gestures)
+            addPreference(SeekBarPreference(activity).apply {
+                setTitle(R.string.preferences_gestures_opacity)
+                key = PreferenceKeys.Gestures.OPACITY
+                setDefaultValue(100)
+                min = 0
+                max = 100
+                seekBarIncrement = 10
+            })
+            addPreference(Preference(activity).apply {
+                setTitle(R.string.preferences_gestures_reset_disabled)
+                setOnPreferenceClickListener {
+                    PreferencesRepository.getPrefs(requireContext()) { prefs -> prefs.edit {
+                        listOf(
+                            PreferenceKeys.Gestures.SwipeNorthWest.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeNorth.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeNorthEast.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeWest.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeEast.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeSouthWest.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeSouthEast.PACKAGE_NAME,
+                        ).forEach { key ->
+                            if (prefs.getString(key, null) == PreferenceKeys.Gestures.GESTURE_UNWANTED) {
+                                remove(key)
+                            }
+                        }
+
+                    } }
+                    true
+                }
+            })
+            addPreference(Preference(activity).apply {
+                setTitle(R.string.preferences_gestures_disable_all)
+                setOnPreferenceClickListener {
+                    PreferencesRepository.getPrefs(requireContext()) { prefs -> prefs.edit {
+                        listOf(
+                            PreferenceKeys.Gestures.SwipeNorthWest.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeNorthEast.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeWest.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeEast.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeSouthWest.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeSouthEast.PACKAGE_NAME,
+                        ).forEach { key ->
+                            putString(key, PreferenceKeys.Gestures.GESTURE_UNWANTED)
+                        }
+                        putInt(PreferenceKeys.Gestures.OPACITY, 0)
+                    } }
+                    true
+                }
             })
         }
 

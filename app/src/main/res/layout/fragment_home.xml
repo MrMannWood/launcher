@@ -73,83 +73,119 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:visibility="invisible">
-            <include
-                    layout="@layout/list_app_item"
-                    android:id="@+id/north_west"
+            <FrameLayout
+                    android:id="@+id/north_west_container"
                     android:layout_width="@dimen/hex_view_height"
                     android:layout_height="@dimen/hex_view_width"
                     android:layout_marginTop="@dimen/octagon_margin"
-                    android:layout_marginLeft="@dimen/octagon_margin"
-                    app:hexItem="@{hexItemNorthWest}"
-                    app:adapter="@{appInfoAdapter}"/>
-            <include
-                    layout="@layout/list_app_item"
-                    android:id="@+id/north"
+                    android:layout_marginLeft="@dimen/octagon_margin">
+                <include
+                        layout="@layout/list_app_item"
+                        android:id="@+id/north_west"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:hexItem="@{hexItemNorthWest}"
+                        app:adapter="@{appInfoAdapter}"/>
+            </FrameLayout>
+            <FrameLayout
+                    android:id="@+id/north_container"
                     android:layout_width="@dimen/hex_view_height"
                     android:layout_height="@dimen/hex_view_width"
-                    android:layout_toRightOf="@id/north_west"
-                    android:layout_marginBottom="@dimen/octagon_margin"
-                    app:hexItem="@{hexItemNorth}"
-                    app:adapter="@{appInfoAdapter}"/>
-
-            <include
-                    layout="@layout/list_app_item"
-                    android:id="@+id/north_east"
+                    android:layout_toRightOf="@id/north_west_container"
+                    android:layout_marginBottom="@dimen/octagon_margin">
+                <include
+                        layout="@layout/list_app_item"
+                        android:id="@+id/north"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:hexItem="@{hexItemNorth}"
+                        app:adapter="@{appInfoAdapter}"/>
+            </FrameLayout>
+            <FrameLayout
+                    android:id="@+id/north_east_container"
                     android:layout_width="@dimen/hex_view_height"
                     android:layout_height="@dimen/hex_view_width"
-                    android:layout_toRightOf="@id/north"
-                    android:layout_alignBottom="@id/north_west"
-                    app:hexItem="@{hexItemNorthEast}"
-                    app:adapter="@{appInfoAdapter}" />
-            <include
-                    layout="@layout/list_app_item"
-                    android:id="@+id/west"
+                    android:layout_toRightOf="@id/north_container"
+                    android:layout_alignBottom="@id/north_west_container">
+                <include
+                        layout="@layout/list_app_item"
+                        android:id="@+id/north_east"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:hexItem="@{hexItemNorthEast}"
+                        app:adapter="@{appInfoAdapter}" />
+            </FrameLayout>
+            <FrameLayout
+                    android:id="@+id/west_container"
                     android:layout_width="@dimen/hex_view_height"
                     android:layout_height="@dimen/hex_view_width"
-                    android:layout_below="@id/north_west"
-                    app:hexItem="@{hexItemWest}"
-                    app:adapter="@{appInfoAdapter}"/>
-
-            <include
-                    layout="@layout/list_app_item"
-                    android:id="@+id/east"
+                    android:layout_below="@id/north_west_container">
+                <include
+                        layout="@layout/list_app_item"
+                        android:id="@+id/west"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:hexItem="@{hexItemWest}"
+                        app:adapter="@{appInfoAdapter}"/>
+            </FrameLayout>
+            <FrameLayout
+                    android:id="@+id/east_container"
                     android:layout_width="@dimen/hex_view_height"
                     android:layout_height="@dimen/hex_view_width"
-                    android:layout_below="@id/north_west"
-                    android:layout_toRightOf="@id/north"
-                    android:layout_marginLeft="@dimen/octagon_margin"
-                    app:hexItem="@{hexItemEast}"
-                    app:adapter="@{appInfoAdapter}" />
-
-            <include
-                    layout="@layout/list_app_item"
-                    android:id="@+id/south_west"
+                    android:layout_below="@id/north_west_container"
+                    android:layout_toRightOf="@id/north_container"
+                    android:layout_marginLeft="@dimen/octagon_margin">
+                <include
+                        layout="@layout/list_app_item"
+                        android:id="@+id/east"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:hexItem="@{hexItemEast}"
+                        app:adapter="@{appInfoAdapter}" />
+            </FrameLayout>
+            <FrameLayout
+                    android:id="@+id/south_west_container"
                     android:layout_width="@dimen/hex_view_height"
                     android:layout_height="@dimen/hex_view_width"
-                    android:layout_below="@id/west"
-                    android:layout_alignRight="@id/north_west"
-                    app:hexItem="@{hexItemSouthWest}"
-                    app:adapter="@{appInfoAdapter}" />
-
-            <include
-                    layout="@layout/list_app_item"
-                    android:id="@+id/south"
+                    android:layout_below="@id/west_container"
+                    android:layout_alignRight="@id/north_west_container">
+                <include
+                        layout="@layout/list_app_item"
+                        android:id="@+id/south_west"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:hexItem="@{hexItemSouthWest}"
+                        app:adapter="@{appInfoAdapter}" />
+            </FrameLayout>
+            <FrameLayout
+                    android:id="@+id/south_container"
                     android:layout_width="@dimen/hex_view_height"
                     android:layout_height="@dimen/hex_view_width"
-                    android:layout_below="@id/west"
-                    android:layout_toRightOf="@id/north_west"
-                    android:layout_marginTop="@dimen/octagon_margin"
-                    app:hexItem="@{hexItemSouth}"
-                    app:adapter="@{appInfoAdapter}" />
-            <include
-                    layout="@layout/list_app_item"
-                    android:id="@+id/south_east"
+                    android:layout_below="@id/west_container"
+                    android:layout_toRightOf="@id/north_west_container"
+                    android:layout_marginTop="@dimen/octagon_margin">
+                <include
+                        layout="@layout/list_app_item"
+                        android:id="@+id/south"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:hexItem="@{hexItemSouth}"
+                        app:adapter="@{appInfoAdapter}" />
+            </FrameLayout>
+            <FrameLayout
+                    android:id="@+id/south_east_container"
                     android:layout_width="@dimen/hex_view_height"
                     android:layout_height="@dimen/hex_view_width"
-                    android:layout_below="@id/west"
-                    android:layout_toRightOf="@id/south"
-                    app:hexItem="@{hexItemSouthEast}"
-                    app:adapter="@{appInfoAdapter}"/>
+                    android:layout_below="@id/west_container"
+                    android:layout_toRightOf="@id/south_container">
+                <include
+                        layout="@layout/list_app_item"
+                        android:id="@+id/south_east"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:hexItem="@{hexItemSouthEast}"
+                        app:adapter="@{appInfoAdapter}"/>
+            </FrameLayout>
         </RelativeLayout>
 
     </com.mrmannwood.hexlauncher.view.TouchInterceptingFrameLayout>

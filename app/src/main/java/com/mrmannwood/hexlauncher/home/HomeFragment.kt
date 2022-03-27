@@ -3,14 +3,13 @@ package com.mrmannwood.hexlauncher.home
 import android.app.Activity
 import android.app.WallpaperManager
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.PointF
-import android.graphics.Rect
+import android.graphics.*
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewConfiguration
+import android.util.DisplayMetrics
+import android.view.*
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -21,6 +20,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
@@ -94,6 +94,10 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         onGestureActionUpdated(PreferenceKeys.Gestures.SwipeSouthEast.PACKAGE_NAME, result)
     }
 
+    private var edgeExclusionZone: Int = 0
+    private var screenWidth: Int = 0
+    private lateinit var gestures: List<GestureConfiguration>
+
     private fun onGestureActionUpdated(preferenceKey: String, result: ActivityResult) {
         result.data.onAppListResult(
             onSuccess = { _, packageName ->
@@ -113,36 +117,68 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
 
     override val nameForInstrumentation = "HomeFragment"
 
-    private lateinit var gestureViewNorthWest: View
-    private lateinit var gestureViewNorth: View
-    private lateinit var gestureViewNorthEast: View
-    private lateinit var gestureViewWest: View
-    private lateinit var gestureViewEast: View
-    private lateinit var gestureViewSouthWest: View
-    private lateinit var gestureViewSouth: View
-    private lateinit var gestureViewSouthEast: View
-
-    private var showContextMenuRunnable: Runnable? = null
-
     private var appList: List<AppInfo>? = null
-    private val gesturePackages = mutableListOf<String?>()
     private var gestureViewHalfWidth: Int = 0
     private var gestureViewHalfHeight: Int = 0
-    private var gestureLocations: List<Pair<View, PointF>>? = null
+    private var generatingGestureContextMenu: Boolean = false
 
     override fun makeDescription(isLoading: Boolean): HomeViewDescription {
         return HomeViewDescription.HomeDescription(isLoading = isLoading)
     }
 
     override fun onViewCreated(databinder: FragmentHomeBinding, savedInstanceState: Bundle?) {
-        gestureViewNorthWest = databinder.northWest.root
-        gestureViewNorth = databinder.north.root
-        gestureViewNorthEast = databinder.northEast.root
-        gestureViewWest = databinder.west.root
-        gestureViewEast = databinder.east.root
-        gestureViewSouthWest = databinder.southWest.root
-        gestureViewSouth = databinder.south.root
-        gestureViewSouthEast = databinder.southEast.root
+        edgeExclusionZone = resources.getDimension(R.dimen.edge_exclusion_zone).toInt()
+        screenWidth = measureScreen(requireActivity())
+        gestures = listOf(
+            GestureConfiguration(
+                PreferenceKeys.Gestures.SwipeNorthWest.PACKAGE_NAME,
+                databinder.northWest.root,
+                viewModel.swipeNorthWestLiveData,
+                { databinder.hexItemNorthWest = it },
+                preferenceSwipeNorthWestResultContract),
+            GestureConfiguration(
+                PreferenceKeys.Gestures.SwipeNorth.PACKAGE_NAME,
+                databinder.north.root,
+                null,
+                { databinder.hexItemNorth = it },
+                null),
+            GestureConfiguration(
+                PreferenceKeys.Gestures.SwipeNorthEast.PACKAGE_NAME,
+                databinder.northEast.root,
+                viewModel.swipeNorthEastLiveData,
+                { databinder.hexItemNorthEast = it },
+                preferenceSwipeNorthEastResultContract),
+            GestureConfiguration(
+                PreferenceKeys.Gestures.SwipeWest.PACKAGE_NAME,
+                databinder.west.root,
+                viewModel.swipeWestLiveData,
+                { databinder.hexItemWest = it },
+                preferenceSwipeWestResultContract),
+            GestureConfiguration(
+                PreferenceKeys.Gestures.SwipeEast.PACKAGE_NAME,
+                databinder.east.root,
+                viewModel.swipeEastLiveData,
+                { databinder.hexItemEast = it },
+                preferenceSwipeEastResultContract),
+            GestureConfiguration(
+                PreferenceKeys.Gestures.SwipeSouthWest.PACKAGE_NAME,
+                databinder.southWest.root,
+                viewModel.swipeSouthWestLiveData,
+                { databinder.hexItemSouthWest = it },
+                preferenceSwipeSouthWestResultContract),
+            GestureConfiguration(
+                PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME,
+                databinder.south.root,
+                viewModel.swipeSouthLiveData,
+                { databinder.hexItemSouth = it },
+                preferenceSwipeSouthResultContract),
+            GestureConfiguration(
+                PreferenceKeys.Gestures.SwipeSouthEast.PACKAGE_NAME,
+                databinder.southEast.root,
+                viewModel.swipeSouthEastLiveData,
+                { databinder.hexItemSouthEast = it },
+                preferenceSwipeSouthEastResultContract),
+        )
 
         databinder.appInfoAdapter = LauncherFragmentDatabindingAdapter
 
@@ -151,6 +187,10 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         databinder.root.setOnTouchListener(makeOnTouchListener(databinder))
 
         databinder.root.setOnCreateContextMenuListener { menu, _, _ ->
+            if (generatingGestureContextMenu) {
+                generatingGestureContextMenu = false
+                return@setOnCreateContextMenuListener
+            }
             menu.add(R.string.menu_item_home_choose_wallpaper).setOnMenuItemClickListener {
                 wallpaperPickerContract.launch(Intent(Intent.ACTION_PICK).apply { type = "image/*" })
                 true
@@ -172,100 +212,58 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             }
         })
 
-        databinder.hexItemNorthWest = makeHexItem(R.string.gesture_set_quick_access_item, R.drawable.ic_add)
-        databinder.hexItemNorthEast = makeHexItem(R.string.gesture_set_quick_access_item, R.drawable.ic_add)
-        databinder.hexItemWest = makeHexItem(R.string.gesture_set_quick_access_item, R.drawable.ic_add)
-        databinder.hexItemEast = makeHexItem(R.string.gesture_set_quick_access_item, R.drawable.ic_add)
-        databinder.hexItemSouthWest = makeHexItem(R.string.gesture_set_quick_access_item, R.drawable.ic_add)
-        databinder.hexItemSouth = makeHexItem(R.string.gesture_set_quick_access_item, R.drawable.ic_add)
-        databinder.hexItemSouthEast = makeHexItem(R.string.gesture_set_quick_access_item, R.drawable.ic_add)
-        setCreateGestureAction(databinder.northWest.root, preferenceSwipeNorthWestResultContract)
-        setCreateGestureAction(databinder.northEast.root, preferenceSwipeNorthEastResultContract)
-        setCreateGestureAction(databinder.west.root, preferenceSwipeWestResultContract)
-        setCreateGestureAction(databinder.east.root, preferenceSwipeEastResultContract)
-        setCreateGestureAction(databinder.southWest.root, preferenceSwipeSouthWestResultContract)
-        setCreateGestureAction(databinder.south.root, preferenceSwipeSouthResultContract)
-        setCreateGestureAction(databinder.southEast.root, preferenceSwipeSouthEastResultContract)
-
-        listOf(
-            viewModel.swipeNorthWestLiveData to { info: AppInfo ->
-                databinder.hexItemNorthWest = info
-                setOpenAppAction(databinder.northWest.root, info)
-            },
-            viewModel.swipeNorthEastLiveData to { info: AppInfo ->
-                databinder.hexItemNorthEast = info
-                setOpenAppAction(databinder.northEast.root, info)
-            },
-            viewModel.swipeWestLiveData to { info: AppInfo ->
-                databinder.hexItemWest = info
-                setOpenAppAction(databinder.west.root, info)
-            },
-            viewModel.swipeEastLiveData to { info: AppInfo ->
-                databinder.hexItemEast = info
-                setOpenAppAction(databinder.east.root, info)
-            },
-            viewModel.swipeSouthWestLiveData to { info: AppInfo ->
-                databinder.hexItemSouthWest = info
-                setOpenAppAction(databinder.southWest.root, info)
-            },
-            viewModel.swipeSouthLiveData to { info: AppInfo ->
-                databinder.hexItemSouth = info
-                setOpenAppAction(databinder.south.root, info)
-            },
-            viewModel.swipeSouthEastLiveData to { info: AppInfo ->
-                databinder.hexItemSouthEast = info
-                setOpenAppAction(databinder.southEast.root, info)
-            },
-        ).forEachIndexed { idx, (liveData, setFunction) -> liveData.observe(viewLifecycleOwner) { packageName ->
-            if (packageName == null) return@observe
-            ensureAppInstalled(packageName) {
-                appList?.firstOrNull { info -> info.packageName == packageName }?.let { appInfo ->
-                    setFunction(appInfo)
-                }
-                gesturePackages.add(idx, packageName)
-            }
-        } }
-
-        viewModel.appListLiveData.observe(viewLifecycleOwner) {
-            appList = it
-            gesturePackages.forEachIndexed { idx, packageName ->
-                if (packageName != null) {
-                    appList?.firstOrNull { info -> info.packageName == packageName }?.let { appInfo ->
-                        when(idx) {
-                            0 -> {
-                                databinder.hexItemNorthWest = appInfo
-                                setOpenAppAction(databinder.northWest.root, appInfo)
+        gestures.filter { it.key != PreferenceKeys.Gestures.SwipeNorth.PACKAGE_NAME }.forEach { config ->
+            config.preferenceWatcher?.observe(viewLifecycleOwner) { packageName ->
+                setHexItemContextMenu(config)
+                when (packageName) {
+                    null -> {
+                        config.setHexItemFunc(makeHexItem(R.string.gesture_set_quick_access_item, R.drawable.ic_add))
+                        if (config.launcher != null) {
+                            setCreateGestureAction(config.view, config.launcher)
+                        }
+                    }
+                    PreferenceKeys.Gestures.GESTURE_UNWANTED -> {
+                        config.packageName = packageName
+                        config.view.visibility = View.GONE
+                    }
+                    else -> {
+                        ensureAppInstalled(packageName) {
+                            appList?.firstOrNull { it.packageName == packageName }?.let { appInfo ->
+                                config.setHexItemFunc(appInfo)
+                                config.view.visibility = View.VISIBLE
+                                setOpenAppAction(config.view, appInfo)
                             }
-                            1 -> {
-                                databinder.hexItemNorthEast = appInfo
-                                setOpenAppAction(databinder.northEast.root, appInfo)
-                            }
-                            2 -> {
-                                databinder.hexItemWest = appInfo
-                                setOpenAppAction(databinder.west.root, appInfo)
-                            }
-                            3 -> {
-                                databinder.hexItemEast = appInfo
-                                setOpenAppAction(databinder.east.root, appInfo)
-                            }
-                            4 -> {
-                                databinder.hexItemSouthWest = appInfo
-                                setOpenAppAction(databinder.southWest.root, appInfo)
-                            }
-                            5 -> {
-                                databinder.hexItemSouth = appInfo
-                                setOpenAppAction(databinder.south.root, appInfo)
-                            }
-                            6 -> {
-                                databinder.hexItemSouthEast = appInfo
-                                setOpenAppAction(databinder.southEast.root, appInfo)
-                            }
-                            else -> throw IllegalArgumentException("Illegal index while reading gestures $idx")
+                            config.packageName = packageName
                         }
                     }
                 }
             }
+            makeGreyscale(config.view)
+        }
+
+        viewModel.appListLiveData.observe(viewLifecycleOwner) {
+            appList = it
+            gestures.forEach { config ->
+                if (config.packageName != null) {
+                    appList?.firstOrNull { info -> info.packageName == config.packageName }?.let { appInfo ->
+                        config.setHexItemFunc(appInfo)
+                        config.view.visibility = View.VISIBLE
+                        setOpenAppAction(config.view, appInfo)
+                    }
+                }
+            }
             onLoadingComplete()
+        }
+
+        viewModel.gestureOpacityLiveData.observe(viewLifecycleOwner) { o ->
+            val opacity = (o ?: 100).toFloat() / 100
+            gestures.map { it.view }.forEach { view ->
+                performViewAction(view) {
+                    if (it is ImageView) {
+                        it.alpha = opacity
+                    }
+                }
+            }
         }
     }
 
@@ -286,11 +284,27 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     private fun setCreateGestureAction(v: View, activityResultLauncher: ActivityResultLauncher<Intent>) {
         v.setTag(R.id.gesture_icon_action, object : Runnable {
             override fun run() {
-                activityResultLauncher.launch(
-                    Intent(activity, AppListActivity::class.java)
-                        .decorateForAppListLaunch(R.string.gesture_app_chooser_title))
+                showSetAppForGesture(activityResultLauncher)
             }
         })
+    }
+
+    private fun setHexItemContextMenu(gesture: GestureConfiguration) {
+        gesture.view.setOnCreateContextMenuListener { menu, _, _ ->
+            generatingGestureContextMenu = true // TODO this is a dirty hack
+            gesture.launcher?.let { launcher ->
+                menu.add(R.string.gesture_item_menu_change).setOnMenuItemClickListener {
+                    showSetAppForGesture(launcher)
+                    true
+                }
+            }
+            menu.add(R.string.gesture_item_menu_disable).setOnMenuItemClickListener {
+                PreferencesRepository.getPrefs(requireContext()) { it.edit {
+                  putString(gesture.key, PreferenceKeys.Gestures.GESTURE_UNWANTED)
+                } }
+                true
+            }
+        }
     }
 
     private fun setOpenAppAction(v: View, appInfo: AppInfo) {
@@ -305,24 +319,18 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             .commit()
     }
 
+    private fun showSetAppForGesture(activityResultLauncher: ActivityResultLauncher<Intent>) {
+        activityResultLauncher.launch(
+            Intent(activity, AppListActivity::class.java)
+                .decorateForAppListLaunch(R.string.gesture_app_chooser_title))
+    }
+
     private fun measureGestureView(databinder: FragmentHomeBinding) {
         databinder.root.post(object: Runnable {
             override fun run() {
                 if (databinder.gestureContainer.height > 0) {
                     gestureViewHalfWidth = databinder.gestureContainer.width / 2
                     gestureViewHalfHeight = databinder.gestureContainer.height / 2
-
-                    gestureLocations = listOf(
-                        gestureViewNorthWest to PointF(gestureViewNorthWest.x, gestureViewNorthWest.y),
-                        gestureViewNorth to PointF(gestureViewNorth.x, gestureViewNorth.y),
-                        gestureViewNorthEast to PointF(gestureViewNorthEast.x, gestureViewNorthEast.y),
-                        gestureViewWest to PointF(gestureViewWest.x, gestureViewWest.y),
-                        gestureViewEast to PointF(gestureViewEast.x, gestureViewEast.y),
-                        gestureViewSouthWest to PointF(gestureViewSouthWest.x, gestureViewSouthWest.y),
-                        gestureViewSouth to PointF(gestureViewSouth.x, gestureViewSouth.y),
-                        gestureViewSouthEast to PointF(gestureViewSouthEast.x, gestureViewSouthEast.y),
-                    )
-
                     databinder.gestureContainer.visibility = View.GONE
 
                 } else {
@@ -332,17 +340,44 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         })
     }
 
+    private fun measureScreen(activity: Activity): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val windowMetrics = activity.windowManager.currentWindowMetrics
+            val insets = windowMetrics.windowInsets.getInsetsIgnoringVisibility(WindowInsets.Type.systemBars());
+            windowMetrics.bounds.width() - insets.left - insets.right;
+        } else {
+            val displayMetrics = DisplayMetrics()
+            activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
+            displayMetrics.widthPixels
+        }
+    }
+
     private fun makeOnTouchListener(databinder: FragmentHomeBinding): View.OnTouchListener {
-        val longPressTime = ViewConfiguration.getLongPressTimeout().toLong()
+        val longPressTime = (ViewConfiguration.getLongPressTimeout() * 1.5).toLong()
 
         return object : View.OnTouchListener {
 
+            private var showContextMenuRunnable: Runnable? = null
+            private var showGestureDetailsContextMenuRunnable: Runnable? = null
+
             private lateinit var downPosition: PointF
+            private var ignoreEvent: Boolean = false
+            private var lastPosition: PointF = PointF()
+            private var lastAction: Int = MotionEvent.ACTION_UP
             private var currentlyActive: Triple<View, Int, Int>? = null
+            private var showingItemContextMenu = false
 
             override fun onTouch(view: View, me: MotionEvent): Boolean {
+                if (ignoreEvent && me.action != MotionEvent.ACTION_DOWN) {
+                    return false
+                }
+
                 when (me.action) {
                     MotionEvent.ACTION_DOWN -> {
+                        ignoreEvent = me.rawX > screenWidth - edgeExclusionZone
+                        if (ignoreEvent) return false
+
+                        showingItemContextMenu = false
                         downPosition = PointF(me.rawX, me.rawY)
                         databinder.gestureContainer.x = me.x - gestureViewHalfWidth
                         databinder.gestureContainer.y = me.y - gestureViewHalfHeight
@@ -352,7 +387,9 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                         }
                     }
                     MotionEvent.ACTION_UP -> {
-                        (currentlyActive?.first?.getTag(R.id.gesture_icon_action) as? Runnable)?.run()
+                        if (!showingItemContextMenu) {
+                            (currentlyActive?.first?.getTag(R.id.gesture_icon_action) as? Runnable)?.run()
+                        }
                         stoppedTouchingView()
                         showContextMenuRunnable?.let { view?.removeCallbacks(it) }
                         databinder.gestureContainer.visibility = View.GONE
@@ -364,12 +401,9 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                             }
                         }
                         if (currentlyActive == null) {
-                            gestureLocations?.filter { isActive(me, it.first) }?.forEach {
+                            gestures.filter { isActive(me, it.view) }.forEach {
                                 stoppedTouchingView()
-                                currentlyActive = Triple(it.first, it.first.layoutParams.width, it.first.layoutParams.height)
-                                it.first.layoutParams.width = (it.first.layoutParams.width * 1.5).toInt()
-                                it.first.layoutParams.height = (it.first.layoutParams.height * 1.5).toInt()
-                                it.first.requestLayout()
+                                startedTouchingView(it.view)
                             }
                         }
                     }
@@ -381,6 +415,9 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                         }
                     }
                 }
+                lastAction = me.action
+                lastPosition.x = me.rawX
+                lastPosition.y = me.rawY
                 return true
             }
 
@@ -390,14 +427,27 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 gestureContainer.visibility = View.GONE
             }
 
+            private fun makeShowGestureDetailsContextMenuRunnable(v: View) = Runnable {
+                if (lastAction == MotionEvent.ACTION_UP) return@Runnable
+                if (!getViewLocation(v).contains(lastPosition.x.toInt(), lastPosition.y.toInt())) return@Runnable
+                v.showContextMenu(v.width.toFloat() / 2, v.height.toFloat() / 2)
+                showingItemContextMenu = true
+            }
+
             val xy = intArrayOf(0,0)
             val rect = Rect()
-            private fun isActive(me: MotionEvent, v: View): Boolean {
+            private fun getViewLocation(v: View): Rect {
                 v.getLocationOnScreen(xy)
                 rect.top = xy[1]
                 rect.left = xy[0]
                 rect.bottom = rect.top + v.height
                 rect.right = rect.left + v.width
+                return rect
+            }
+
+            private fun isActive(me: MotionEvent, v: View): Boolean {
+                if (v.visibility != View.VISIBLE) return false
+                val rect = getViewLocation(v)
                 return rect.contains(me.rawX.toInt(), me.rawY.toInt()) ||
                         doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left, rect.top, rect.left, rect.top + rect.height()) ||
                         doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left, rect.top, rect.left + rect.width(), rect.top) ||
@@ -410,7 +460,6 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 line1y1: Float,
                 line1x2: Float,
                 line1y2: Float,
-
                 line2x1: Int,
                 line2y1: Int,
                 line2x2: Int,
@@ -427,13 +476,20 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 return s >= 0 && s <= 1 && t >= 0 && t <= 1
             }
 
+            private fun startedTouchingView(v: View) {
+                currentlyActive = Triple(v, v.layoutParams.width, v.layoutParams.height)
+                removeGreyscale(v)
+                v.requestLayout()
+                showGestureDetailsContextMenuRunnable = makeShowGestureDetailsContextMenuRunnable(v)
+                v.postDelayed(showGestureDetailsContextMenuRunnable, longPressTime)
+            }
+
             private fun stoppedTouchingView() {
                 currentlyActive?.let { current ->
-                    current.first.layoutParams.width = current.second
-                    current.first.layoutParams.height = current.third
-                    current.first.requestLayout()
-                    currentlyActive = null
+                    showGestureDetailsContextMenuRunnable?.let{ current.first.removeCallbacks(it) }
+                    makeGreyscale(current.first)
                 }
+                currentlyActive = null
             }
         }
     }
@@ -455,5 +511,41 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 Timber.e(e, "Unable to open package: ${appInfo.packageName}")
             }
         }
+    }
+
+    private fun performViewAction(v: View, action: (View) -> Unit) {
+        if (v is ViewGroup) {
+            for (i in 0 until v.childCount) {
+                performViewAction(v.getChildAt(i), action)
+            }
+        } else {
+            action(v)
+        }
+    }
+
+    private fun removeGreyscale(v: View) {
+        performViewAction(v) { view ->
+            if (view is ImageView) {
+                view.colorFilter = null
+            }
+        }
+    }
+
+    private fun makeGreyscale(v: View) {
+        performViewAction(v) { view ->
+            if (view is ImageView) {
+                view.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+            }
+        }
+    }
+
+    private class GestureConfiguration(
+        val key: String,
+        val view: View,
+        val preferenceWatcher: LiveData<String?>?,
+        val setHexItemFunc: (HexItem) -> Unit,
+        val launcher: ActivityResultLauncher<Intent>?
+    ) {
+        var packageName: String? = null
     }
 }

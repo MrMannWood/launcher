@@ -238,7 +238,6 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                     }
                 }
             }
-            makeGreyscale(config.view)
         }
 
         viewModel.appListLiveData.observe(viewLifecycleOwner) {
@@ -376,6 +375,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                     MotionEvent.ACTION_DOWN -> {
                         ignoreEvent = me.rawX > screenWidth - edgeExclusionZone
                         if (ignoreEvent) return false
+                        gestures.map { it.view }.forEach { makeGreyscale(it) }
 
                         showingItemContextMenu = false
                         downPosition = PointF(me.rawX, me.rawY)
@@ -390,6 +390,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                         if (!showingItemContextMenu) {
                             (currentlyActive?.first?.getTag(R.id.gesture_icon_action) as? Runnable)?.run()
                         }
+                        gestures.map { it.view }.forEach { removeGreyscale(it) }
                         stoppedTouchingView()
                         showContextMenuRunnable?.let { view?.removeCallbacks(it) }
                         databinder.gestureContainer.visibility = View.GONE

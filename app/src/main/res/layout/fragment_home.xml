@@ -75,8 +75,8 @@
                 android:visibility="invisible">
             <FrameLayout
                     android:id="@+id/north_west_container"
-                    android:layout_width="@dimen/hex_view_height"
-                    android:layout_height="@dimen/hex_view_width"
+                    android:layout_width="@dimen/small_hex_view_height"
+                    android:layout_height="@dimen/small_hex_view_width"
                     android:layout_marginTop="@dimen/octagon_margin"
                     android:layout_marginLeft="@dimen/octagon_margin">
                 <include
@@ -89,8 +89,8 @@
             </FrameLayout>
             <FrameLayout
                     android:id="@+id/north_container"
-                    android:layout_width="@dimen/hex_view_height"
-                    android:layout_height="@dimen/hex_view_width"
+                    android:layout_width="@dimen/small_hex_view_height"
+                    android:layout_height="@dimen/small_hex_view_width"
                     android:layout_toRightOf="@id/north_west_container"
                     android:layout_marginBottom="@dimen/octagon_margin">
                 <include
@@ -103,8 +103,8 @@
             </FrameLayout>
             <FrameLayout
                     android:id="@+id/north_east_container"
-                    android:layout_width="@dimen/hex_view_height"
-                    android:layout_height="@dimen/hex_view_width"
+                    android:layout_width="@dimen/small_hex_view_height"
+                    android:layout_height="@dimen/small_hex_view_width"
                     android:layout_toRightOf="@id/north_container"
                     android:layout_alignBottom="@id/north_west_container">
                 <include
@@ -117,8 +117,8 @@
             </FrameLayout>
             <FrameLayout
                     android:id="@+id/west_container"
-                    android:layout_width="@dimen/hex_view_height"
-                    android:layout_height="@dimen/hex_view_width"
+                    android:layout_width="@dimen/small_hex_view_height"
+                    android:layout_height="@dimen/small_hex_view_width"
                     android:layout_below="@id/north_west_container">
                 <include
                         layout="@layout/list_app_item"
@@ -130,8 +130,8 @@
             </FrameLayout>
             <FrameLayout
                     android:id="@+id/east_container"
-                    android:layout_width="@dimen/hex_view_height"
-                    android:layout_height="@dimen/hex_view_width"
+                    android:layout_width="@dimen/small_hex_view_height"
+                    android:layout_height="@dimen/small_hex_view_width"
                     android:layout_below="@id/north_west_container"
                     android:layout_toRightOf="@id/north_container"
                     android:layout_marginLeft="@dimen/octagon_margin">
@@ -145,8 +145,8 @@
             </FrameLayout>
             <FrameLayout
                     android:id="@+id/south_west_container"
-                    android:layout_width="@dimen/hex_view_height"
-                    android:layout_height="@dimen/hex_view_width"
+                    android:layout_width="@dimen/small_hex_view_height"
+                    android:layout_height="@dimen/small_hex_view_width"
                     android:layout_below="@id/west_container"
                     android:layout_alignRight="@id/north_west_container">
                 <include
@@ -159,8 +159,8 @@
             </FrameLayout>
             <FrameLayout
                     android:id="@+id/south_container"
-                    android:layout_width="@dimen/hex_view_height"
-                    android:layout_height="@dimen/hex_view_width"
+                    android:layout_width="@dimen/small_hex_view_height"
+                    android:layout_height="@dimen/small_hex_view_width"
                     android:layout_below="@id/west_container"
                     android:layout_toRightOf="@id/north_west_container"
                     android:layout_marginTop="@dimen/octagon_margin">
@@ -174,8 +174,8 @@
             </FrameLayout>
             <FrameLayout
                     android:id="@+id/south_east_container"
-                    android:layout_width="@dimen/hex_view_height"
-                    android:layout_height="@dimen/hex_view_width"
+                    android:layout_width="@dimen/small_hex_view_height"
+                    android:layout_height="@dimen/small_hex_view_width"
                     android:layout_below="@id/west_container"
                     android:layout_toRightOf="@id/south_container">
                 <include

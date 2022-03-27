@@ -2,11 +2,16 @@ package com.mrmannwood.hexlauncher.home
 
 import android.app.Activity
 import android.app.WallpaperManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.*
+import android.graphics.drawable.AdaptiveIconDrawable
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.DisplayMetrics
 import android.view.*
 import android.widget.ImageView
@@ -134,11 +139,13 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 PreferenceKeys.Gestures.SwipeNorthWest.PACKAGE_NAME,
                 databinder.northWest.root,
                 viewModel.swipeNorthWestLiveData,
+                DefaultAppType.PHONE,
                 { databinder.hexItemNorthWest = it },
                 preferenceSwipeNorthWestResultContract),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeNorth.PACKAGE_NAME,
                 databinder.north.root,
+                null,
                 null,
                 { databinder.hexItemNorth = it },
                 null),
@@ -146,36 +153,42 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 PreferenceKeys.Gestures.SwipeNorthEast.PACKAGE_NAME,
                 databinder.northEast.root,
                 viewModel.swipeNorthEastLiveData,
+                DefaultAppType.CAMERA,
                 { databinder.hexItemNorthEast = it },
                 preferenceSwipeNorthEastResultContract),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeWest.PACKAGE_NAME,
                 databinder.west.root,
                 viewModel.swipeWestLiveData,
+                DefaultAppType.SMS,
                 { databinder.hexItemWest = it },
                 preferenceSwipeWestResultContract),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeEast.PACKAGE_NAME,
                 databinder.east.root,
                 viewModel.swipeEastLiveData,
+                DefaultAppType.ASSISTANT,
                 { databinder.hexItemEast = it },
                 preferenceSwipeEastResultContract),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeSouthWest.PACKAGE_NAME,
                 databinder.southWest.root,
                 viewModel.swipeSouthWestLiveData,
+                DefaultAppType.EMAIL,
                 { databinder.hexItemSouthWest = it },
                 preferenceSwipeSouthWestResultContract),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME,
                 databinder.south.root,
                 viewModel.swipeSouthLiveData,
+                DefaultAppType.BROWSER,
                 { databinder.hexItemSouth = it },
                 preferenceSwipeSouthResultContract),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeSouthEast.PACKAGE_NAME,
                 databinder.southEast.root,
                 viewModel.swipeSouthEastLiveData,
+                DefaultAppType.MAP,
                 { databinder.hexItemSouthEast = it },
                 preferenceSwipeSouthEastResultContract),
         )
@@ -205,6 +218,12 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             }
         }
 
+        gestures.forEach { config ->
+            config.setHexItemFunc(makeHexItem(R.string.gesture_set_quick_access_item, R.drawable.ic_add))
+            if (config.launcher != null) {
+                setCreateGestureAction(config.view, config.launcher)
+            }
+        }
         databinder.hexItemNorth = makeHexItem(R.string.gesture_search_apps, R.drawable.ic_apps)
         databinder.north.root.setTag(R.id.gesture_icon_action, object : Runnable {
             override fun run() {
@@ -216,12 +235,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             config.preferenceWatcher?.observe(viewLifecycleOwner) { packageName ->
                 setHexItemContextMenu(config)
                 when (packageName) {
-                    null -> {
-                        config.setHexItemFunc(makeHexItem(R.string.gesture_set_quick_access_item, R.drawable.ic_add))
-                        if (config.launcher != null) {
-                            setCreateGestureAction(config.view, config.launcher)
-                        }
-                    }
+                    null -> { /* ignore */ }
                     PreferenceKeys.Gestures.GESTURE_UNWANTED -> {
                         config.packageName = packageName
                         config.view.visibility = View.GONE
@@ -251,6 +265,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                     }
                 }
             }
+            gestures.forEach { gesture -> initDefaultApp(gesture) }
             onLoadingComplete()
         }
 
@@ -274,7 +289,13 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     ): HexItem = object: HexItem {
         override val label = resources.getString(label)
         override val icon: Provider<Drawable> = Provider(
-            { ContextCompat.getDrawable(requireContext(), icon)!! }, InlineExecutor)
+            {
+                AdaptiveIconDrawable(
+                    ColorDrawable(Color.BLACK),
+                    ContextCompat.getDrawable(requireContext(), icon)!!
+                )
+            },
+            InlineExecutor)
         override val hidden: Boolean = false
         override val backgroundColor: Int = Color.TRANSPARENT
         override val backgroundHidden: Boolean = true
@@ -540,13 +561,43 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         }
     }
 
+    private fun initDefaultApp(gesture: GestureConfiguration) {
+        if (gesture.defaultApp == null) return
+        getDefaultApp(gesture.defaultApp) { appInfo ->
+            if (gesture.packageName != null) return@getDefaultApp
+            gesture.packageName = appInfo.packageName
+            gesture.setHexItemFunc(appInfo)
+            setOpenAppAction(gesture.view, appInfo)
+        }
+    }
+
+    private fun getDefaultApp(type: DefaultAppType, action: (AppInfo) -> Unit) {
+        val callback = OriginalThreadCallback(action)
+        PackageManagerExecutor.execute {
+            type.intent().resolveActivity(requireContext().packageManager)?.packageName?.let { pac ->
+                appList?.firstOrNull { it.packageName == pac }?.let { callback.invoke(it) }
+            }
+        }
+    }
+
     private class GestureConfiguration(
         val key: String,
         val view: View,
         val preferenceWatcher: LiveData<String?>?,
+        val defaultApp: DefaultAppType?,
         val setHexItemFunc: (HexItem) -> Unit,
         val launcher: ActivityResultLauncher<Intent>?
     ) {
         var packageName: String? = null
+    }
+
+    private enum class DefaultAppType(val intent: () -> Intent) {
+        CAMERA({ Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA) }),
+        BROWSER({ Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/")) }),
+        PHONE({ Intent(Intent.ACTION_DIAL) }),
+        SMS({ Intent(Intent.ACTION_MAIN).also { it.addCategory(Intent.CATEGORY_APP_MESSAGING) } }),
+        EMAIL({ Intent(Intent.ACTION_MAIN).also { it.addCategory(Intent.CATEGORY_APP_EMAIL) } }),
+        MAP({ Intent(Intent.ACTION_MAIN).also { it.setPackage("com.google.android.apps.maps") } }),
+        ASSISTANT({ Intent(Intent.ACTION_VOICE_COMMAND) }),
     }
 }

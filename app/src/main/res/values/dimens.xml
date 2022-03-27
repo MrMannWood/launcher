@@ -2,6 +2,8 @@
 <resources>
     <dimen name="hex_view_height">64.9519dp</dimen>
     <dimen name="hex_view_width">75dp</dimen>
-    <dimen name="octagon_margin">30dp</dimen>
+    <dimen name="small_hex_view_height">32.47595dp</dimen>
+    <dimen name="small_hex_view_width">37.5dp</dimen>
+    <dimen name="octagon_margin">15dp</dimen>
     <dimen name="edge_exclusion_zone">25dp</dimen>
 </resources>

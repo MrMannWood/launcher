@@ -12,11 +12,11 @@ class WelcomeFragment : Fragment(R.layout.fragment_nux_welcome) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val nextButton = view.findViewById<View>(R.id.button_next)
-        nextButton.setOnClickListener {
+        view.setOnClickListener {
             (parentFragment as NUXHostFragment).next()
         }
 
+        val nextButton = view.findViewById<View>(R.id.button_next)
         val animatorSet = AnimatorSet().apply {
             playTogether(
                 ObjectAnimator.ofFloat(nextButton, "scaleX", 0.5f).apply {

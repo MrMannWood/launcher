@@ -17,6 +17,7 @@ import com.mrmannwood.hexlauncher.appcustomize.AppCustomizationFragment
 import com.mrmannwood.hexlauncher.applist.AppListFragment
 import com.mrmannwood.hexlauncher.executors.OriginalThreadCallback
 import com.mrmannwood.hexlauncher.home.HomeFragment
+import com.mrmannwood.hexlauncher.isVersionStringLess
 import com.mrmannwood.hexlauncher.nux.NUXHostFragment
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
@@ -77,16 +78,13 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
     }
 
     private fun checkShouldShowNux(prefs: SharedPreferences) : Boolean {
-//        return prefs.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null)?.let { _ ->
-//            // todo make this smarter, so new nuxes can be shown as necessary
-//            false
-//        } ?: run {
-//            prefs.edit {
-//                putString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, BuildConfig.VERSION_NAME)
-//            }
-//            true
-//        }
-        return true
+       val showNux = prefs.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null)?.let {
+            isVersionStringLess(it, "1.4.1")
+        } ?: run { true }
+        prefs.edit {
+            putString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, BuildConfig.VERSION_NAME)
+        }
+        return showNux
     }
 
     private fun goFullscreen() {

@@ -1,5 +1,7 @@
 package com.mrmannwood.hexlauncher
 
+import java.lang.Integer.min
+
 fun String.levenshtein(that : CharSequence) : Int {
     val lhsLength = this.length
     val rhsLength = that.length
@@ -30,4 +32,15 @@ fun String.levenshtein(that : CharSequence) : Int {
 
 fun String.removeChars(chars: CharArray): String {
     return this.toCharArray().filter { !chars.contains(it) }.joinToString("")
+}
+
+fun isVersionStringLess(one: String, two: String): Boolean {
+    val oneS = one.split(".")
+    val twoS = two.split(".")
+    for (i in 0 until min(oneS.size, twoS.size)) {
+        if (oneS[i] < twoS[i]) {
+            return true
+        }
+    }
+    return false
 }

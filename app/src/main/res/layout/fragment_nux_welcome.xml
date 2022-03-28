@@ -4,11 +4,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        android:id="@+id/welcome_message_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/tutorial_message_margin">
+
+        <TextView
+            android:id="@+id/welcome_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/nux_welcome_message"
+            android:textColor="@color/colorOnPrimary"
+            android:textSize="16sp"/>
+
+        <ImageView
+            android:id="@+id/button_next"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/outline_navigate_next"/>
+
+    </LinearLayout>
+
     <FrameLayout
         android:id="@+id/image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/welcome_message_container"
+        android:layout_marginBottom="12dp"
         android:contentDescription="@string/nux_welcome_image_content_description">
 
         <com.mrmannwood.hexlauncher.view.HexagonView
@@ -36,30 +65,5 @@
             android:src="@color/colorSecondary"/>
 
     </FrameLayout>
-
-    <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="@dimen/tutorial_message_margin">
-
-        <TextView
-                android:id="@+id/welcome_message"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/nux_welcome_message"
-                android:textColor="@color/colorOnPrimary"
-                android:textSize="16sp"/>
-
-        <ImageView
-                android:id="@+id/button_next"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/outline_navigate_next"/>
-
-    </LinearLayout>
 
 </RelativeLayout>

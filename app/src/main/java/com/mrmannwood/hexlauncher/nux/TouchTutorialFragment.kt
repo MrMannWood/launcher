@@ -10,17 +10,21 @@ class TouchTutorialFragment : AbstractGestureWheelTutorialFragment() {
 
     override fun onViewCreated() {
         message.setText(R.string.nux_touch_tutorial_message)
+        floatingMessage.setText(R.string.nux_touch_tutorial_message_2)
+        gestures.find { it.id ==   R.id.north_container } ?.visibility = View.INVISIBLE
     }
 
     override fun onDown() {
         down = true
-        message.setText(R.string.nux_touch_tutorial_message_2)
+        message.visibility = View.INVISIBLE
+        floatingMessage.visibility = View.VISIBLE
     }
 
     override fun onUp() {
         down = false
         if (!appSelected) {
-            message.setText(R.string.nux_touch_tutorial_message)
+            message.visibility = View.VISIBLE
+            floatingMessage.visibility = View.INVISIBLE
         } else {
             next()
         }
@@ -31,13 +35,13 @@ class TouchTutorialFragment : AbstractGestureWheelTutorialFragment() {
             return
         }
         appSelected = true
-        message.setText(R.string.nux_touch_tutorial_message_3)
+        floatingMessage.setText(R.string.nux_touch_tutorial_message_3)
     }
 
     override fun onAppDeselected() {
         appSelected = false
         if (down) {
-            message.setText(R.string.nux_touch_tutorial_message_2)
+            floatingMessage.setText(R.string.nux_touch_tutorial_message_2)
         }
     }
 }

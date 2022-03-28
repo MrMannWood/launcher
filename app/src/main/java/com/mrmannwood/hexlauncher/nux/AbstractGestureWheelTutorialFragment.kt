@@ -32,6 +32,7 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
 
     protected lateinit var gestures: List<ImageView>
     protected lateinit var message: TextView
+    protected lateinit var floatingMessage: TextView
 
     protected abstract fun onViewCreated()
     protected abstract fun onDown()
@@ -50,6 +51,7 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
 
         val gestureContainer = view.findViewById<View>(R.id.gesture_container)
         message = view.findViewById(R.id.nux_gesture_wheel_message)
+        floatingMessage = view.findViewById(R.id.nux_gesture_wheel_floating_message)
 
         gestures = listOf(
             gestureContainer.findViewById(R.id.north_west_container),

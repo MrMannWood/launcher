@@ -6,6 +6,7 @@ import com.mrmannwood.launcher.R
 class CustomizeTutorialFragment : AbstractGestureWheelTutorialFragment() {
 
     override fun onViewCreated() {
+        gestures.find { it.id ==   R.id.north_container } ?.visibility = View.INVISIBLE
         message.setText(R.string.nux_customize_tutorial_message)
         gestures.filter { it.id != R.id.north_container }.forEach {
             it.setOnCreateContextMenuListener { menu, v, _ ->

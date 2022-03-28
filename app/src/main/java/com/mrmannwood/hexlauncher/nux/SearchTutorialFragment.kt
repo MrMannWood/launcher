@@ -113,7 +113,7 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
     class TutorialHexItem(private val context: Context, private val index: Int) : HexItem {
         override val label: String = "Example App $index"
         override val icon: Provider<Drawable> = Provider(
-            { ColorDrawable(ContextCompat.getColor(context, R.color.colorOnPrimary)) },
+            { ColorDrawable(ContextCompat.getColor(context, if (index % 2 == 0) R.color.colorOnPrimary else R.color.colorOnSecondary)) },
             InlineExecutor
         )
         override val hidden: Boolean = false

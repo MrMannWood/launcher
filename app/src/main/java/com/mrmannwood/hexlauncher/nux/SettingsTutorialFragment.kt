@@ -8,6 +8,7 @@ class SettingsTutorialFragment : AbstractGestureWheelTutorialFragment() {
     override val allowContextMenu: Boolean = true
 
     override fun onViewCreated() {
+        gestures.find { it.id ==   R.id.north_container } ?.visibility = View.INVISIBLE
         message.setText(R.string.nux_settings_message)
         requireView().setOnCreateContextMenuListener { menu, v, _ ->
             menu.add(R.string.nux_settings_tutorial_settings).setOnMenuItemClickListener {

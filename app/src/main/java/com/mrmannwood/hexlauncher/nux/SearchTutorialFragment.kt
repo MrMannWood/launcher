@@ -44,7 +44,7 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
     private lateinit var resultListView: RecyclerView
     private lateinit var resultListAdapter: Adapter<TutorialHexItem>
     private var showKeyboardJob : Job? = null
-    private var leftHandedLayout : Boolean = false // TODO
+    private var leftHandedLayout : Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

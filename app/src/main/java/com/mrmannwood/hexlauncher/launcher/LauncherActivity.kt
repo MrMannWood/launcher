@@ -46,7 +46,7 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
             OriginalThreadCallback.create { prefs ->
                 if (checkShouldShowNux(prefs)) {
                     supportFragmentManager.beginTransaction()
-                        .add(R.id.container, NUXHostFragment())
+                        .replace(R.id.container, NUXHostFragment())
                         .commit()
                 }
             })
@@ -77,15 +77,16 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
     }
 
     private fun checkShouldShowNux(prefs: SharedPreferences) : Boolean {
-        return prefs.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null)?.let { _ ->
-            // todo make this smarter, so new nuxes can be shown as necessary
-            false
-        } ?: run {
-            prefs.edit {
-                putString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, BuildConfig.VERSION_NAME)
-            }
-            true
-        }
+//        return prefs.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null)?.let { _ ->
+//            // todo make this smarter, so new nuxes can be shown as necessary
+//            false
+//        } ?: run {
+//            prefs.edit {
+//                putString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, BuildConfig.VERSION_NAME)
+//            }
+//            true
+//        }
+        return true
     }
 
     private fun goFullscreen() {

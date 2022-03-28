@@ -8,6 +8,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.mrmannwood.hexlauncher.HandleBackPressed
+import com.mrmannwood.hexlauncher.home.HomeFragment
 import com.mrmannwood.launcher.R
 
 class NUXHostFragment : Fragment(R.layout.fragment_nux_host), HandleBackPressed {
@@ -30,7 +31,7 @@ class NUXHostFragment : Fragment(R.layout.fragment_nux_host), HandleBackPressed 
                 fragment.acceptNuxCompleted(object : NuxCompleted {
                     override fun onNuxCompleted() {
                         parentFragmentManager.beginTransaction()
-                            .remove(this@NUXHostFragment)
+                            .replace(R.id.container, HomeFragment())
                             .commit()
                     }
                 })
@@ -46,8 +47,11 @@ class NUXHostFragment : Fragment(R.layout.fragment_nux_host), HandleBackPressed 
 
                 private val fragments = listOf(
                     { WelcomeFragment() },
-                    { SwipeTutorialFragment() },
+                    { TouchTutorialFragment() },
+                    { CustomizeTutorialFragment() },
                     { SettingsTutorialFragment() },
+                    { SwipeTutorialFragment() },
+                    { SearchTutorialFragment() },
                     { SetAsHomeFragment() }
                 )
 
@@ -56,10 +60,25 @@ class NUXHostFragment : Fragment(R.layout.fragment_nux_host), HandleBackPressed 
                 override fun createFragment(position: Int): Fragment = fragments[position]()
             }
         }
+        viewPager.isUserInputEnabled = false
         tabLayout = view.findViewById(R.id.tab_layout)
 
-        TabLayoutMediator(tabLayout, viewPager) { _, _ -> }.attach()
+        TabLayoutMediator(tabLayout, viewPager) { tab, _ -> tab.view.isClickable = false }.attach()
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                if (position == 5) {
+                    tabLayout.visibility = View.GONE
+                } else {
+                    tabLayout.visibility = View.VISIBLE
+                }
+                super.onPageSelected(position)
+            }
+        })
     }
 
     override fun handleBackPressed(): Boolean = true /* consume */
+
+    fun next() {
+        viewPager.currentItem = viewPager.currentItem + 1
+    }
 }

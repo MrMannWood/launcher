@@ -38,6 +38,7 @@ import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.hexlauncher.launcher.HexItem
 import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
 import com.mrmannwood.hexlauncher.launcher.Provider
+import com.mrmannwood.hexlauncher.measureScreen
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
@@ -358,18 +359,6 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 }
             }
         })
-    }
-
-    private fun measureScreen(activity: Activity): Int {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val windowMetrics = activity.windowManager.currentWindowMetrics
-            val insets = windowMetrics.windowInsets.getInsetsIgnoringVisibility(WindowInsets.Type.systemBars());
-            windowMetrics.bounds.width() - insets.left - insets.right;
-        } else {
-            val displayMetrics = DisplayMetrics()
-            activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
-            displayMetrics.widthPixels
-        }
     }
 
     private fun makeOnTouchListener(databinder: FragmentHomeBinding): View.OnTouchListener {

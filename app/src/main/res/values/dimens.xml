@@ -6,4 +6,5 @@
     <dimen name="small_hex_view_width">37.5dp</dimen>
     <dimen name="octagon_margin">15dp</dimen>
     <dimen name="edge_exclusion_zone">25dp</dimen>
+    <dimen name="tutorial_message_margin">150dp</dimen>
 </resources>

@@ -61,12 +61,22 @@
     <string name="nux_welcome_message">Welcome to Hex Launcher</string>
     <string name="nux_welcome_image_content_description">Welcome Image of stacked hexagons</string>
     <string name="nux_swipe_message">Swipe up to search</string>
-    <string name="nux_swipe_tutorial_user_swiped_up">Nice Job!</string>
-    <string name="nux_swipe_phantom_finger_content_description">Example of opening search</string>
-    <string name="nux_settings_message">Long press for settings</string>
+    <string name="nux_settings_message">Long press background for settings</string>
     <string name="nux_settings_tutorial_settings">Settings</string>
-    <string name="nux_settings_tutorial_user_clicked_settings">Nice Job!</string>
-    <string name="nux_settings_phantom_finger_content_description">Example of opening settings</string>
+
+    <string name="nux_customize_message">Long press icons to change or customize</string>
+
+    <string name="nux_touch_tutorial_message">Touch the background to display shortcuts</string>
+    <string name="nux_touch_tutorial_message_2">Touch or move through an app to activate it</string>
+    <string name="nux_touch_tutorial_message_3">Lift to launch the app</string>
+
+    <string name="nux_customize_tutorial_message">Hold on an app to customize it</string>
+    <string name="nux_customize_tutorial_customize">Customize</string>
+    <string name="nux_search_message">Search for apps</string>
+    <string name="nux_search_message_2">Long press an icon to customize it</string>
+    <string name="nux_search_app_customize">Customize</string>
+    <string name="nux_search_app_details">App Details</string>
+
     <string name="nux_set_as_home">Set as Default</string>
     <string name="nux_set_as_home_content_description">Set as Default</string>
     <string name="nux_set_as_home_or">Or</string>

@@ -21,7 +21,8 @@ class TouchTutorialFragment : AbstractGestureWheelTutorialFragment() {
 
             override fun onBegin() {
                 pushMessage(R.string.nux_touch_tutorial_message)
-                gestures.find { it.id ==   R.id.north_container } ?.visibility = View.INVISIBLE
+                gestures.filter { it.id == R.id.north_container || it.id == R.id.south_container }
+                    .forEach { it.visibility = View.INVISIBLE }
             }
 
             override fun onDown() {
@@ -52,7 +53,8 @@ class TouchTutorialFragment : AbstractGestureWheelTutorialFragment() {
             var messageShown = false
 
             override fun onBegin() {
-                gestures.find { it.id == R.id.north_container } ?.visibility = View.INVISIBLE
+                gestures.filter { it.id == R.id.north_container || it.id == R.id.south_container }
+                    .forEach { it.visibility = View.INVISIBLE }
                 pushMessage(R.string.nux_touch_tutorial_message)
                 gestures.filter { it.id != R.id.north_container }.forEach {
                     it.setOnCreateContextMenuListener { menu, _, _ ->
@@ -82,7 +84,8 @@ class TouchTutorialFragment : AbstractGestureWheelTutorialFragment() {
             override var appSelected: Boolean = false
 
             override fun onBegin() {
-                gestures.find { it.id == R.id.north_container } ?.visibility = View.INVISIBLE
+                gestures.filter { it.id == R.id.north_container || it.id == R.id.south_container }
+                    .forEach { it.visibility = View.INVISIBLE }
                 allowContextMenu = true
                 pushMessage(R.string.nux_settings_message)
                 requireView().setOnCreateContextMenuListener { menu, _, _ ->
@@ -98,6 +101,7 @@ class TouchTutorialFragment : AbstractGestureWheelTutorialFragment() {
 
             override fun onBegin() {
                 gestures.find { it.id == R.id.north_container } ?.visibility = View.VISIBLE
+                gestures.find { it.id == R.id.south_container } ?.visibility = View.INVISIBLE
                 pushMessage(R.string.nux_swipe_message)
             }
 

@@ -8,7 +8,7 @@ class SwipeTutorialFragment : AbstractGestureWheelTutorialFragment() {
     private var selected = false
 
     override fun onViewCreated() {
-        message.setText(R.string.nux_swipe_message)
+        pushMessage(R.string.nux_swipe_message)
     }
 
     override fun onDown() = Unit

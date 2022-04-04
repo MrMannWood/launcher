@@ -9,7 +9,7 @@ class SettingsTutorialFragment : AbstractGestureWheelTutorialFragment() {
 
     override fun onViewCreated() {
         gestures.find { it.id ==   R.id.north_container } ?.visibility = View.INVISIBLE
-        message.setText(R.string.nux_settings_message)
+        pushMessage(R.string.nux_settings_message)
         requireView().setOnCreateContextMenuListener { menu, v, _ ->
             menu.add(R.string.nux_settings_tutorial_settings).setOnMenuItemClickListener {
                 (parentFragment as NUXHostFragment).next()

@@ -48,7 +48,6 @@ class NUXHostFragment : Fragment(R.layout.fragment_nux_host), HandleBackPressed 
                 private val fragments = listOf(
                     { WelcomeFragment() },
                     { TouchTutorialFragment() },
-                    { CustomizeTutorialFragment() },
                     { SettingsTutorialFragment() },
                     { SwipeTutorialFragment() },
                     { SearchTutorialFragment() },

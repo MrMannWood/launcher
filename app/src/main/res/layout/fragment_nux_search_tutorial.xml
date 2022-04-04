@@ -11,7 +11,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/tutorial_message_margin"
             android:textColor="@color/colorOnPrimary"
-            android:textSize="16sp"
+            android:textSize="@dimen/tutorial_message_size"
             android:gravity="center_horizontal"
             android:text="@string/nux_search_message"
             />

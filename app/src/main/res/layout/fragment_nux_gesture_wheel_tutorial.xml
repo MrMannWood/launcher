@@ -3,38 +3,49 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <TextView
-            android:id="@+id/nux_gesture_wheel_message"
-            android:layout_width="wrap_content"
+    <LinearLayout
+            android:id="@+id/nux_gesture_wheel_tutorial_message_container"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/tutorial_message_margin"
-            android:textColor="@color/colorOnPrimary"
-            android:textSize="16sp"
-            android:gravity="center_horizontal"
-            />
-
-
-    <TextView
-        android:id="@+id/nux_gesture_wheel_floating_message"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="24dp"
-        android:textColor="@color/colorOnPrimary"
-        android:textSize="16sp"
-        android:gravity="center_horizontal"
-        android:visibility="invisible"
-        />
+            android:layout_marginTop="@dimen/tutorial_message_margin">
+        <TextView
+                android:id="@+id/nux_gesture_wheel_message_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textColor="@color/colorOnPrimary"
+                android:textSize="@dimen/tutorial_message_size"
+                android:layout_marginBottom="8dp"
+                />
+        <TextView
+                android:id="@+id/nux_gesture_wheel_message_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textColor="@color/colorOnPrimary"
+                android:textSize="@dimen/tutorial_message_size"
+                android:layout_marginBottom="8dp"
+                />
+        <TextView
+                android:id="@+id/nux_gesture_wheel_message_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textColor="@color/colorOnPrimary"
+                android:textSize="@dimen/tutorial_message_size"
+                />
+    </LinearLayout>
 
     <RelativeLayout
             android:id="@+id/gesture_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_below="@id/nux_gesture_wheel_floating_message"
+            android:layout_below="@id/nux_gesture_wheel_tutorial_message_container"
             android:visibility="invisible">
         <com.mrmannwood.hexlauncher.view.HexagonView
                 android:id="@+id/north_west_container"

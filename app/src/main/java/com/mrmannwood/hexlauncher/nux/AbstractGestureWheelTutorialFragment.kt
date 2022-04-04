@@ -9,9 +9,11 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import com.mrmannwood.hexlauncher.measureScreen
 import com.mrmannwood.launcher.R
+import java.util.*
 import kotlin.math.pow
 
 abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment_nux_gesture_wheel_tutorial)  {
@@ -25,14 +27,19 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
         )
     }
 
+    private var floatingMessageMarginBottom: Int = 0
     private var edgeExclusionZone: Int = 0
     private var screenWidth: Int = 0
+    private var originalY: Float = -1f
+    private val messageQueue: LinkedList<String> = LinkedList()
 
     protected open val allowContextMenu: Boolean = false
 
     protected lateinit var gestures: List<ImageView>
-    protected lateinit var message: TextView
-    protected lateinit var floatingMessage: TextView
+    private lateinit var messageContainer: View
+    private lateinit var message0: TextView
+    private lateinit var message1: TextView
+    private lateinit var message2: TextView
 
     protected abstract fun onViewCreated()
     protected abstract fun onDown()
@@ -40,18 +47,44 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
     protected abstract fun onAppSelected(selected: View)
     protected abstract fun onAppDeselected()
 
+    protected fun pushMessage(@StringRes message: Int) {
+        pushMessage(resources.getString(message))
+    }
+
+    protected fun pushMessage(message: String) {
+        messageQueue.push(message)
+        showMessages()
+    }
+
+    protected fun popMessage() {
+        messageQueue.pop()
+        showMessages()
+        if (messageQueue.size <= 1) {
+            messageContainer.y = originalY
+        }
+    }
+
+    private fun showMessages() {
+        message0.text = if (messageQueue.size > 0) { messageQueue[0] } else { "" }
+        message1.text = if (messageQueue.size > 1) { messageQueue[1] } else { "" }
+        message2.text = if (messageQueue.size > 2) { messageQueue[2] } else { "" }
+    }
+
     protected fun next() {
         (parentFragment as NUXHostFragment).next()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        floatingMessageMarginBottom = resources.getDimension(R.dimen.tutorial_floating_message_margin).toInt()
         edgeExclusionZone = resources.getDimension(R.dimen.edge_exclusion_zone).toInt()
         screenWidth = measureScreen(requireActivity())
 
         val gestureContainer = view.findViewById<View>(R.id.gesture_container)
-        message = view.findViewById(R.id.nux_gesture_wheel_message)
-        floatingMessage = view.findViewById(R.id.nux_gesture_wheel_floating_message)
+        messageContainer = view.findViewById(R.id.nux_gesture_wheel_tutorial_message_container)
+        message0 = view.findViewById(R.id.nux_gesture_wheel_message_1)
+        message1 = view.findViewById<TextView>(R.id.nux_gesture_wheel_message_2).also { it.alpha = 0.50f }
+        message2 = view.findViewById<TextView>(R.id.nux_gesture_wheel_message_3).also { it.alpha = 0.25f }
 
         gestures = listOf(
             gestureContainer.findViewById(R.id.north_west_container),
@@ -73,6 +106,13 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
         ))
 
         onViewCreated()
+    }
+
+    private fun onMoveGestureWheel(x: Float, y: Float) {
+        if (originalY == -1f) {
+            originalY = messageContainer.y
+        }
+        messageContainer.y = y - messageContainer.height - floatingMessageMarginBottom
     }
 
     private fun makeTouchListener(
@@ -112,14 +152,15 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
                         gestureContainer.x = me.x - gestureContainer.width / 2
                         gestureContainer.y = me.y - gestureContainer.height / 2
                         gestureContainer.visibility = View.VISIBLE
+                        onMoveGestureWheel(gestureContainer.x, gestureContainer.y)
                         showContextMenuRunnable = makeShowContextMenuRunnable(gestureContainer, me.x, me.y).also {
-                            view?.postDelayed(it, longPressTime)
+                            view.postDelayed(it, longPressTime)
                         }
                     }
                     MotionEvent.ACTION_UP -> {
                         onUp()
                         stoppedTouchingView()
-                        showContextMenuRunnable?.let { view?.removeCallbacks(it) }
+                        showContextMenuRunnable?.let { view.removeCallbacks(it) }
                         gestureContainer.visibility = View.GONE
                     }
                     MotionEvent.ACTION_MOVE -> {
@@ -143,7 +184,7 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
                                     .pow(2)
                             )
                         ) {
-                            view?.removeCallbacks(r)
+                            view.removeCallbacks(r)
                         }
                     }
                 }
@@ -265,9 +306,9 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
                 currentlyActive?.let { current ->
                     showGestureDetailsContextMenuRunnable?.let { current.removeCallbacks(it) }
                     current.colorFilter = null
+                    onAppDeselected()
                 }
                 currentlyActive = null
-                onAppDeselected()
             }
         }
     }

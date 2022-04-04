@@ -4,51 +4,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/welcome_message_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="@dimen/tutorial_message_margin">
-
-        <TextView
+    <TextView
             android:id="@+id/welcome_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="@string/nux_welcome_message"
             android:textColor="@color/colorOnPrimary"
-            android:textSize="16sp"/>
+            android:textSize="@dimen/tutorial_message_size"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/tutorial_message_margin"/>
 
-        <ImageView
-            android:id="@+id/button_next"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/outline_navigate_next"/>
-
-    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_above="@id/welcome_message_container"
-        android:layout_marginBottom="12dp"
+        android:layout_below="@id/welcome_message"
+        android:layout_marginTop="@dimen/tutorial_floating_message_margin"
         android:contentDescription="@string/nux_welcome_image_content_description">
 
         <com.mrmannwood.hexlauncher.view.HexagonView
-            android:layout_width="210dp"
-            android:layout_height="210dp"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
             android:layout_gravity="center"
             android:src="@color/colorPrimary"/>
 
         <com.mrmannwood.hexlauncher.view.HexagonView
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="190dp"
+            android:layout_height="190dp"
             android:layout_gravity="center"
             android:src="@color/colorSecondary"/>
 
@@ -59,7 +44,7 @@
             android:src="@color/colorPrimary"/>
 
         <com.mrmannwood.hexlauncher.view.HexagonView
-            android:layout_width="100dp"
+            android:layout_width="110dp"
             android:layout_height="100dp"
             android:layout_gravity="center"
             android:src="@color/colorSecondary"/>

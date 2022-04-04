@@ -31,9 +31,6 @@ interface AppDataDao {
     @Query("SELECT package_name, last_update_time FROM app_data")
     fun getLastUpdateTimeStamps() : List<AppData.Timestamp>
 
-    @Query("UPDATE app_data SET last_update_time = 0 WHERE package_name IS NOT NULL")
-    fun zeroAllLastUpdateTimeStamps()
-
     @Query("UPDATE app_data_decoration SET bgc_override = :backgroundColor WHERE package_name_dec = :packageName")
     fun setColorOverride(packageName: String, backgroundColor: Int)
 

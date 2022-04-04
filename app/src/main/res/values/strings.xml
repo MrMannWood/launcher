@@ -48,12 +48,6 @@
     <string name="preferences_category_legal">Legal</string>
     <string name="preferences_privacy_policy">Privacy Policy</string>
 
-    <string name="preferences_category_experimental">Experimental Features</string>
-    <string name="preferences_category_experimental_summary">Toggling these are a bad idea. Proceed with caution.</string>
-    <string name="preferences_experimental_show">Enable Experimental Features</string>
-
-    <string name="preferences_refresh_app_cache_title">Refresh App Cache</string>
-
     <string name="preferences_category_version_info">Version Info</string>
     <string name="preferences_version_name">App Version: %s</string>
     <string name="preferences_version_build_type">Build Type: %s</string>

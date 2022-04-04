@@ -116,7 +116,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                                 remove(key)
                             }
                         }
-
                     } }
                     true
                 }
@@ -131,7 +130,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             PreferenceKeys.Gestures.SwipeWest.PACKAGE_NAME,
                             PreferenceKeys.Gestures.SwipeEast.PACKAGE_NAME,
                             PreferenceKeys.Gestures.SwipeSouthWest.PACKAGE_NAME,
-                            PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME,
                             PreferenceKeys.Gestures.SwipeSouthEast.PACKAGE_NAME,
                         ).forEach { key ->
                             putString(key, PreferenceKeys.Gestures.GESTURE_UNWANTED)
@@ -179,24 +177,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             })
             addPreference(Preference(activity).apply {
                 title = getString(R.string.preferences_version_build_type, BuildConfig.BUILD_TYPE)
-            })
-        }
-
-        PreferenceCategory(activity).apply {
-            screen.addPreference(this)
-            setTitle(R.string.preferences_category_experimental)
-            setSummary(R.string.preferences_category_experimental_summary)
-
-            addPreference(Preference(activity).apply {
-                setTitle(R.string.preferences_refresh_app_cache_title)
-                setOnPreferenceClickListener {
-                    val appContext = activity.applicationContext
-                    diskExecutor.execute {
-                        DB.get(requireContext()).appDataDao().zeroAllLastUpdateTimeStamps()
-                        AppListUpdater.updateAppList(appContext)
-                    }
-                    true
-                }
             })
         }
 

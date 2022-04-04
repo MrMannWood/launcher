@@ -2,17 +2,14 @@ package com.mrmannwood.hexlauncher.home
 
 import android.app.Activity
 import android.app.WallpaperManager
-import android.content.Context
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.DisplayMetrics
 import android.view.*
 import android.widget.ImageView
 import android.widget.Toast
@@ -39,6 +36,7 @@ import com.mrmannwood.hexlauncher.launcher.HexItem
 import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
 import com.mrmannwood.hexlauncher.launcher.Provider
 import com.mrmannwood.hexlauncher.measureScreen
+import com.mrmannwood.hexlauncher.notifications.NotificationShadeUtil
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.hexlauncher.settings.SettingsActivity
@@ -88,11 +86,6 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         onGestureActionUpdated(PreferenceKeys.Gestures.SwipeSouthWest.PACKAGE_NAME, result)
-    }
-    private val preferenceSwipeSouthResultContract = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        onGestureActionUpdated(PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME, result)
     }
     private val preferenceSwipeSouthEastResultContract = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -168,7 +161,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 PreferenceKeys.Gestures.SwipeEast.PACKAGE_NAME,
                 databinder.east.root,
                 viewModel.swipeEastLiveData,
-                DefaultAppType.ASSISTANT,
+                DefaultAppType.BROWSER,
                 { databinder.hexItemEast = it },
                 preferenceSwipeEastResultContract),
             GestureConfiguration(
@@ -182,9 +175,9 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME,
                 databinder.south.root,
                 viewModel.swipeSouthLiveData,
-                DefaultAppType.BROWSER,
+                null,
                 { databinder.hexItemSouth = it },
-                preferenceSwipeSouthResultContract),
+                null),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeSouthEast.PACKAGE_NAME,
                 databinder.southEast.root,
@@ -231,8 +224,17 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 showLauncherFragment()
             }
         })
+        databinder.hexItemSouth = makeHexItem(R.string.gesture_search_apps, R.drawable.outline_notifications)
+        databinder.south.root.setTag(R.id.gesture_icon_action, object : Runnable {
+            override fun run() {
+                context?.let { NotificationShadeUtil.showNotificationShade(it) }
+            }
+        })
 
-        gestures.filter { it.key != PreferenceKeys.Gestures.SwipeNorth.PACKAGE_NAME }.forEach { config ->
+        gestures.filter {
+            it.key != PreferenceKeys.Gestures.SwipeNorth.PACKAGE_NAME &&
+                    it.key != PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME
+        }.forEach { config ->
             config.preferenceWatcher?.observe(viewLifecycleOwner) { packageName ->
                 setHexItemContextMenu(config)
                 when (packageName) {
@@ -240,15 +242,12 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                     PreferenceKeys.Gestures.GESTURE_UNWANTED -> {
                         config.packageName = packageName
                         config.view.visibility = View.GONE
+
                     }
                     else -> {
                         ensureAppInstalled(packageName) {
-                            appList?.firstOrNull { it.packageName == packageName }?.let { appInfo ->
-                                config.setHexItemFunc(appInfo)
-                                config.view.visibility = View.VISIBLE
-                                setOpenAppAction(config.view, appInfo)
-                            }
                             config.packageName = packageName
+                            setAppInformationForGesture(config)
                         }
                     }
                 }
@@ -259,11 +258,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             appList = it
             gestures.forEach { config ->
                 if (config.packageName != null) {
-                    appList?.firstOrNull { info -> info.packageName == config.packageName }?.let { appInfo ->
-                        config.setHexItemFunc(appInfo)
-                        config.view.visibility = View.VISIBLE
-                        setOpenAppAction(config.view, appInfo)
-                    }
+                    setAppInformationForGesture(config)
                 }
             }
             gestures.forEach { gesture -> initDefaultApp(gesture) }
@@ -292,7 +287,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         override val icon: Provider<Drawable> = Provider(
             {
                 AdaptiveIconDrawable(
-                    ColorDrawable(Color.BLACK),
+                    ColorDrawable(ContextCompat.getColor(requireContext(), R.color.colorOnPrimary)),
                     ContextCompat.getDrawable(requireContext(), icon)!!
                 )
             },
@@ -310,8 +305,18 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         })
     }
 
+    private fun setAppInformationForGesture(config: GestureConfiguration) {
+        appList?.firstOrNull { info -> info.packageName == config.packageName }?.let { appInfo ->
+            config.setHexItemFunc(appInfo)
+            config.view.visibility = View.VISIBLE
+            config.appName = appInfo.label
+            setOpenAppAction(config.view, appInfo)
+        }
+    }
+
     private fun setHexItemContextMenu(gesture: GestureConfiguration) {
         gesture.view.setOnCreateContextMenuListener { menu, _, _ ->
+            gesture.appName?.let { menu.setHeaderTitle(it) }
             generatingGestureContextMenu = true // TODO this is a dirty hack
             gesture.launcher?.let { launcher ->
                 menu.add(R.string.gesture_item_menu_change).setOnMenuItemClickListener {
@@ -564,6 +569,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         getDefaultApp(gesture.defaultApp) { appInfo ->
             if (gesture.packageName != null) return@getDefaultApp
             gesture.packageName = appInfo.packageName
+            gesture.appName = appInfo.label
             gesture.setHexItemFunc(appInfo)
             setOpenAppAction(gesture.view, appInfo)
         }
@@ -587,6 +593,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         val launcher: ActivityResultLauncher<Intent>?
     ) {
         var packageName: String? = null
+        var appName: String? = null
     }
 
     private enum class DefaultAppType(val intent: () -> Intent) {
@@ -596,6 +603,5 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         SMS({ Intent(Intent.ACTION_MAIN).also { it.addCategory(Intent.CATEGORY_APP_MESSAGING) } }),
         EMAIL({ Intent(Intent.ACTION_MAIN).also { it.addCategory(Intent.CATEGORY_APP_EMAIL) } }),
         MAP({ Intent(Intent.ACTION_MAIN).also { it.setPackage("com.google.android.apps.maps") } }),
-        ASSISTANT({ Intent(Intent.ACTION_VOICE_COMMAND) }),
     }
 }

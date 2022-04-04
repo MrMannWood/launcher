@@ -49,6 +49,9 @@ object PreferenceKeys {
     object User {
         const val LEFT_HANDED = "left_handed"
     }
+    object Feedback {
+        const val RATE = "rated"
+    }
     object Logging {
         const val ENABLE_DISK_LOGGING = "enable_disk_logging"
     }

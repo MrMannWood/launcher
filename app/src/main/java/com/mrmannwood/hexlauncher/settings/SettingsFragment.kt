@@ -1,10 +1,14 @@
 package com.mrmannwood.hexlauncher.settings
 
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.edit
 import androidx.core.content.res.ResourcesCompat
@@ -15,9 +19,12 @@ import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
+import com.mrmannwood.hexlauncher.executors.OriginalThreadCallback
+import com.mrmannwood.hexlauncher.executors.PackageManagerExecutor
 import com.mrmannwood.hexlauncher.executors.diskExecutor
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
+import com.mrmannwood.hexlauncher.settings.PreferencesRepository.watchPref
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 
@@ -28,6 +35,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     ) { updateHomeRolePreference(requireActivity()) }
 
     private lateinit var homeRolePreference: Preference
+    private lateinit var feedbackCategory: Preference
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val activity = requireActivity()
@@ -141,6 +149,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
             })
         }
 
+        feedbackCategory = PreferenceCategory(activity).apply {
+            screen.addPreference(this)
+            key = PreferenceKeys.Feedback.RATE
+            setTitle(R.string.preferences_category_feedback)
+            addPreference(Preference(activity).apply {
+                title = getString(R.string.preferences_feedback_rate, getString(R.string.app_name))
+                setOnPreferenceClickListener {
+                    openFeedback(activity)
+                    sharedPreferences?.edit { putBoolean(PreferenceKeys.Feedback.RATE, true) }
+                    true
+                }
+            })
+            isVisible = false
+        }
+
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
             setTitle(R.string.preferences_category_debugging)
@@ -188,6 +211,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         setDivider(
             ResourcesCompat.getDrawable(resources, R.drawable.preference_divider, requireActivity().theme)
         )
+        watchPref(requireActivity(), PreferenceKeys.Feedback.RATE, PreferenceExtractor.BooleanExtractor)
+            .observe(viewLifecycleOwner) { feedbackCategory.isVisible = it != true }
     }
 
     private fun updateHomeRolePreference(activity: FragmentActivity) {
@@ -205,6 +230,45 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     }
                 }
             }
+        }
+    }
+
+    private fun openFeedback(context: Context) {
+        getInstallerPackage(context, OriginalThreadCallback.create { installer ->
+            when (installer) {
+                "com.android.vending" -> {
+                    try {
+                        startActivity(
+                            Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${context.packageName}")).apply {
+                                addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or
+                                        Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
+                                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                            }
+                        )
+                    } catch (e: ActivityNotFoundException) {
+                        startActivity(Intent(Intent.ACTION_VIEW,
+                            Uri.parse("http://play.google.com/store/apps/details?id=${context.packageManager}")))
+                    }
+                }
+                else -> {
+                    startActivity(Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/MrMannWood/launcher/issues")))
+                }
+            }
+        })
+    }
+
+    private fun getInstallerPackage(context: Context, callback: (String?) -> Unit) {
+        PackageManagerExecutor.execute {
+            val installer = try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    context.packageManager.getInstallSourceInfo(context.packageName).installingPackageName
+                } else {
+                    @Suppress("DEPRECATION")
+                    context.packageManager.getInstallerPackageName(context.packageName)
+                }
+            } catch (e: Exception) { null }
+            callback(installer)
         }
     }
 }

@@ -48,8 +48,6 @@ class NUXHostFragment : Fragment(R.layout.fragment_nux_host), HandleBackPressed 
                 private val fragments = listOf(
                     { WelcomeFragment() },
                     { TouchTutorialFragment() },
-                    { SettingsTutorialFragment() },
-                    { SwipeTutorialFragment() },
                     { SearchTutorialFragment() },
                     { SetAsHomeFragment() }
                 )
@@ -65,7 +63,7 @@ class NUXHostFragment : Fragment(R.layout.fragment_nux_host), HandleBackPressed 
         TabLayoutMediator(tabLayout, viewPager) { tab, _ -> tab.view.isClickable = false }.attach()
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                if (position == 5) {
+                if (position == 2) {
                     tabLayout.visibility = View.GONE
                 } else {
                     tabLayout.visibility = View.VISIBLE

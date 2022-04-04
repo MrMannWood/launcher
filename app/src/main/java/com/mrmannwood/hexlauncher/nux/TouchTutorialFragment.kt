@@ -9,10 +9,10 @@ class TouchTutorialFragment : AbstractGestureWheelTutorialFragment() {
     private interface TouchTutorial {
         var appSelected: Boolean
         fun onBegin()
-        fun onDown()
-        fun onUp()
-        fun onAppSelected(selected: View)
-        fun onAppDeselected()
+        fun onDown() = Unit
+        fun onUp() = Unit
+        fun onAppSelected(selected: View) = Unit
+        fun onAppDeselected() = Unit
     }
 
     private val tutorials = listOf(
@@ -77,41 +77,67 @@ class TouchTutorialFragment : AbstractGestureWheelTutorialFragment() {
                     messageShown = false
                 }
             }
+        },
+        object : TouchTutorial {
+            override var appSelected: Boolean = false
 
-            override fun onAppSelected(selected: View) = Unit
+            override fun onBegin() {
+                gestures.find { it.id == R.id.north_container } ?.visibility = View.INVISIBLE
+                allowContextMenu = true
+                pushMessage(R.string.nux_settings_message)
+                requireView().setOnCreateContextMenuListener { menu, _, _ ->
+                    menu.add(R.string.nux_settings_tutorial_settings).setOnMenuItemClickListener {
+                        nextTutorial()
+                        true
+                    }
+                }
+            }
+        },
+        object : TouchTutorial {
+            override var appSelected: Boolean = false
 
-            override fun onAppDeselected() = Unit
-        }
+            override fun onBegin() {
+                gestures.find { it.id == R.id.north_container } ?.visibility = View.VISIBLE
+                pushMessage(R.string.nux_swipe_message)
+            }
+
+            override fun onUp() {
+                if (appSelected) {
+                    nextTutorial()
+                }
+            }
+        },
     )
 
-    private var tutorial: Int = 0
+    private var tutorialIterator = tutorials.iterator()
+    private var tutorial: TouchTutorial? = tutorialIterator.next()
 
     override fun onViewCreated() {
-        tutorials[tutorial].onBegin()
+        tutorial?.onBegin()
     }
 
     override fun onDown() {
-        tutorials[tutorial].onDown()
+        tutorial?.onDown()
     }
 
     override fun onUp() {
-        tutorials[tutorial].onUp()
+        tutorial?.onUp()
     }
 
     override fun onAppSelected(selected: View) {
-        tutorials[tutorial].appSelected = true
-        tutorials[tutorial].onAppSelected(selected)
+        tutorial?.appSelected = true
+        tutorial?.onAppSelected(selected)
     }
 
     override fun onAppDeselected() {
-        tutorials[tutorial].appSelected = false
-        tutorials[tutorial].onAppDeselected()
+        tutorial?.appSelected = false
+        tutorial?.onAppDeselected()
     }
 
     fun nextTutorial() {
-        tutorial++
-        if (tutorial < tutorials.size) {
-            tutorials[tutorial].onBegin()
+        if (tutorialIterator.hasNext()) {
+            tutorial = tutorialIterator.next()
+            tutorial?.onBegin()
         } else {
             next()
         }

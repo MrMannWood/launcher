@@ -363,6 +363,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
 
     private fun makeOnTouchListener(databinder: FragmentHomeBinding): View.OnTouchListener {
         val longPressTime = (ViewConfiguration.getLongPressTimeout() * 1.5).toLong()
+        val doubleTapTime = ViewConfiguration.getDoubleTapTimeout()
 
         return object : View.OnTouchListener {
 
@@ -372,6 +373,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             private lateinit var downPosition: PointF
             private var ignoreEvent: Boolean = false
             private var lastPosition: PointF = PointF()
+            private var lastDown: Long = -1
             private var lastAction: Int = MotionEvent.ACTION_UP
             private var currentlyActive: Triple<View, Int, Int>? = null
             private var showingItemContextMenu = false
@@ -392,9 +394,14 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                         databinder.gestureContainer.x = me.x - gestureViewHalfWidth
                         databinder.gestureContainer.y = me.y - gestureViewHalfHeight
                         databinder.gestureContainer.visibility = View.VISIBLE
-                        showContextMenuRunnable = makeShowContextMenuRunnable(databinder.gestureContainer, me.x, me.y).also {
-                            view?.postDelayed(it, longPressTime)
+                        if (now() - lastDown <= doubleTapTime) {
+                            showContextMenuRunnable = makeShowContextMenuRunnable(
+                                databinder.gestureContainer
+                            ).also {
+                                view.postDelayed(it, longPressTime)
+                            }
                         }
+                        lastDown = now()
                     }
                     MotionEvent.ACTION_UP -> {
                         if (!showingItemContextMenu) {
@@ -432,9 +439,11 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 return true
             }
 
-            private fun makeShowContextMenuRunnable(gestureContainer: View, x: Float, y: Float) = Runnable {
+            private fun now() = System.currentTimeMillis()
+
+            private fun makeShowContextMenuRunnable(gestureContainer: View) = Runnable {
                 stoppedTouchingView()
-                view?.showContextMenu(x, y)
+                view?.showContextMenu()
                 gestureContainer.visibility = View.GONE
             }
 

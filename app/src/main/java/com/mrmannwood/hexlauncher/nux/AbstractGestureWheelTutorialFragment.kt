@@ -33,7 +33,7 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
     private var originalY: Float = -1f
     private val messageQueue: LinkedList<String> = LinkedList()
 
-    protected open val allowContextMenu: Boolean = false
+    protected var allowContextMenu: Boolean = false
 
     protected lateinit var gestures: List<ImageView>
     private lateinit var messageContainer: View
@@ -123,6 +123,7 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
         onAppDeselected: () -> Unit
     ) : View.OnTouchListener {
         val longPressTime = (ViewConfiguration.getLongPressTimeout() * 1.5).toLong()
+        val doubleTapTime = ViewConfiguration.getDoubleTapTimeout()
 
         return object : View.OnTouchListener {
 
@@ -132,6 +133,7 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
             private lateinit var downPosition: PointF
             private var ignoreEvent: Boolean = false
             private var lastPosition: PointF = PointF()
+            private var lastDown: Long = -1
             private var lastAction: Int = MotionEvent.ACTION_UP
             private var currentlyActive: ImageView? = null
             private var showingItemContextMenu = false
@@ -153,9 +155,12 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
                         gestureContainer.y = me.y - gestureContainer.height / 2
                         gestureContainer.visibility = View.VISIBLE
                         onMoveGestureWheel(gestureContainer.x, gestureContainer.y)
-                        showContextMenuRunnable = makeShowContextMenuRunnable(gestureContainer, me.x, me.y).also {
-                            view.postDelayed(it, longPressTime)
+                        if (now() - lastDown <= doubleTapTime) {
+                            showContextMenuRunnable = makeShowContextMenuRunnable(gestureContainer).also {
+                                view.postDelayed(it, longPressTime)
+                            }
                         }
+                        lastDown = now()
                     }
                     MotionEvent.ACTION_UP -> {
                         onUp()
@@ -194,10 +199,12 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
                 return true
             }
 
-            private fun makeShowContextMenuRunnable(gestureContainer: View, x: Float, y: Float) = Runnable {
+            private fun now() = System.currentTimeMillis()
+
+            private fun makeShowContextMenuRunnable(gestureContainer: View) = Runnable {
                 if (allowContextMenu) {
                     stoppedTouchingView()
-                    view?.showContextMenu(x, y)
+                    view?.showContextMenu()
                     gestureContainer.visibility = View.GONE
                 }
             }

@@ -61,7 +61,7 @@
     <string name="nux_welcome_message">Welcome to Hex Launcher</string>
     <string name="nux_welcome_image_content_description">Welcome Image of stacked hexagons</string>
     <string name="nux_swipe_message">Swipe up to search</string>
-    <string name="nux_settings_message">Long press background for settings</string>
+    <string name="nux_settings_message">Double tap then long press for settings</string>
     <string name="nux_settings_tutorial_settings">Settings</string>
 
     <string name="nux_customize_message">Long press icons to change or customize</string>

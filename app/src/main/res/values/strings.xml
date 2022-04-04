@@ -34,6 +34,8 @@
     <string name="preferences_category_app_list">Apps</string>
     <string name="preferences_app_list_show_all_apps">Show All Apps</string>
     <string name="preferences_app_list_enable_category_search">Enable Searching by App Category</string>
+    <string name="preferences_app_list_all_apps_hotkey">Enable "Show all apps" hotkey</string>
+    <string name="preferences_app_list_all_apps_hotkey_summary">Searching \"...\" shows all apps</string>
 
     <string name="preferences_category_preferences">Preferences</string>
     <string name="preferences_preferences_left_handed">Left Handed</string>

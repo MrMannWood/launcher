@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.*
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
@@ -58,6 +60,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
 
     private var apps : List<AppInfo>? = null
     private var enableCategorySearch : Boolean = true
+    private var enableAllAppsSearch : Boolean = false
     private var leftHandedLayout : Boolean = false
 
     private fun getAppListHost() : Host<*> {
@@ -125,6 +128,9 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         viewModel.enableCategorySearch.observe(viewLifecycleOwner) { enable ->
             enableCategorySearch = enable != false
         }
+        viewModel.enableAllAppsSearch.observe(viewLifecycleOwner) { enable ->
+            enableAllAppsSearch = enable == true
+        }
         viewModel.leftHandedLayout.observe(viewLifecycleOwner) { leftHanded ->
             if (leftHanded == null) return@observe
             if (leftHandedLayout == leftHanded) return@observe
@@ -166,7 +172,11 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     private fun createSearchTextListener() : TextWatcher = object : TextWatcher {
 
         override fun afterTextChanged(p0: Editable) {
-            performSearch()
+            if (enableAllAppsSearch && searchView.text.toString() == "...") {
+                showAllApps()
+            } else {
+                performSearch()
+            }
         }
 
         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
@@ -209,7 +219,40 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         }
     }
 
+    private fun showAllApps() {
+        if (resultListView.layoutManager !is GridLayoutManager) {
+            val displayMetrics: DisplayMetrics = resources.displayMetrics
+            val numColumns = (displayMetrics.widthPixels / (resources.getDimension(R.dimen.hex_view_height) + 24)).toInt()
+
+            resultListView.layoutManager = object : GridLayoutManager(
+                requireContext(),
+                numColumns,
+                RecyclerView.VERTICAL,
+                true /* reverseLayout */
+            ) {
+                override fun isLayoutRTL() : Boolean = !leftHandedLayout
+            }.apply {
+                spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                    override fun getSpanSize(position: Int) = 1
+                }
+            }
+        }
+
+        resultListAdapter.setData(AppInfo::class, apps ?: emptyList())
+
+        activity?.let { activity ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                showKeyboardJob?.cancelAndJoin()
+                hideKeyboard(activity)
+            }
+        }
+    }
+
     private fun performSearch() {
+        if (resultListView.layoutManager !is HexagonalGridLayoutManager) {
+            resultListView.layoutManager = createLayoutManager()
+        }
+
         val search = searchView.text.toString().trim().lowercase(Locale.ROOT)
         resultListAdapter.setData(
             AppInfo::class,

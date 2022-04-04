@@ -14,6 +14,11 @@ class LauncherViewModel(app: Application): AndroidViewModel(app) {
         key = PreferenceKeys.Apps.ENABLE_CATEGORY_SEARCH,
         extractor = PreferenceExtractor.BooleanExtractor
     )
+    val enableAllAppsSearch = watchPref(
+        context = getApplication(),
+        key = PreferenceKeys.Apps.ENABLE_ALL_APPS_HOT_KEY,
+        extractor = PreferenceExtractor.BooleanExtractor
+    )
     val leftHandedLayout = watchPref(
         context = getApplication(),
         key = PreferenceKeys.User.LEFT_HANDED,

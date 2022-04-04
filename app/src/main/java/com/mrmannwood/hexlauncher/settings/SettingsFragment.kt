@@ -79,6 +79,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 key = PreferenceKeys.Apps.ENABLE_CATEGORY_SEARCH
                 setDefaultValue(true)
             })
+            addPreference(SwitchPreference(activity).apply {
+                setTitle(R.string.preferences_app_list_all_apps_hotkey)
+                setSummary(R.string.preferences_app_list_all_apps_hotkey_summary)
+                key = PreferenceKeys.Apps.ENABLE_ALL_APPS_HOT_KEY
+                setDefaultValue(false)
+            })
         }
 
         PreferenceCategory(activity).apply {

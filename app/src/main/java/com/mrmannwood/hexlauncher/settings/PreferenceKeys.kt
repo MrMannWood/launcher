@@ -44,6 +44,7 @@ object PreferenceKeys {
     }
     object Apps {
         const val ENABLE_CATEGORY_SEARCH = "enable_category_search"
+        const val ENABLE_ALL_APPS_HOT_KEY = "enable_all_apps_hotkey"
     }
     object User {
         const val LEFT_HANDED = "left_handed"

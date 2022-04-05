@@ -4,25 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-            android:id="@+id/welcome_message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/nux_welcome_message"
-            android:textColor="@color/colorOnPrimary"
-            android:textSize="@dimen/tutorial_message_size"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/tutorial_message_margin"/>
-
-
     <FrameLayout
         android:id="@+id/image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/welcome_message"
-        android:layout_marginTop="@dimen/tutorial_floating_message_margin"
+        android:layout_centerInParent="true"
         android:contentDescription="@string/nux_welcome_image_content_description">
 
         <com.mrmannwood.hexlauncher.view.HexagonView
@@ -50,5 +36,17 @@
             android:src="@color/colorSecondary"/>
 
     </FrameLayout>
+
+    <TextView
+            android:id="@+id/welcome_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/nux_welcome_message"
+            android:textColor="@color/colorOnPrimary"
+            android:textSize="@dimen/tutorial_message_size"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@id/image"
+            android:layout_marginBottom="@dimen/tutorial_floating_message_margin"/>
 
 </RelativeLayout>

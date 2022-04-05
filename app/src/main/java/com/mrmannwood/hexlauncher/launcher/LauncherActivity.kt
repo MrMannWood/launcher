@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.core.content.edit
 import androidx.core.view.WindowCompat
 import com.mrmannwood.hexlauncher.HandleBackPressed
+import com.mrmannwood.hexlauncher.TestLabUtil.isTestLab
 import com.mrmannwood.hexlauncher.activity.BaseActivity
 import com.mrmannwood.hexlauncher.appcustomize.AppCustomizationFragment
 import com.mrmannwood.hexlauncher.applist.AppListFragment
@@ -78,7 +79,8 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
     }
 
     private fun checkShouldShowNux(prefs: SharedPreferences) : Boolean {
-       val showNux = prefs.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null)?.let {
+        if (isTestLab(this)) return false
+        val showNux = prefs.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null)?.let {
             isVersionStringLess(it, "1.4.1")
         } ?: run { true }
         prefs.edit {
@@ -103,7 +105,9 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
 
         override fun onAppSelected(appInfo: AppInfo) {
             packageManager.getLaunchIntentForPackage(appInfo.packageName)?.let { intent ->
-                startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                if (!isTestLab(this@LauncherActivity)) {
+                    startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                }
                 end()
             } ?: run {
                 Toast.makeText(this@LauncherActivity, R.string.unable_to_start_app, Toast.LENGTH_LONG).show()

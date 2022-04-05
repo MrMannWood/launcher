@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import com.mrmannwood.launcher.R
 
 class WelcomeFragment : Fragment(R.layout.fragment_nux_welcome) {
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -14,5 +13,4 @@ class WelcomeFragment : Fragment(R.layout.fragment_nux_welcome) {
             (parentFragment as NUXHostFragment).next()
         }
     }
-
 }

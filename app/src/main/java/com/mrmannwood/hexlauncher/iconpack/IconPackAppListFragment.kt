@@ -13,9 +13,9 @@ import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
 
-class IconPackFragment : Fragment(R.layout.fragment_icon_pack) {
+class IconPackAppListFragment : Fragment(R.layout.fragment_icon_pack) {
 
-    private val viewModel: IconPackViewModel by activityViewModels()
+    private val appListViewModel: IconPackAppListViewModel by activityViewModels()
 
     private lateinit var iconPackAppView: RecyclerView
     private lateinit var iconPackAdapter: Adapter<AppInfo>
@@ -28,7 +28,7 @@ class IconPackFragment : Fragment(R.layout.fragment_icon_pack) {
         iconPackAppView = view.findViewById(R.id.icon_pack_app_list)
         iconPackAppView.adapter = iconPackAdapter
 
-        viewModel.leftHandedLayout.observe(viewLifecycleOwner) { leftHanded ->
+        appListViewModel.leftHandedLayout.observe(viewLifecycleOwner) { leftHanded ->
             leftHandedLayout = when {
                 leftHanded == null -> false
                 leftHandedLayout == leftHanded -> return@observe
@@ -36,7 +36,7 @@ class IconPackFragment : Fragment(R.layout.fragment_icon_pack) {
             }
             iconPackAppView.layoutManager = createLayoutManager()
         }
-        viewModel.iconPackAppsLiveData.observe(viewLifecycleOwner) { apps ->
+        appListViewModel.iconPackAppsLiveData.observe(viewLifecycleOwner) { apps ->
             iconPackAdapter.setData(AppInfo::class, apps)
         }
     }
@@ -60,7 +60,10 @@ class IconPackFragment : Fragment(R.layout.fragment_icon_pack) {
                     this.adapter = LauncherFragmentDatabindingAdapter
                 }
                 vdb.root.setOnClickListener {
-                    //TODO
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.settings_root, IconPackDisplayFragment.newInstance(appInfo.packageName))
+                        .addToBackStack(null)
+                        .commit()
                 }
             }
         )

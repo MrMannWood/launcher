@@ -7,7 +7,7 @@ import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 
 class IconPackViewModel(application: Application): AndroidViewModel(application) {
-    val iconPackAppsLiveData = IconPackLiveData(getApplication())
+    val iconPackAppsLiveData = IconPackAppListLiveData(getApplication())
     val leftHandedLayout = PreferencesRepository.watchPref(
         context = getApplication(),
         key = PreferenceKeys.User.LEFT_HANDED,

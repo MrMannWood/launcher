@@ -9,7 +9,7 @@ import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.hexlauncher.launcher.getAppInfoForApps
 import java.util.concurrent.atomic.AtomicBoolean
 
-class IconPackLiveData(
+class IconPackAppListLiveData(
     private val application: Application
 ): LiveData<List<AppInfo>>() {
 
@@ -35,9 +35,7 @@ class IconPackLiveData(
                 .map { it.activityInfo.packageName }
                 .distinct()
             getAppInfoForApps(application, iconPackApps.distinct()) {
-                println("02_MARSHALL: callback $it")
                 if (!isActive.get()) return@getAppInfoForApps
-                println("02_MARSHALL: posting")
                 postValue(it)
             }
         }

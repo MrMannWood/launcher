@@ -20,6 +20,9 @@ interface AppDataDao {
     @Query("SELECT * FROM app_data")
     fun getApps(): List<AppData>
 
+    @Query("SELECT * FROM app_data JOIN app_data_decoration ON app_data.package_name = app_data_decoration.package_name_dec WHERE package_name IN (:packageNames)")
+    fun getApps(packageNames: List<String>) : List<DecoratedAppData>
+
     @Transaction
     @Query("SELECT * FROM app_data WHERE component_name = :componentName")
     fun watchApp(componentName: ComponentName): LiveData<AppData>

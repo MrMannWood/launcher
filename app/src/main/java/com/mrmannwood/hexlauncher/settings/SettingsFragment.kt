@@ -23,6 +23,8 @@ import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
 import com.mrmannwood.hexlauncher.executors.OriginalThreadCallback
 import com.mrmannwood.hexlauncher.executors.PackageManagerExecutor
+import com.mrmannwood.hexlauncher.executors.diskExecutor
+import com.mrmannwood.hexlauncher.iconpack.IconPackFragment
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.ROLE_HELD
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.ROLE_NOT_AVAILABLE
@@ -123,6 +125,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     setDefaultValue(false)
                 }
             )
+            addPreference(Preference(activity).apply {
+                setTitle(R.string.preferences_app_list_icon_pack)
+                setOnPreferenceClickListener {
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.settings_root, IconPackFragment())
+                        .addToBackStack(null)
+                        .commit()
+                    true
+                }
+            })
         }
 
         PreferenceCategory(activity).apply {

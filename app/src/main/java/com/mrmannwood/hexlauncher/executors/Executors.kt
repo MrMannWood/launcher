@@ -9,6 +9,19 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.atomic.AtomicInteger
 
+val mainThreadExecutor: Executor = object : Executor {
+
+    private val handler = Handler(Looper.getMainLooper())
+
+    override fun execute(task: Runnable) {
+        handler.post(task)
+    }
+
+    fun executeDelayed(task: Runnable, delayMillis: Long) {
+        handler.postDelayed(task, delayMillis)
+    }
+}
+
 val cpuBoundTaskExecutor: Executor = Executors.newCachedThreadPool(object : ThreadFactory {
     private val count: AtomicInteger = AtomicInteger(0)
     override fun newThread(r: Runnable): Thread {

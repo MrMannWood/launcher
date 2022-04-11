@@ -123,13 +123,13 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
     private fun loadIcons(iconMap: Map<String, String>, onIconsLoaded: (List<Drawable>) -> Unit) {
         val drawables = Array<Drawable?>(iconMap.size) { null }
         val finished = AtomicInteger(0)
-        iconMap.entries.forEachIndexed { idx, (componentName, drawableName) ->
+        iconMap.entries.take(10).forEachIndexed { idx, (componentName, drawableName) ->
             val pacman = appContext.packageManager.getResourcesForApplication(packageName)
             val id = pacman.getIdentifier(drawableName, "drawable", packageName)
             if (id > 0) {
                 drawables[idx] = pacman.getDrawable(id)
             }
-            if (finished.incrementAndGet() == iconMap.size - 1) {
+            if (finished.incrementAndGet() == 10) {//  TODO iconMap.size - 1) {
                 onIconsLoaded(drawables.mapNotNull { it }.toList())
             }
         }

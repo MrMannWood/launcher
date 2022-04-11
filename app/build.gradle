@@ -64,6 +64,7 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.palette:palette-ktx:1.0.0"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version" //TODO I don't like this
 
 
     // Testing-only dependencies

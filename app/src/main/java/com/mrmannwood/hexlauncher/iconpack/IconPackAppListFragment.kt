@@ -61,7 +61,7 @@ class IconPackAppListFragment : Fragment(R.layout.fragment_icon_pack) {
                 }
                 vdb.root.setOnClickListener {
                     parentFragmentManager.beginTransaction()
-                        .replace(R.id.settings_root, IconPackDisplayFragment.newInstance(appInfo.packageName))
+                        .replace(R.id.settings_root, IconPackDisplayFragment.newInstance(appInfo.packageName, false))
                         .addToBackStack(null)
                         .commit()
                 }

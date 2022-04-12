@@ -44,7 +44,8 @@ fun getSingleAppLiveData(context: Context, componentName: ComponentName): LiveDa
     }
 }
 
-fun getAppInfoLiveData(appContext: Application, showHidden: Boolean = false): LiveData<List<AppInfo>> {
+fun getAppInfoLiveData(context: Context, showHidden: Boolean = false) : LiveData<List<AppInfo>> {
+    val appContext = context.applicationContext
     if (showHidden) {
         return makeLiveData(appContext, true)
     }
@@ -54,7 +55,7 @@ fun getAppInfoLiveData(appContext: Application, showHidden: Boolean = false): Li
     return appInfoLiveData!!
 }
 
-private fun makeLiveData(appContext: Application, showHidden: Boolean = false): LiveData<List<AppInfo>> {
+private fun makeLiveData(appContext: Context, showHidden: Boolean = false): LiveData<List<AppInfo>> {
     return (appContext as LauncherApplication).appListLiveData.combineWith(
         DB.get(appContext).appDataDao().watchApps(),
         cpuBoundTaskExecutor

@@ -1,8 +1,12 @@
 package com.mrmannwood.hexlauncher.iconpack
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.pm.ComponentInfo
 import android.graphics.drawable.Drawable
+import android.util.SparseArray
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.util.forEach
 import androidx.lifecycle.LiveData
 import com.mrmannwood.hexlauncher.executors.PackageManagerExecutor
 import org.xmlpull.v1.XmlPullParser
@@ -77,7 +81,8 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
         onParseFailure: (AppFilterParserException) -> Unit
     ) {
         cpuBoundTaskExecutor.execute {
-            val icons = mutableListOf<IconPackIconInfo>()
+            val resources = appContext.packageManager.getResourcesForApplication(packageName)
+            val icons = SparseArray<IconPackIconInfo>()
             var success = true
             try {
                 while (true) {
@@ -90,35 +95,27 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
                                 "iconupon" -> Unit //TODO
                                 "scale" -> Unit //TODO
                                 "item" -> {
-                                    var componentName: String? = null
+                                    var componentInfo: Component? = null
                                     var drawableName: String? = null
                                     for (i in 0 until parser.attributeCount) {
                                         when (parser.getAttributeName(i)) {
-                                            "component" -> componentName =
-                                                parser.getAttributeValue(i)
+                                            "component" -> componentInfo =
+                                                Component.parse(parser.getAttributeValue(i))
                                             "drawable" -> drawableName = parser.getAttributeValue(i)
                                         }
                                     }
-                                    if (componentName != null && drawableName != null) {
-                                        icons.add(
-                                            IconPackIconInfo(
-                                                packageName,
-                                                componentName,
-                                                drawableName,
-                                                Provider(
-                                                    init = {
-                                                        val resources = appContext.packageManager.getResourcesForApplication(packageName)
-                                                        val id = resources.getIdentifier(drawableName, "drawable", packageName)
-                                                        if (id > 0) {
-                                                            ResourcesCompat.getDrawable(resources, id, null)
-                                                        } else {
-                                                            null
-                                                        }
-                                                    },
-                                                    executor = PackageManagerExecutor
+                                    if (componentInfo != null && drawableName != null) {
+                                        val id = resources.getIdentifier(drawableName, "drawable", packageName)
+                                        if (id > 0 && icons[id] == null) {
+                                            icons.put(
+                                                id,
+                                                IconPackIconInfo(
+                                                    componentInfo,
+                                                    drawableName,
+                                                    Provider({ ResourcesCompat.getDrawable(resources, id, null) })
                                                 )
                                             )
-                                        )
+                                        }
                                     }
                                 }
                             }
@@ -131,11 +128,14 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
                 onParseFailure(AppFilterParserException(packageName, e))
             }
             if (success) {
-                onParseSuccess(icons)
+                val iconList = ArrayList<IconPackIconInfo>(icons.size())
+                icons.forEach { _, value -> iconList.add(value) }
+                onParseSuccess(iconList)
             }
         }
     }
 
     private class AppFilterDoesNotExistException(packageName: String): Exception("Could not find AppFilter for $packageName")
     private class AppFilterParserException(packageName: String, e: Exception): Exception("Could not parse AppFilter for $packageName", e)
+
 }

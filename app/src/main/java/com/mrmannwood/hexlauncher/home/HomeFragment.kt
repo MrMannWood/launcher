@@ -328,7 +328,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         @DrawableRes icon: Int,
     ): HexItem = object : HexItem {
         override val label = resources.getString(label)
-        override val icon: Provider<Drawable> = Provider(
+        override val icon: Provider<Drawable?> = Provider(
             {
                 AdaptiveIconDrawable(
                     ColorDrawable(ContextCompat.getColor(context, R.color.colorOnPrimary)),

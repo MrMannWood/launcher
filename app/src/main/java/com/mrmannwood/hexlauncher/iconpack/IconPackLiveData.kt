@@ -2,6 +2,7 @@ package com.mrmannwood.hexlauncher.iconpack
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.LiveData
 import com.mrmannwood.hexlauncher.executors.PackageManagerExecutor
 import org.xmlpull.v1.XmlPullParser
@@ -10,9 +11,9 @@ import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
 import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.executors.cpuBoundTaskExecutor
-import java.util.concurrent.atomic.AtomicInteger
+import com.mrmannwood.hexlauncher.launcher.Provider
 
-class IconPackLiveData(context: Context, private val packageName: String): LiveData<Result<List<Drawable>>>() {
+class IconPackLiveData(context: Context, private val packageName: String): LiveData<Result<List<IconPackIconInfo>>>() {
 
     private val appContext = context.applicationContext
     private val isActive = AtomicBoolean(false)
@@ -26,11 +27,8 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
                 if(!isActive.get()) return@getAppFilterParser
                 readAppFilter(
                     parser = parser,
-                    onParseSuccess = { iconMap ->
-                        if(!isActive.get()) return@readAppFilter
-                        loadIcons(iconMap) {
-                            postValue(Result.success(it))
-                        }
+                    onParseSuccess = { icons ->
+                        postValue(Result.success(icons))
                     },
                     onParseFailure = { exception -> postValue(Result.failure(exception)) }
                 )
@@ -75,11 +73,11 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
 
     private fun readAppFilter(
         parser: XmlPullParser,
-        onParseSuccess: (Map<String, String>) -> Unit,
+        onParseSuccess: (List<IconPackIconInfo>) -> Unit,
         onParseFailure: (AppFilterParserException) -> Unit
     ) {
         cpuBoundTaskExecutor.execute {
-            val icons = mutableMapOf<String, String>()
+            val icons = mutableListOf<IconPackIconInfo>()
             var success = true
             try {
                 while (true) {
@@ -102,7 +100,25 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
                                         }
                                     }
                                     if (componentName != null && drawableName != null) {
-                                        icons[componentName] = drawableName
+                                        icons.add(
+                                            IconPackIconInfo(
+                                                packageName,
+                                                componentName,
+                                                drawableName,
+                                                Provider(
+                                                    init = {
+                                                        val resources = appContext.packageManager.getResourcesForApplication(packageName)
+                                                        val id = resources.getIdentifier(drawableName, "drawable", packageName)
+                                                        if (id > 0) {
+                                                            ResourcesCompat.getDrawable(resources, id, null)
+                                                        } else {
+                                                            null
+                                                        }
+                                                    },
+                                                    executor = PackageManagerExecutor
+                                                )
+                                            )
+                                        )
                                     }
                                 }
                             }
@@ -116,21 +132,6 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
             }
             if (success) {
                 onParseSuccess(icons)
-            }
-        }
-    }
-
-    private fun loadIcons(iconMap: Map<String, String>, onIconsLoaded: (List<Drawable>) -> Unit) {
-        val drawables = Array<Drawable?>(iconMap.size) { null }
-        val finished = AtomicInteger(0)
-        iconMap.entries.take(10).forEachIndexed { idx, (componentName, drawableName) ->
-            val pacman = appContext.packageManager.getResourcesForApplication(packageName)
-            val id = pacman.getIdentifier(drawableName, "drawable", packageName)
-            if (id > 0) {
-                drawables[idx] = pacman.getDrawable(id)
-            }
-            if (finished.incrementAndGet() == 10) {//  TODO iconMap.size - 1) {
-                onIconsLoaded(drawables.mapNotNull { it }.toList())
             }
         }
     }

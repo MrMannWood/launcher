@@ -8,6 +8,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.hexlauncher.launcher.*
@@ -51,7 +52,7 @@ class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
         iconAdapter = createResultAdapter(view.context)
 
         iconView = view.findViewById(R.id.icon_pack_display)
-        iconView.layoutManager = LinearLayoutManager(view.context)
+        iconView.layoutManager = GridLayoutManager(view.context, 4)
         iconView.adapter = iconAdapter
 
         viewModel.iconPackLiveData.observe(viewLifecycleOwner) { result ->
@@ -60,13 +61,13 @@ class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
                 println("02_MARSHALL:: Got Icons")
                 val context = getView()?.context ?: return@onSuccess
                 println("02_MARSHALL:: Have context")
-                iconAdapter.setData(IconPackHexItem::class, it.mapIndexed { idx, drawable -> makeHexItem(context, idx, drawable) })
+                iconAdapter.setData(IconPackHexItem::class, it.map { makeHexItem(context, it) })
             }
         }
     }
 
-    private fun makeHexItem(context: Context, index: Int, drawable: Drawable): IconPackHexItem {
-        return IconPackHexItem(context, index, drawable)
+    private fun makeHexItem(context: Context, iconInfo: IconPackIconInfo): IconPackHexItem {
+        return IconPackHexItem(context, iconInfo)
     }
 
     private fun createResultAdapter(context: Context): Adapter<IconPackHexItem> {
@@ -88,13 +89,11 @@ class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
         )
     }
 
-    private class IconPackHexItem(
-        context: Context, index: Int, drawable: Drawable
-    ): HexItem {
-        override val label: String = index.toString()
-        override val icon: Provider<Drawable> = Provider(init = { drawable })
+    private class IconPackHexItem(context: Context, iconInfo: IconPackIconInfo): HexItem {
+        override val label: String = iconInfo.componentName
+        override val icon: Provider<Drawable?> = iconInfo.drawableProvider
         override val hidden: Boolean = false
-        override val backgroundColor: Int = ContextCompat.getColor(context, R.color.colorOnPrimary)
+        override val backgroundColor: Int = ContextCompat.getColor(context, R.color.colorOnSecondary)
         override val backgroundHidden: Boolean = false
     }
 }

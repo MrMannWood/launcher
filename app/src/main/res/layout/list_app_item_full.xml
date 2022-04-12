@@ -53,7 +53,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:scaleType="fitCenter"
-                android:src="@{adapter.getForegroundIcon(appInfo)}"
+                android:src="@{adapter.getForegroundIcon(iconParent.getContext(), appInfo)}"
                 android:visibility="@{adapter.getAdaptiveIconVisibility(appInfo)}"
                 />
 

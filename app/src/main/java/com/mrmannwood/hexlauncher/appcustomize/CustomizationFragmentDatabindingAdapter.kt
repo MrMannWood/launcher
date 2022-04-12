@@ -1,7 +1,9 @@
 package com.mrmannwood.hexlauncher.appcustomize
 
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
@@ -17,8 +19,8 @@ object CustomizationFragmentDatabindingAdapter {
     fun getNonAdaptiveIconVisibility(appInfo: AppInfo?): Int =
         LauncherFragmentDatabindingAdapter.getNonAdaptiveIconVisibility(appInfo)
 
-    fun getForegroundIcon(appInfo: AppInfo?) =
-        LauncherFragmentDatabindingAdapter.getForegroundIcon(appInfo)
+    fun getForegroundIcon(context: Context, appInfo: AppInfo?) =
+        LauncherFragmentDatabindingAdapter.getForegroundIcon(context, appInfo)
 
     fun getBackgroundIcon(appInfo: AppInfo?) =
         LauncherFragmentDatabindingAdapter.getBackgroundIcon(appInfo)

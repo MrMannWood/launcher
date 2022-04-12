@@ -234,10 +234,12 @@ class AppCustomizationFragment : InstrumentedFragment() {
         }
     }
 
-    private fun extractColorsForPicker(drawableProvider: Provider<Drawable>, action: (iconAdapter: IconAdapter, drawable: Drawable) -> List<Int>) {
+    private fun extractColorsForPicker(drawableProvider: Provider<Drawable?>, action: (iconAdapter: IconAdapter, drawable: Drawable) -> List<Int>) {
         drawableProvider.get { drawable ->
-            cpuBoundTaskExecutor.execute {
-                addColorsToColorPickerSuggestions(action(IconAdapter.INSTANCE, drawable))
+            if (drawable != null) {
+                cpuBoundTaskExecutor.execute {
+                    addColorsToColorPickerSuggestions(action(IconAdapter.INSTANCE, drawable))
+                }
             }
         }
     }

@@ -18,6 +18,7 @@
     </data>
 
     <FrameLayout
+        android:id="@+id/customization_app_item_parent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/primary_translucent">
@@ -77,7 +78,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:scaleType="fitCenter"
-                    android:src="@{adapter.getForegroundIcon(appInfo)}"
+                    android:src="@{adapter.getForegroundIcon(customizationAppItemParent.getContext(), appInfo)}"
                     android:visibility="@{adapter.getAdaptiveIconVisibility(appInfo)}"
                     />
 
@@ -129,7 +130,7 @@
                         android:layout_width="75dp"
                         android:layout_height="75dp"
                         android:scaleType="fitCenter"
-                        android:src="@{adapter.getForegroundIcon(appInfo)}"
+                        android:src="@{adapter.getForegroundIcon(customizationAppItemParent.getContext(), appInfo)}"
                         />
 
                     <com.google.android.material.textview.MaterialTextView

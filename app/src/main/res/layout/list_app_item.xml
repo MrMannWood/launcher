@@ -12,6 +12,7 @@
     </data>
 
     <FrameLayout
+        android:id="@+id/app_item_parent"
         android:layout_width="@dimen/hex_view_height"
         android:layout_height="@dimen/hex_view_width"
         android:foregroundGravity="center"
@@ -41,7 +42,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:scaleType="fitCenter"
-            android:src="@{adapter.getForegroundIcon(hexItem)}"
+            android:src="@{adapter.getForegroundIcon(appItemParent.getContext(), hexItem)}"
             android:visibility="@{adapter.getAdaptiveIconVisibility(hexItem)}"
             />
 

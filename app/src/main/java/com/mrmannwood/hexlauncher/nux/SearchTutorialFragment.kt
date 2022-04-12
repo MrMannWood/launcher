@@ -130,7 +130,7 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
             }
         )
         override val label: String = "Example App $index"
-        override val icon: Provider<Drawable> = Provider({ ColorDrawable(color) }, InlineExecutor)
+        override val icon: Provider<Drawable?> = Provider({ ColorDrawable(color) }, InlineExecutor)
         override val hidden: Boolean = false
         override val backgroundColor: Int = color
         override val backgroundHidden: Boolean = false

@@ -14,6 +14,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mrmannwood.hexlauncher.launcher.*
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
+import java.lang.IllegalArgumentException
 
 class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
 
@@ -59,7 +60,7 @@ class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
         iconAdapter = createResultAdapter(view.context)
 
         iconView = view.findViewById(R.id.icon_pack_display)
-        iconView.layoutManager = GridLayoutManager(view.context, 4)
+        iconView.layoutManager = GridLayoutManager(view.context, 6)
         iconView.adapter = iconAdapter
 
         if (!showAllIcons) {
@@ -71,7 +72,7 @@ class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
         viewModel.iconPackLiveData.observe(viewLifecycleOwner) { result ->
             result.onFailure { println("02_MARSHALL:: Failed to open icon pack") }
             result.onSuccess {
-                iconInfo = it.associateBy { iconInfo -> iconInfo.component.packageName }
+                iconInfo = it.associateBy { iconInfo -> iconInfo.component.packageName ?: "" }
                 maybeShowIcons()
             }
         }
@@ -88,27 +89,40 @@ class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
 
         if (showAllIcons) {
             println("02_MARSHALL::show all")
-            iconAdapter.setData(IconPackHexItem::class, icons.values.map { makeHexItem(context, it) })
+            iconAdapter.setData(IconPackHexItem::class, icons.values.map { makeHexItem(context, null, it) })
         } else {
             println("02_MARSHALL::show some")
             if (apps == null) {
                 println("02_MARSHALL::apps are null")
                 return
             }
-            icons.keys.forEach {
-                println("02_MARSHALL::$it")
-            }
+            println("02_MARSHALL:: total ${icons.size}")
             iconAdapter.setData(
                 IconPackHexItem::class,
-                apps.mapNotNull { icons[it.packageName] }.map { makeHexItem(context, it) }.onEach {
-                    println("02_MARSHALL::found")
+                apps.map { it to icons[it.packageName] }.map { (app, icon) ->
+                    when {
+                        icon == null -> makeHexItem(app)
+                        else -> makeHexItem(context, app, icon)
+                    }
                 }
             )
         }
     }
 
-    private fun makeHexItem(context: Context, iconInfo: IconPackIconInfo): IconPackHexItem {
-        return IconPackHexItem(context, iconInfo)
+    private fun makeHexItem(hexItem: HexItem): IconPackHexItem {
+        return IconPackHexItem(
+            label = hexItem.label,
+            icon = hexItem.icon,
+            backgroundColor = hexItem.backgroundColor
+        )
+    }
+
+    private fun makeHexItem(context: Context, appInfo: AppInfo?, iconInfo: IconPackIconInfo): IconPackHexItem {
+        return IconPackHexItem(
+            label = appInfo?.label ?: iconInfo.component.packageName ?: iconInfo.component.activityName,
+            icon = iconInfo.drawableProvider,
+            backgroundColor = ContextCompat.getColor(context, R.color.colorOnSecondary)
+        )
     }
 
     private fun createResultAdapter(context: Context): Adapter<IconPackHexItem> {
@@ -125,7 +139,6 @@ class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
                 }
                 vdb.root.setOnClickListener {
                     MaterialAlertDialogBuilder(vdb.root.context)
-                        .setTitle(hexItem.iconInfo.ownerAppName)
                         .setMessage(hexItem.label)
                         .show()
                 }
@@ -133,11 +146,12 @@ class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
         )
     }
 
-    private class IconPackHexItem(context: Context, val iconInfo: IconPackIconInfo): HexItem {
-        override val label: String = iconInfo.component.toString()
-        override val icon: Provider<Drawable?> = iconInfo.drawableProvider
+    private class IconPackHexItem(
+        override val label: String,
+        override val icon: Provider<Drawable?>,
+        override val backgroundColor: Int
+    ): HexItem {
         override val hidden: Boolean = false
-        override val backgroundColor: Int = ContextCompat.getColor(context, R.color.colorOnSecondary)
         override val backgroundHidden: Boolean = false
     }
 }

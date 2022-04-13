@@ -82,7 +82,7 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
     ) {
         cpuBoundTaskExecutor.execute {
             val resources = appContext.packageManager.getResourcesForApplication(packageName)
-            val icons = SparseArray<IconPackIconInfo>()
+            val icons = mutableListOf<IconPackIconInfo>()
             var success = true
             try {
                 while (true) {
@@ -90,10 +90,10 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
                         XmlPullParser.END_DOCUMENT -> break
                         XmlPullParser.START_TAG -> {
                             when (parser.name) {
-                                "iconback" -> Unit //TODO
-                                "iconmask" -> Unit //TODO
-                                "iconupon" -> Unit //TODO
-                                "scale" -> Unit //TODO
+                                "iconback" -> println("02_MARSHALL: iconback")
+                                "iconmask" -> println("02_MARSHALL: iconmask")
+                                "iconupon" -> println("02_MARSHALL: iconupon")
+                                "scale" -> println("02_MARSHALL: scale")
                                 "item" -> {
                                     var componentInfo: Component? = null
                                     var drawableName: String? = null
@@ -106,9 +106,8 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
                                     }
                                     if (componentInfo != null && drawableName != null) {
                                         val id = resources.getIdentifier(drawableName, "drawable", packageName)
-                                        if (id > 0 && icons[id] == null) {
-                                            icons.put(
-                                                id,
+                                        if (id > 0) {
+                                            icons.add(
                                                 IconPackIconInfo(
                                                     componentInfo,
                                                     drawableName,
@@ -128,9 +127,7 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
                 onParseFailure(AppFilterParserException(packageName, e))
             }
             if (success) {
-                val iconList = ArrayList<IconPackIconInfo>(icons.size())
-                icons.forEach { _, value -> iconList.add(value) }
-                onParseSuccess(iconList)
+                onParseSuccess(icons)
             }
         }
     }

@@ -10,17 +10,18 @@ class IconPackIconInfo(
 )
 
 data class Component(
-    val packageName: String,
+    val packageName: String? = null,
     val activityName: String
 ) {
     companion object {
-        private val regex = Regex("""ComponentInfo\{([a-zA-Z\.0-9_]+)\/([a-zA-Z\.0-9_]+)\}""")
+        private val fullComponentInfoRegex = Regex("""ComponentInfo\{([^\/]+)\/([^}]+)\}""")
+        private val activityOnlyRegex = Regex("""ComponentInfo\{([^}]+)\}""")
         fun parse(componentString: String): Component? {
-            val match = regex.find(componentString) ?: return null
-            return Component(
-                match.groupValues[1],
-                match.groupValues[2]
-            )
+            var match = fullComponentInfoRegex.find(componentString)
+            if (match != null) return Component(match.groupValues[1], match.groupValues[2])
+            match = activityOnlyRegex.find(componentString)
+            if (match != null) return Component(activityName = match.groupValues[1])
+            return null
         }
     }
 }

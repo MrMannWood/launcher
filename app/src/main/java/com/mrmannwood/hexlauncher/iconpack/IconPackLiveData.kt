@@ -1,12 +1,7 @@
 package com.mrmannwood.hexlauncher.iconpack
 
-import android.content.ComponentName
 import android.content.Context
-import android.content.pm.ComponentInfo
-import android.graphics.drawable.Drawable
-import android.util.SparseArray
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.util.forEach
 import androidx.lifecycle.LiveData
 import com.mrmannwood.hexlauncher.executors.PackageManagerExecutor
 import org.xmlpull.v1.XmlPullParser

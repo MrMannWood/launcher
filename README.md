@@ -18,7 +18,7 @@ Hex Launcher is a minimalist, performant, private, and open-source home screen r
 ## Make Your Phone Work For You
 
 Hex Launcher was designed to get you into your apps as quickly as possible, and to prevent you from mindlessly looking for a new way to doom scroll.
-It provides a search-first UI that puts your results directly under your thumb, and allows you to set up two apps for fast access with gestures.
+It provides a search-first UI that puts your results directly under your thumb, and allows you to set up six apps for fast access with gestures.
 
 ## Take Back Your Privacy
 

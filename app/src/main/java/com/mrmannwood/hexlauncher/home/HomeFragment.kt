@@ -2,6 +2,7 @@ package com.mrmannwood.hexlauncher.home
 
 import android.app.Activity
 import android.app.WallpaperManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.*
@@ -101,11 +102,11 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
 
     private fun onGestureActionUpdated(preferenceKey: String, result: ActivityResult) {
         result.data.onAppListResult(
-            onSuccess = { _, packageName ->
+            onSuccess = { _, componentName ->
                 val context = context ?: return@onAppListResult
                 PreferencesRepository.getPrefs(context, OriginalThreadCallback.create {
                     it.edit {
-                        putString(preferenceKey, packageName)
+                        putString(preferenceKey, componentName.flattenToString())
                     }
                 })
             },
@@ -240,19 +241,29 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             it.key != PreferenceKeys.Gestures.SwipeNorth.PACKAGE_NAME &&
                     it.key != PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME
         }.forEach { config ->
-            config.preferenceWatcher?.observe(viewLifecycleOwner) { packageName ->
+            config.preferenceWatcher?.observe(viewLifecycleOwner) { componentName ->
                 setHexItemContextMenu(config)
-                when (packageName) {
+                when (componentName) {
                     null -> { /* ignore */ }
                     PreferenceKeys.Gestures.GESTURE_UNWANTED -> {
-                        config.packageName = packageName
                         config.view.visibility = View.GONE
-
                     }
                     else -> {
-                        ensureAppInstalled(packageName) {
-                            config.packageName = packageName
+                        ComponentName.unflattenFromString(componentName)?.let {
+                            ensureAppInstalled(it) { config.componentName = it }
                             setAppInformationForGesture(config)
+                        } ?: run {
+                            context?.let { context ->
+                                context.packageManager?.let { pacman ->
+                                    pacman.getLaunchIntentForPackage(componentName)
+                                        ?.resolveActivity(pacman)
+                                        ?.let { resolvedName ->
+                                            PreferencesRepository.getPrefs(context) { it.edit {
+                                                putString(config.key, resolvedName.flattenToString())
+                                            }}
+                                        }
+                                }
+                            }
                         }
                     }
                 }
@@ -262,7 +273,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         viewModel.appListLiveData.observe(viewLifecycleOwner) {
             appList = it
             gestures.forEach { config ->
-                if (config.packageName != null) {
+                if (config.componentName != null) {
                     setAppInformationForGesture(config)
                 }
             }
@@ -312,7 +323,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     }
 
     private fun setAppInformationForGesture(config: GestureConfiguration) {
-        appList?.firstOrNull { info -> info.packageName == config.packageName }?.let { appInfo ->
+        appList?.firstOrNull { info -> info.componentName == config.componentName }?.let { appInfo ->
             config.setHexItemFunc(appInfo)
             config.view.visibility = View.VISIBLE
             config.appName = appInfo.label
@@ -526,22 +537,20 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         }
     }
 
-    private fun ensureAppInstalled(packageName: String, action: () -> Unit) {
+    private fun ensureAppInstalled(componentName: ComponentName, action: () -> Unit) {
         PackageManagerExecutor.execute {
             try {
-                context?.packageManager?.getPackageInfo(packageName, 0) ?: return@execute
+                context?.packageManager?.getPackageInfo(componentName.packageName, 0) ?: return@execute
                 action()
             } catch (_ : Exception) { /* package isn't installed */ }
         }
     }
 
     private fun makeOpenAppRunnable(appInfo: AppInfo): Runnable = Runnable {
-        activity?.packageManager?.getLaunchIntentForPackage(appInfo.packageName)?.let { intent ->
-            try {
-                startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            } catch (e: Exception) {
-                Timber.e(e, "Unable to open package: ${appInfo.packageName}")
-            }
+        try {
+            startActivity(Intent().apply { component = appInfo.componentName }.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        } catch (e: Exception) {
+            Timber.e(e, "Unable to open app: ${appInfo.componentName}")
         }
     }
 
@@ -574,8 +583,8 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     private fun initDefaultApp(gesture: GestureConfiguration) {
         if (gesture.defaultApp == null) return
         getDefaultApp(gesture.defaultApp) { appInfo ->
-            if (gesture.packageName != null) return@getDefaultApp
-            gesture.packageName = appInfo.packageName
+            if (gesture.componentName != null) return@getDefaultApp
+            gesture.componentName = appInfo.componentName
             gesture.appName = appInfo.label
             gesture.setHexItemFunc(appInfo)
             setOpenAppAction(gesture.view, appInfo)
@@ -586,9 +595,11 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         val callback = OriginalThreadCallback(action)
         PackageManagerExecutor.execute {
             context?.packageManager?.let { pacman ->
-                type.intent().resolveActivity(pacman)?.packageName?.let { pac ->
-                    appList?.firstOrNull { it.packageName == pac }?.let { callback.invoke(it) }
-                }
+                type.intent().resolveActivity(pacman)
+                    ?.let { componentName ->
+                        appList?.firstOrNull { it.componentName == componentName }
+                            ?.let { callback.invoke(it) }
+                    }
             }
         }
     }
@@ -601,7 +612,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         val setHexItemFunc: (HexItem) -> Unit,
         val launcher: ActivityResultLauncher<Intent>?
     ) {
-        var packageName: String? = null
+        var componentName: ComponentName? = null
         var appName: String? = null
     }
 

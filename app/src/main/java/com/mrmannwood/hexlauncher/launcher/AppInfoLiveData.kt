@@ -1,24 +1,24 @@
 package com.mrmannwood.hexlauncher.launcher
 
 import android.app.Application
+import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
+import android.graphics.Color
 import androidx.annotation.MainThread
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import com.mrmannwood.hexlauncher.DB
-import com.mrmannwood.hexlauncher.applist.DecoratedAppData
-import com.mrmannwood.hexlauncher.executors.PackageManagerExecutor
+import com.mrmannwood.hexlauncher.LauncherApplication
+import com.mrmannwood.hexlauncher.executors.cpuBoundTaskExecutor
+import com.mrmannwood.hexlauncher.livedata.combineWith
 import com.mrmannwood.launcher.R
-import timber.log.Timber
 
 private var appInfoLiveData : LiveData<List<AppInfo>>? = null
 private val categoryMap: MutableMap<Int, List<String>> = HashMap()
 
-fun getSingleAppLiveData(context: Context, packageName: String) : LiveData<AppInfo?> {
-    return Transformations.map(DB.get(context).appDataDao().watchApp(packageName)) {
-        transformAppInfo(context.applicationContext, it)
+fun getSingleAppLiveData(context: Context, componentName: ComponentName) : LiveData<AppInfo?> {
+    return Transformations.map(makeLiveData(context.applicationContext as Application, true)) {
+        it.firstOrNull{ it.componentName == componentName }
     }
 }
 
@@ -33,33 +33,24 @@ fun getAppInfoLiveData(appContext: Application, showHidden: Boolean = false) : L
 }
 
 private fun makeLiveData(appContext: Application, showHidden: Boolean = false) : LiveData<List<AppInfo>> {
-    return Transformations.map(DB.get(appContext).appDataDao().watchApps()) { apps ->
-        apps.filter {
-            if (showHidden) {
-                true
-            } else {
-                !it.decoration.hidden
-            }
-        }.mapNotNull { transformAppInfo(appContext, it) }
-    }
-}
-
-@MainThread
-private fun transformAppInfo(context: Context, app: DecoratedAppData) : AppInfo? {
-    return try {
-        AppInfo(
-            packageName = app.appData.packageName,
-            icon = Provider({ context.packageManager.getApplicationIcon(app.appData.packageName) }, PackageManagerExecutor),
-            backgroundColor = app.decoration.bgcOverride ?: app.appData.backgroundColor,
-            label = app.appData.label,
-            hidden = app.decoration.hidden,
-            backgroundHidden = app.decoration.backgroundHidden,
-            categories = getCategories(context, app.appData.category),
-            tags = app.decoration.tags
-        )
-    } catch (e: PackageManager.NameNotFoundException) {
-        Timber.w(e, "Package manager error while loading apps")
-        null
+    return (appContext as LauncherApplication).appListLiveData.combineWith(
+        DB.get(appContext).appDataDao().watchApps(),
+        cpuBoundTaskExecutor
+    ) { appList, decorationList ->
+        if (appList == null || decorationList == null) return@combineWith null
+        val decorationMap = decorationList.associateBy { it.componentName }
+        appList.map { it to decorationMap[it.componentName] }
+            .filter { showHidden || it.second?.hidden == false }
+            .map { (launcherItem, decoration) ->
+                AppInfo(
+                    launcherItem = launcherItem,
+                    backgroundColor = decoration?.bgcOverride ?: decoration?.backgroundColor ?: Color.TRANSPARENT,
+                    hidden = decoration?.hidden == true,
+                    backgroundHidden = decoration?.backgroundHidden == true,
+                    categories = getCategories(appContext, launcherItem.category),
+                    tags = decoration?.tags ?: emptyList()
+                )
+            }.toList()
     }
 }
 

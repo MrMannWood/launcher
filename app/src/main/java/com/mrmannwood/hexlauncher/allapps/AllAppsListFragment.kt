@@ -2,6 +2,7 @@ package com.mrmannwood.hexlauncher.allapps
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -12,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.mrmannwood.applist.AppListManager
 import com.mrmannwood.hexlauncher.appcustomize.AppCustomizationFragment
 import com.mrmannwood.hexlauncher.launcher.Adapter
 import com.mrmannwood.hexlauncher.launcher.AppInfo
@@ -59,7 +61,7 @@ class AllAppsListFragment : Fragment() {
     }
 
     private fun createResultAdapter(context: Context): Adapter<AppInfo> {
-        val idGenerator = Adapter.IdGenerator(listOf(AppInfo::class to { it.packageName }))
+        val idGenerator = Adapter.IdGenerator(listOf(AppInfo::class to { it.componentName }))
         return Adapter(
             context = context,
             order = arrayOf(AppInfo::class),
@@ -74,21 +76,25 @@ class AllAppsListFragment : Fragment() {
                 vdb.root.setOnCreateContextMenuListener { menu, _, _ ->
                     menu.setHeaderTitle(result.label)
                     menu.add(R.string.menu_item_app_details).setOnMenuItemClickListener {
-                        startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.parse("package:${result.packageName}")
-                        })
+                        val rect = Rect()
+                        vdb.root.getGlobalVisibleRect(rect)
+                        AppListManager.startAppDetailsActivity(
+                            requireContext(),
+                            result.launcherItem,
+                            rect
+                        )
                         true
                     }
                     menu.add(R.string.menu_item_app_customize).setOnMenuItemClickListener {
                         parentFragmentManager.beginTransaction()
-                            .replace(R.id.settings_root, AppCustomizationFragment.forPackage(result.packageName))
+                            .replace(R.id.settings_root, AppCustomizationFragment.forComponent(result.componentName))
                             .addToBackStack("AppCustomizationFragment")
                             .commit()
                         true
                     }
                     menu.add(R.string.menu_item_uninstall_app_title).setOnMenuItemClickListener {
                         startActivity(Intent(Intent.ACTION_DELETE).apply {
-                            data = Uri.parse("package:${result.packageName}")
+                            data = Uri.parse("package:${result.launcherItem.packageName}")
                         })
                         true
                     }

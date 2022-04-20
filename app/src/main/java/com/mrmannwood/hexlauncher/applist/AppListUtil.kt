@@ -16,7 +16,7 @@ fun writeAppsToFile(context: Context, out: File) {
     try {
         FileWriter(File(out, "db_dump.txt")).use { writer ->
             apps.forEach { app ->
-                writer.append("${app.label}:${app.packageName}:${app.lastUpdateTime}:${app.backgroundColor}")
+                writer.append("${app.label}:${app.componentName.flattenToString()}:${app.lastUpdateTime}:${app.backgroundColor}")
             }
         }
     } catch (e: IOException) {

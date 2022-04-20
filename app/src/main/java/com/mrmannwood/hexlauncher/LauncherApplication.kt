@@ -3,16 +3,16 @@ package com.mrmannwood.hexlauncher
 import android.app.Activity
 import android.app.Application
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.FileProvider
+import com.mrmannwood.applist.AppListLiveData
+import com.mrmannwood.applist.AppListManager
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
 import com.mrmannwood.hexlauncher.applist.writeAppsToFile
+import com.mrmannwood.hexlauncher.executors.PackageManagerExecutor
 import com.mrmannwood.hexlauncher.executors.diskExecutor
-import com.mrmannwood.hexlauncher.foregrounddetection.ForegroundActivityListener
-import com.mrmannwood.hexlauncher.launcher.PackageObserverBroadcastReceiver
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository
@@ -21,7 +21,6 @@ import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
@@ -30,11 +29,15 @@ import java.util.concurrent.CountDownLatch
 class LauncherApplication : Application() {
 
     companion object {
-        val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        lateinit var APPLICATION: LauncherApplication
     }
+
+    lateinit var appListManager: AppListManager
+    lateinit var appListLiveData: AppListLiveData
 
     override fun onCreate() {
         super.onCreate()
+        APPLICATION = this
         Timber.plant(FileLoggerTree.getAndInit(this@LauncherApplication))
         if (BuildConfig.DEBUG) {
             DebugBuildModeConfiguration.onApplicationCreate(this@LauncherApplication)
@@ -46,6 +49,13 @@ class LauncherApplication : Application() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
+
+        appListManager = AppListManager(this)
+
+        DB.get(this)
+
+        appListLiveData = AppListLiveData(this, appListManager, PackageManagerExecutor)
+        appListLiveData.observeForever {  }
 
         PreferencesRepository.watchPref(
             context = this@LauncherApplication,
@@ -59,20 +69,14 @@ class LauncherApplication : Application() {
             }
         }
 
-        DB.get(this@LauncherApplication)
+        AppListUpdater.updateAppList(applicationContext, appListManager)
+        appListManager.registerPackagesChangedReceiver {
+            AppListUpdater.updateAppList(this, appListManager)
+        }
+        appListManager.registerManagedEventReceiver {
+            AppListUpdater.updateAppList(this, appListManager)
+        }
 
-        AppListUpdater.updateAppList(applicationContext)
-
-        registerReceiver(
-                PackageObserverBroadcastReceiver(),
-                IntentFilter().apply {
-                    addDataScheme("package")
-                    addAction(Intent.ACTION_PACKAGE_ADDED)
-                    addAction(Intent.ACTION_PACKAGE_REMOVED)
-                }
-        )
-
-        ForegroundActivityListener.init(this)
         CoroutineScope(Dispatchers.IO).launch  {
             File(filesDir, "rage_shake").deleteRecursively()
         }
@@ -141,7 +145,6 @@ class LauncherApplication : Application() {
     }
 
     private object ReleaseBuildModeConfiguration : BuildModeConfiguration {
-        override fun onApplicationCreate(application: Application) {
-        }
+        override fun onApplicationCreate(application: Application) { }
     }
 }

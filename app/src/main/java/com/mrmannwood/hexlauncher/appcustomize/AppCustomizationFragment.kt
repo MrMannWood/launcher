@@ -1,5 +1,6 @@
 package com.mrmannwood.hexlauncher.appcustomize
 
+import android.content.ComponentName
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
@@ -32,12 +34,12 @@ import com.mrmannwood.launcher.databinding.ListAppCustomizationTagBinding
 class AppCustomizationFragment : InstrumentedFragment() {
 
     companion object {
-        private const val PACKAGE_NAME = "package_name"
+        private const val COMPONENT_NAME = "component_name"
 
-        fun forPackage(packageName: String) : AppCustomizationFragment {
+        fun forComponent(componentName: ComponentName) : AppCustomizationFragment {
             return AppCustomizationFragment().apply {
                 arguments = Bundle().apply {
-                    putString(PACKAGE_NAME, packageName)
+                    putParcelable(COMPONENT_NAME, componentName)
                 }
             }
         }
@@ -46,17 +48,17 @@ class AppCustomizationFragment : InstrumentedFragment() {
     override val nameForInstrumentation = "AppCustomizationFragment"
 
     private lateinit var binding: FragmentAppCustomizationBinding
-    private lateinit var packageName: String
+    private lateinit var componentName: ComponentName
     private var appInfo: AppInfo? = null
     private lateinit var tagsAdapter: Adapter<SearchTerm>
 
-    private lateinit var  viewModel : AppCustomizationViewModel
+    private val viewModel : AppCustomizationViewModel by viewModels { AppCustomizationViewModelFactory(requireContext(), componentName) }
     private val colorPickerViewModel : ColorPickerViewModel by activityViewModels()
     private val textEntryDialogViewModel : TextEntryDialogViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        packageName = requireArguments().getString(PACKAGE_NAME, null)!!
+        componentName = requireArguments().getParcelable(COMPONENT_NAME)!!
     }
 
     override fun onCreateView(
@@ -70,8 +72,6 @@ class AppCustomizationFragment : InstrumentedFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel =
-            ViewModelProvider(this, AppCustomizationViewModelFactory(view.context, packageName))[AppCustomizationViewModel::class.java]
 
         binding.resources = resources
         binding.adapter = CustomizationFragmentDatabindingAdapter
@@ -109,7 +109,7 @@ class AppCustomizationFragment : InstrumentedFragment() {
 
                         binding.iconBgcOverride?.let { bgc ->
                             updateAppInfo { dao ->
-                                dao.setColorOverride(appInfo!!.packageName, bgc)
+                                dao.setColorOverride(appInfo!!.componentName, bgc)
                             }
                         }
                     }
@@ -153,7 +153,7 @@ class AppCustomizationFragment : InstrumentedFragment() {
         binding.buttonHideApp.setOnClickListener {
             appInfo?.let { app ->
                 updateAppInfo { dao ->
-                    dao.setHidden(app.packageName, !app.hidden)
+                    dao.setHidden(app.componentName, !app.hidden)
                 }
             }
         }
@@ -161,7 +161,7 @@ class AppCustomizationFragment : InstrumentedFragment() {
         binding.iconBackgroundLayout.setOnClickListener {
             appInfo?.let { app ->
                 updateAppInfo { dao ->
-                    dao.setBackgroundHidden(app.packageName, !app.backgroundHidden)
+                    dao.setBackgroundHidden(app.componentName, !app.backgroundHidden)
                 }
             }
         }
@@ -176,7 +176,7 @@ class AppCustomizationFragment : InstrumentedFragment() {
                     } else if (appInfo?.searchTerms?.contains(tag) != true) {
                         updateAppInfo { dao ->
                             dao.setTags(
-                                appInfo!!.packageName,
+                                appInfo!!.componentName,
                                 ArrayList<String>().also {
                                     it.addAll(appInfo!!.tags)
                                     it.add(tag)
@@ -209,7 +209,7 @@ class AppCustomizationFragment : InstrumentedFragment() {
                         vdb.buttonTagDelete.setOnClickListener {
                             updateAppInfo { dao ->
                                 dao.setTags(
-                                    appInfo!!.packageName,
+                                    appInfo!!.componentName,
                                     ArrayList<String>().also {
                                         it.addAll(appInfo!!.tags)
                                         it.remove(tag.term)

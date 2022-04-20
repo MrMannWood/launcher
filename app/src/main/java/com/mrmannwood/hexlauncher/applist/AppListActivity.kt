@@ -1,5 +1,6 @@
 package com.mrmannwood.hexlauncher.applist
 
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.StringRes
@@ -13,7 +14,7 @@ class AppListActivity : BaseActivity(), AppListFragment.AppListHostActivity {
 
     companion object {
         private const val KEY_TITLE = "title"
-        private const val KEY_PACKAGE_NAME = "package_name"
+        private const val KEY_COMPONENT_NAME = "component_name"
         private const val KEY_APP_NAME = "app_name"
 
         fun Intent.decorateForAppListLaunch(@StringRes title: Int) : Intent {
@@ -22,18 +23,18 @@ class AppListActivity : BaseActivity(), AppListFragment.AppListHostActivity {
         }
 
         private fun Intent.setAppInfo(appInfo: AppInfo) {
-            putExtra(KEY_PACKAGE_NAME, appInfo.packageName)
+            putExtra(KEY_COMPONENT_NAME, appInfo.componentName)
             putExtra(KEY_APP_NAME, appInfo.label)
         }
 
         fun Intent?.onAppListResult(
-            onSuccess: (appName: String, packageName: String) -> Unit, onFailure: () -> Unit) {
+            onSuccess: (appName: String, componentName: ComponentName) -> Unit, onFailure: () -> Unit) {
             val appName = this?.getStringExtra(KEY_APP_NAME)
-            val packageName = this?.getStringExtra(KEY_PACKAGE_NAME)
-            if (appName == null || packageName == null) {
+            val componentName = this?.getParcelableExtra<ComponentName>(KEY_COMPONENT_NAME)
+            if (appName == null || componentName == null) {
                 onFailure()
             } else {
-                onSuccess(appName, packageName)
+                onSuccess(appName, componentName)
             }
         }
     }

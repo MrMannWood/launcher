@@ -150,7 +150,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     }
 
     private fun createResultAdapter(context: Context): Adapter<AppInfo> {
-        val idGenerator = Adapter.IdGenerator(listOf(AppInfo::class to { it.packageName }))
+        val idGenerator = Adapter.IdGenerator(listOf(AppInfo::class to { it.componentName }))
         return Adapter(
                 context = context,
                 order = arrayOf(AppInfo::class),

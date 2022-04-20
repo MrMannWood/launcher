@@ -32,7 +32,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private val setHomeLauncherResultContract = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { updateHomeRolePreference(requireActivity()) }
+    ) { activity?.let { updateHomeRolePreference(it) } }
 
     private lateinit var homeRolePreference: Preference
     private lateinit var feedbackCategory: Preference

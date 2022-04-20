@@ -207,7 +207,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 true
             }
             menu.add(R.string.menu_item_home_settings).setOnMenuItemClickListener {
-                startActivity(Intent(requireActivity(), SettingsActivity::class.java))
+                activity?.let { startActivity(Intent(it, SettingsActivity::class.java)) }
                 true
             }
         }
@@ -529,7 +529,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     }
 
     private fun makeOpenAppRunnable(appInfo: AppInfo): Runnable = Runnable {
-        requireActivity().packageManager.getLaunchIntentForPackage(appInfo.packageName)?.let { intent ->
+        activity?.packageManager?.getLaunchIntentForPackage(appInfo.packageName)?.let { intent ->
             try {
                 startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             } catch (e: Exception) {

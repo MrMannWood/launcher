@@ -63,8 +63,8 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     private var enableAllAppsSearch : Boolean = false
     private var leftHandedLayout : Boolean = false
 
-    private fun getAppListHost() : Host<*> {
-        return (requireActivity() as AppListHostActivity).getAppListHost()
+    private fun getAppListHost() : Host<*>? {
+        return (activity as? AppListHostActivity)?.getAppListHost()
     }
 
     override val nameForInstrumentation = "AppListFragment"
@@ -85,7 +85,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         searchView = view.findViewById(R.id.search)
         searchView.handleBackPressed = object : HandleBackPressed {
             override fun handleBackPressed(): Boolean {
-                getAppListHost().end(null)
+                getAppListHost()?.end(null)
                 return true
             }
         }
@@ -94,7 +94,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
             if (actionId != EditorInfo.IME_ACTION_SEARCH) {
                 false
             } else {
-                getAppListHost().onSearchButtonPressed(searchView.text.toString())
+                getAppListHost()?.onSearchButtonPressed(searchView.text.toString())
                 true
             }
         }
@@ -110,7 +110,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
             override fun onStop(owner: LifecycleOwner) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     showKeyboardJob?.cancelAndJoin()
-                    hideKeyboard(requireActivity())
+                    activity?.let { hideKeyboard(it) }
                 }
             }
         })
@@ -161,9 +161,9 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
                         this.hexItem = appInfo
                         this.adapter = LauncherFragmentDatabindingAdapter
                     }
-                    getAppListHost().onAppInfoBinding(vdb.root, appInfo)
+                    getAppListHost()?.onAppInfoBinding(vdb.root, appInfo)
                     vdb.root.setOnClickListener {
-                        getAppListHost().onAppSelected(appInfo)
+                        getAppListHost()?.onAppSelected(appInfo)
                     }
                 }
         )

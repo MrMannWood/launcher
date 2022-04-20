@@ -20,12 +20,14 @@ class SetAsHomeFragment : Fragment(R.layout.fragment_nux_set_home), NUXHostFragm
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<View>(R.id.set_as_home).apply {
             setOnClickListener {
-                val (intent, func) = RoleManagerHelper.INSTANCE.getRoleSetIntent(
-                    requireActivity(),
-                    RoleManagerCompat.ROLE_HOME
-                )
-                setHomeLauncherResultContract.launch(intent)
-                func()
+                activity?.let { activity ->
+                    val (intent, func) = RoleManagerHelper.INSTANCE.getRoleSetIntent(
+                        activity,
+                        RoleManagerCompat.ROLE_HOME
+                    )
+                    setHomeLauncherResultContract.launch(intent)
+                    func()
+                }
             }
         }
         view.findViewById<View>(R.id.try_it_out).apply {

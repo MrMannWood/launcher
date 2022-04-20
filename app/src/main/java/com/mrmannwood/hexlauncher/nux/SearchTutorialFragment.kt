@@ -50,19 +50,19 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
         super.onViewCreated(view, savedInstanceState)
 
         message = view.findViewById(R.id.nux_search_message)
-        resultListAdapter = createResultAdapter()
+        resultListAdapter = createResultAdapter(view.context)
         resultListView = view.findViewById<RecyclerView>(R.id.result_list).apply {
             layoutManager = createLayoutManager()
             adapter = resultListAdapter
         }
 
         val exampleApps = listOf(
-            TutorialHexItem(requireContext().applicationContext, 1),
-            TutorialHexItem(requireContext().applicationContext, 2),
-            TutorialHexItem(requireContext().applicationContext, 3),
-            TutorialHexItem(requireContext().applicationContext, 4),
-            TutorialHexItem(requireContext().applicationContext, 5),
-            TutorialHexItem(requireContext().applicationContext, 6),
+            TutorialHexItem(view.context.applicationContext, 1),
+            TutorialHexItem(view.context.applicationContext, 2),
+            TutorialHexItem(view.context.applicationContext, 3),
+            TutorialHexItem(view.context.applicationContext, 4),
+            TutorialHexItem(view.context.applicationContext, 5),
+            TutorialHexItem(view.context.applicationContext, 6),
         )
 
         searchView = view.findViewById(R.id.search)
@@ -94,7 +94,7 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
         })
 
         leftHandedSwitch = view.findViewById(R.id.nux_search_left_switch)
-        watchPref(requireContext(), PreferenceKeys.User.LEFT_HANDED, PreferenceExtractor.BooleanExtractor)
+        watchPref(view.context, PreferenceKeys.User.LEFT_HANDED, PreferenceExtractor.BooleanExtractor)
             .observe(viewLifecycleOwner) { leftHanded ->
                 if (leftHanded == null) return@observe
                 if (leftHandedLayout == leftHanded) return@observe
@@ -104,7 +104,8 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
             }
 
         leftHandedSwitch.setOnCheckedChangeListener { _, checked ->
-            PreferencesRepository.getPrefs(requireContext()) { it.edit {
+            val context = context ?: return@setOnCheckedChangeListener
+            PreferencesRepository.getPrefs(context) { it.edit {
                putBoolean(PreferenceKeys.User.LEFT_HANDED, checked)
             } }
         }
@@ -132,10 +133,10 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
         )
     }
 
-    private fun createResultAdapter(): Adapter<TutorialHexItem> {
+    private fun createResultAdapter(context: Context): Adapter<TutorialHexItem> {
         val idGenerator = Adapter.IdGenerator(listOf(TutorialHexItem::class to { it.label }))
         return Adapter(
-            context = requireContext(),
+            context = context,
             order = arrayOf(TutorialHexItem::class),
             idFunc = idGenerator::genId,
             viewFunc = { R.layout.list_app_item },

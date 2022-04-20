@@ -2,6 +2,7 @@ package com.mrmannwood.hexlauncher.home
 
 import android.app.Activity
 import android.app.WallpaperManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.AdaptiveIconDrawable
@@ -49,16 +50,17 @@ import kotlin.math.pow
 class HomeFragment : WidgetHostFragment(), HandleBackPressed {
 
     private val wallpaperPickerContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val context = context ?: return@registerForActivityResult
         if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
         if (result.data?.data == null) return@registerForActivityResult
         try {
-            startActivity(WallpaperManager.getInstance(requireContext())
+            startActivity(WallpaperManager.getInstance(context)
                 .getCropAndSetWallpaperIntent(result.data!!.data!!).apply {
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
             )
         } catch (e: IllegalArgumentException) {
-            Toast.makeText(requireContext(), R.string.error_cannot_change_wallpaper, Toast.LENGTH_LONG).show()
+            Toast.makeText(context, R.string.error_cannot_change_wallpaper, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -100,14 +102,16 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     private fun onGestureActionUpdated(preferenceKey: String, result: ActivityResult) {
         result.data.onAppListResult(
             onSuccess = { _, packageName ->
-                PreferencesRepository.getPrefs(requireContext(), OriginalThreadCallback.create {
+                val context = context ?: return@onAppListResult
+                PreferencesRepository.getPrefs(context, OriginalThreadCallback.create {
                     it.edit {
                         putString(preferenceKey, packageName)
                     }
                 })
             },
             onFailure = {
-                Toast.makeText(requireContext(), R.string.no_app_selected, Toast.LENGTH_LONG).show()
+                val context = context ?: return@onAppListResult
+                Toast.makeText(context, R.string.no_app_selected, Toast.LENGTH_LONG).show()
             }
         )
     }
@@ -126,6 +130,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     }
 
     override fun onViewCreated(databinder: FragmentHomeBinding, savedInstanceState: Bundle?) {
+        val context = databinder.root.context
         edgeExclusionZone = resources.getDimension(R.dimen.edge_exclusion_zone).toInt()
         screenWidth = measureScreen(requireActivity())
         gestures = listOf(
@@ -213,18 +218,18 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         }
 
         gestures.forEach { config ->
-            config.setHexItemFunc(makeHexItem(R.string.gesture_set_quick_access_item, R.drawable.ic_add))
+            config.setHexItemFunc(makeHexItem(context, R.string.gesture_set_quick_access_item, R.drawable.ic_add))
             if (config.launcher != null) {
                 setCreateGestureAction(config.view, config.launcher)
             }
         }
-        databinder.hexItemNorth = makeHexItem(R.string.gesture_search_apps, R.drawable.ic_apps)
+        databinder.hexItemNorth = makeHexItem(context, R.string.gesture_search_apps, R.drawable.ic_apps)
         databinder.north.root.setTag(R.id.gesture_icon_action, object : Runnable {
             override fun run() {
                 showLauncherFragment()
             }
         })
-        databinder.hexItemSouth = makeHexItem(R.string.gesture_search_apps, R.drawable.outline_notifications)
+        databinder.hexItemSouth = makeHexItem(context, R.string.gesture_search_apps, R.drawable.outline_notifications)
         databinder.south.root.setTag(R.id.gesture_icon_action, object : Runnable {
             override fun run() {
                 context?.let { NotificationShadeUtil.showNotificationShade(it) }
@@ -280,6 +285,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     override fun handleBackPressed(): Boolean = true /* consume, this is a launcher*/
 
     private fun makeHexItem(
+        context: Context,
         @StringRes label: Int,
         @DrawableRes icon: Int,
     ): HexItem = object: HexItem {
@@ -287,8 +293,8 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         override val icon: Provider<Drawable> = Provider(
             {
                 AdaptiveIconDrawable(
-                    ColorDrawable(ContextCompat.getColor(requireContext(), R.color.colorOnPrimary)),
-                    ContextCompat.getDrawable(requireContext(), icon)!!
+                    ColorDrawable(ContextCompat.getColor(context, R.color.colorOnPrimary)),
+                    ContextCompat.getDrawable(context, icon)!!
                 )
             },
             InlineExecutor)
@@ -325,7 +331,8 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 }
             }
             menu.add(R.string.gesture_item_menu_disable).setOnMenuItemClickListener {
-                PreferencesRepository.getPrefs(requireContext()) { it.edit {
+                val context = context ?: return@setOnMenuItemClickListener true
+                PreferencesRepository.getPrefs(context) { it.edit {
                   putString(gesture.key, PreferenceKeys.Gestures.GESTURE_UNWANTED)
                 } }
                 true
@@ -578,8 +585,10 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     private fun getDefaultApp(type: DefaultAppType, action: (AppInfo) -> Unit) {
         val callback = OriginalThreadCallback(action)
         PackageManagerExecutor.execute {
-            type.intent().resolveActivity(requireContext().packageManager)?.packageName?.let { pac ->
-                appList?.firstOrNull { it.packageName == pac }?.let { callback.invoke(it) }
+            context?.packageManager?.let { pacman ->
+                type.intent().resolveActivity(pacman)?.packageName?.let { pac ->
+                    appList?.firstOrNull { it.packageName == pac }?.let { callback.invoke(it) }
+                }
             }
         }
     }

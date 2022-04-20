@@ -1,5 +1,6 @@
 package com.mrmannwood.hexlauncher.home
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -33,7 +34,7 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
 
         viewModel.widgetsLiveData.forEach { liveData -> liveData.observe(
             viewLifecycleOwner,
-            WidgetLiveDataObserver()
+            WidgetLiveDataObserver(view.context)
         ) }
     }
 
@@ -49,8 +50,11 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
 
     abstract fun makeDescription(isLoading: Boolean) : HomeViewDescription
 
-    private inner class WidgetLiveDataObserver : Observer<WidgetHostViewModel.WidgetPlacement> {
+    private inner class WidgetLiveDataObserver(
+        context: Context
+    ) : Observer<WidgetHostViewModel.WidgetPlacement> {
 
+        private val context = context.applicationContext
         private var widgetView : View? = null
 
         override fun onChanged(value: WidgetHostViewModel.WidgetPlacement) {
@@ -68,7 +72,7 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
                 (widget.parent as? ViewGroup)?.removeView(widget)
                 widget
             } ?: run {
-                LayoutInflater.from(requireContext()).inflate(layout, databinder.container, false)
+                LayoutInflater.from(context).inflate(layout, databinder.container, false)
             }
             widgetView = view
 

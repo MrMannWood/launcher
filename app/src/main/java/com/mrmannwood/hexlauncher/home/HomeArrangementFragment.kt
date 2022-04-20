@@ -49,14 +49,16 @@ class HomeArrangementFragment : WidgetHostFragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(databinder: FragmentHomeBinding, savedInstanceState: Bundle?) {
-        PreferencesRepository.getPrefs(requireContext()) { sharedPrefs = it }
+        val context = databinder.root.context
+
+        PreferencesRepository.getPrefs(context) { sharedPrefs = it }
 
         widgetContainer = databinder.container
         widgetContainer.addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, _ -> viewBottom = bottom }
         widgetContainer.setOnTouchListener(object : View.OnTouchListener {
 
             private val gestureDetector = GestureDetectorCompat(
-                requireContext(),
+                context,
                 object : GestureDetector.SimpleOnGestureListener() {
                     override fun onDown(e: MotionEvent?): Boolean {
                         return true
@@ -141,7 +143,8 @@ class HomeArrangementFragment : WidgetHostFragment() {
             }
 
             private fun createAndShowWidget(widgetDescription: WidgetDescription) {
-                LayoutInflater.from(requireContext())
+                val context = context ?: return
+                LayoutInflater.from(context)
                     .inflate(widgetDescription.layout, widgetContainer, false).apply {
                         val yPosition = widgets.values.firstOrNull()?.let {
                             if (it.y > widgetContainer.height / 2) {
@@ -165,7 +168,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
             }
         })
 
-        instructionMessage = LayoutInflater.from(requireContext())
+        instructionMessage = LayoutInflater.from(context)
             .inflate(R.layout.item_home_arrangement_instruction, databinder.container, true)
             .findViewById(R.id.arrangement_instruction)
         setInstructionText()

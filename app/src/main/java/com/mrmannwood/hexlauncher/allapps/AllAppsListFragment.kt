@@ -1,5 +1,6 @@
 package com.mrmannwood.hexlauncher.allapps
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -34,9 +35,9 @@ class AllAppsListFragment : Fragment() {
     ): View = inflater.inflate(R.layout.fragment_all_app_list, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        resultListAdapter = createResultAdapter()
+        resultListAdapter = createResultAdapter(view.context)
         resultListView = view.findViewById<RecyclerView>(R.id.app_list).apply {
-            layoutManager = createResultLayoutManager()
+            layoutManager = createResultLayoutManager(view.context)
             adapter = resultListAdapter
         }
 
@@ -51,16 +52,16 @@ class AllAppsListFragment : Fragment() {
         }
     }
 
-    private fun createResultLayoutManager() : RecyclerView.LayoutManager {
-        return LinearLayoutManager(requireContext()).apply {
+    private fun createResultLayoutManager(context: Context) : RecyclerView.LayoutManager {
+        return LinearLayoutManager(context).apply {
             reverseLayout = true
         }
     }
 
-    private fun createResultAdapter(): Adapter<AppInfo> {
+    private fun createResultAdapter(context: Context): Adapter<AppInfo> {
         val idGenerator = Adapter.IdGenerator(listOf(AppInfo::class to { it.packageName }))
         return Adapter(
-            context = requireContext(),
+            context = context,
             order = arrayOf(AppInfo::class),
             idFunc = idGenerator::genId,
             viewFunc = { R.layout.list_app_item_full },

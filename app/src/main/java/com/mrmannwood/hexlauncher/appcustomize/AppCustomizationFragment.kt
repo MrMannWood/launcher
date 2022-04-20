@@ -70,7 +70,8 @@ class AppCustomizationFragment : InstrumentedFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, AppCustomizationViewModelFactory(requireContext(), packageName)).get(AppCustomizationViewModel::class.java)
+        viewModel =
+            ViewModelProvider(this, AppCustomizationViewModelFactory(view.context, packageName))[AppCustomizationViewModel::class.java]
 
         binding.resources = resources
         binding.adapter = CustomizationFragmentDatabindingAdapter
@@ -169,7 +170,9 @@ class AppCustomizationFragment : InstrumentedFragment() {
             text?.split(" ")?.forEach { t ->
                 t.trim().takeIf { it.isNotBlank() }?.lowercase()?.let { tag ->
                     if (tag.contains(",")) {
-                        Toast.makeText(requireContext(), R.string.text_entry_cannot_contain_comma, Toast.LENGTH_LONG).show()
+                        context?.let { context ->
+                            Toast.makeText(context, R.string.text_entry_cannot_contain_comma, Toast.LENGTH_LONG).show()
+                        }
                     } else if (appInfo?.searchTerms?.contains(tag) != true) {
                         updateAppInfo { dao ->
                             dao.setTags(
@@ -190,9 +193,9 @@ class AppCustomizationFragment : InstrumentedFragment() {
             TextEntryDialog().show(childFragmentManager, null)
         }
 
-        binding.tags.layoutManager = LinearLayoutManager(requireContext())
+        binding.tags.layoutManager = LinearLayoutManager(view.context)
         tagsAdapter = Adapter(
-            context = requireContext(),
+            context = view.context,
             order = arrayOf(SearchTerm.Category::class, SearchTerm.Tag::class),
             idFunc = { appInfo?.categories?.indexOf(it.term)?.toLong() ?: -1L },
             viewFunc = { R.layout.list_app_customization_tag },
@@ -223,7 +226,9 @@ class AppCustomizationFragment : InstrumentedFragment() {
 
     private fun updateAppInfo(action: (dao: AppDataDao) -> Unit) {
         diskExecutor.execute {
-            action(DB.get(requireContext()).appDataDao())
+            context?.let { context ->
+                action(DB.get(context).appDataDao())
+            }
         }
     }
 

@@ -109,7 +109,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
             addPreference(Preference(activity).apply {
                 setTitle(R.string.preferences_gestures_reset_disabled)
                 setOnPreferenceClickListener {
-                    PreferencesRepository.getPrefs(requireContext()) { prefs -> prefs.edit {
+                    val context = context ?: return@setOnPreferenceClickListener true
+                    PreferencesRepository.getPrefs(context) { prefs -> prefs.edit {
                         listOf(
                             PreferenceKeys.Gestures.SwipeNorthWest.PACKAGE_NAME,
                             PreferenceKeys.Gestures.SwipeNorth.PACKAGE_NAME,
@@ -131,7 +132,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
             addPreference(Preference(activity).apply {
                 setTitle(R.string.preferences_gestures_disable_all)
                 setOnPreferenceClickListener {
-                    PreferencesRepository.getPrefs(requireContext()) { prefs -> prefs.edit {
+                    val context = context ?: return@setOnPreferenceClickListener true
+                    PreferencesRepository.getPrefs(context) { prefs -> prefs.edit {
                         listOf(
                             PreferenceKeys.Gestures.SwipeNorthWest.PACKAGE_NAME,
                             PreferenceKeys.Gestures.SwipeNorthEast.PACKAGE_NAME,

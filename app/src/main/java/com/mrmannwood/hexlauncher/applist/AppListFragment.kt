@@ -76,7 +76,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     ): View = inflater.inflate(R.layout.fragment_app_list, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        resultListAdapter = createResultAdapter()
+        resultListAdapter = createResultAdapter(view.context)
         resultListView = view.findViewById<RecyclerView>(R.id.result_list).apply {
             layoutManager = createLayoutManager()
             adapter = resultListAdapter
@@ -149,10 +149,10 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         )
     }
 
-    private fun createResultAdapter(): Adapter<AppInfo> {
+    private fun createResultAdapter(context: Context): Adapter<AppInfo> {
         val idGenerator = Adapter.IdGenerator(listOf(AppInfo::class to { it.packageName }))
         return Adapter(
-                context = requireContext(),
+                context = context,
                 order = arrayOf(AppInfo::class),
                 idFunc = idGenerator::genId,
                 viewFunc = { R.layout.list_app_item },
@@ -220,12 +220,14 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     }
 
     private fun showAllApps() {
+        val activity = activity ?: return
+
         if (resultListView.layoutManager !is GridLayoutManager) {
             val displayMetrics: DisplayMetrics = resources.displayMetrics
             val numColumns = (displayMetrics.widthPixels / (resources.getDimension(R.dimen.hex_view_height) + 24)).toInt()
 
             resultListView.layoutManager = object : GridLayoutManager(
-                requireContext(),
+                activity,
                 numColumns,
                 RecyclerView.VERTICAL,
                 true /* reverseLayout */
@@ -240,11 +242,9 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
 
         resultListAdapter.setData(AppInfo::class, apps ?: emptyList())
 
-        activity?.let { activity ->
-            viewLifecycleOwner.lifecycleScope.launch {
-                showKeyboardJob?.cancelAndJoin()
-                hideKeyboard(activity)
-            }
+        viewLifecycleOwner.lifecycleScope.launch {
+            showKeyboardJob?.cancelAndJoin()
+            hideKeyboard(activity)
         }
     }
 

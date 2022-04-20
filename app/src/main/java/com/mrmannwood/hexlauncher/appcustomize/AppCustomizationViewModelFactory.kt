@@ -8,8 +8,7 @@ class AppCustomizationViewModelFactory(
     private val context: Context,
     private val packageName: String
 ) : ViewModelProvider.Factory {
-
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return AppCustomizationViewModel(context, packageName) as T
+        return AppCustomizationViewModel(context.applicationContext, packageName) as T
     }
 }

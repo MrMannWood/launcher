@@ -27,13 +27,19 @@ object AppListUpdater {
             appDao.deleteNotIncluded(installedApps.map { it.componentName })
 
             val appUpdateTimes = appDao.getLastUpdateTimeStamps().associateBy({ it.componentName }, { it.timestamp })
-            installedApps.map { it to appUpdateTimes.getOrElse(it.componentName) { -1L } }
+            installedApps
+                .map { it to appUpdateTimes.getOrElse(it.componentName) { -1L } }
                 .filter { (launcherItem, lastUpdateTime) -> launcherItem.lastUpdateTime > lastUpdateTime }
-                .map { it.first }
-                .onEach { Timber.d("Inserting ${it.componentName}") }
+                .map { convertToAppData(it.first) }
                 .forEach {
                     try {
-                        appDao.insert(convertToAppData(it))
+                        if (it.lastUpdateTime == -1L) {
+                            Timber.d("Inserting ${it.componentName.flattenToString()}")
+                            appDao.insert(it)
+                        } else {
+                            Timber.d("Updating ${it.componentName.flattenToString()}")
+                            appDao.update(it.label, it.lastUpdateTime, it.backgroundColor, it.componentName)
+                        }
                     } catch (e: SQLiteException) {
                         Timber.e(e, "An error occurred while writing app to db: $it")
                     }
@@ -50,6 +56,7 @@ object AppListUpdater {
             label = launcherItem.label,
             lastUpdateTime = launcherItem.lastUpdateTime,
             backgroundColor = IconAdapter.INSTANCE.getBackgroundColor(launcherItem.icon),
+            tags = emptyList()
         )
     }
 }

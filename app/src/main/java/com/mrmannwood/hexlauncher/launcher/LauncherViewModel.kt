@@ -24,4 +24,14 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
         key = PreferenceKeys.User.LEFT_HANDED,
         extractor = PreferenceExtractor.BooleanExtractor
     )
+    val openWhenLastApp = watchPref(
+        context = getApplication(),
+        key = PreferenceKeys.Apps.ENABLE_OPEN_WHEN_ONLY_OPTION,
+        extractor = PreferenceExtractor.BooleanExtractor
+    )
+    val enableFuzzySearch = watchPref(
+        context = getApplication(),
+        key = PreferenceKeys.Apps.ENABLE_FUZZY_SEARCH,
+        extractor = PreferenceExtractor.BooleanExtractor
+    )
 }

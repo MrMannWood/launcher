@@ -94,6 +94,22 @@ class SettingsFragment : PreferenceFragmentCompat() {
             )
             addPreference(
                 SwitchPreference(activity).apply {
+                    setTitle(R.string.preferences_app_list_enable_fuzzy_search)
+                    setSummary(R.string.preferences_app_list_enable_fuzzy_search_summary)
+                    key = PreferenceKeys.Apps.ENABLE_FUZZY_SEARCH
+                    setDefaultValue(true)
+                }
+            )
+            addPreference(
+                SwitchPreference(activity).apply {
+                    setTitle(R.string.preferences_app_list_enable_open_last_option)
+                    setSummary(R.string.preferences_app_list_enable_open_last_option_summary)
+                    key = PreferenceKeys.Apps.ENABLE_OPEN_WHEN_ONLY_OPTION
+                    setDefaultValue(false)
+                }
+            )
+            addPreference(
+                SwitchPreference(activity).apply {
                     setTitle(R.string.preferences_app_list_enable_category_search)
                     key = PreferenceKeys.Apps.ENABLE_CATEGORY_SEARCH
                     setDefaultValue(true)

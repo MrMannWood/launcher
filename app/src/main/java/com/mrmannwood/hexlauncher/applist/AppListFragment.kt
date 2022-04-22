@@ -75,6 +75,8 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     private var enableCategorySearch: Boolean = true
     private var enableAllAppsSearch: Boolean = false
     private var leftHandedLayout: Boolean = false
+    private var openWhenLastOption: Boolean = false
+    private var enableFuzzySearch: Boolean = true
 
     private fun getAppListHost(): Host<*>? {
         return (activity as? AppListHostActivity)?.getAppListHost()
@@ -149,6 +151,14 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
             if (leftHandedLayout == leftHanded) return@observe
             leftHandedLayout = leftHanded
             resultListView.layoutManager = createLayoutManager()
+        }
+        viewModel.enableFuzzySearch.observe(viewLifecycleOwner) { enable ->
+            if (enable == null) return@observe
+            enableFuzzySearch = enable
+        }
+        viewModel.openWhenLastApp.observe(viewLifecycleOwner) { enable ->
+            if (enable == null) return@observe
+            openWhenLastOption = enable
         }
         viewModel.apps.observe(viewLifecycleOwner) { appList ->
             apps = appList
@@ -282,7 +292,11 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         apps.forEach { app ->
             app.searchTerms.forEach { (label, type) ->
                 if (length <= label.length && (enableCategorySearch || type != SearchTermType.Category)) {
-                    val minAcceptable = if (type != SearchTermType.Label) 0 else (length / 3)
+                    val minAcceptable = if (!enableFuzzySearch || type != SearchTermType.Label) {
+                        0
+                    } else {
+                        length / 3
+                    }
                     val result = term.levenshtein(label.substring(0, length))
                     if (result <= minAcceptable) {
                         matchingApps.add(Triple(result, type, app))
@@ -291,6 +305,13 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
             }
         }
 
+        if (openWhenLastOption &&
+            term.length > 1 &&
+            matchingApps.size == 1 &&
+            matchingApps[0].first == 0
+        ) {
+            getAppListHost()?.onAppSelected(matchingApps[0].third)
+        }
         return matchingApps.sortedWith(
             compareBy(
                 { it.first },

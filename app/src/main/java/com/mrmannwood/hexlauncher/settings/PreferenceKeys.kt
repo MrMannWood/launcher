@@ -15,8 +15,8 @@ object PreferenceKeys {
         const val ORIENTATION = "orientation"
     }
     object Gestures {
-        val GESTURE_UNWANTED = "unwanted"
-        val OPACITY = "gestures_opacity"
+        const val GESTURE_UNWANTED = "unwanted"
+        const val OPACITY = "gestures_opacity"
         object SwipeNorthEast {
             const val PACKAGE_NAME = "gestures_swipe_north_east_package_name"
         }
@@ -45,6 +45,8 @@ object PreferenceKeys {
     object Apps {
         const val ENABLE_CATEGORY_SEARCH = "enable_category_search"
         const val ENABLE_ALL_APPS_HOT_KEY = "enable_all_apps_hotkey"
+        const val ENABLE_OPEN_WHEN_ONLY_OPTION = "enable_open_only_option"
+        const val ENABLE_FUZZY_SEARCH = "enable_fuzzy_search"
     }
     object User {
         const val LEFT_HANDED = "left_handed"

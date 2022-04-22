@@ -36,6 +36,10 @@
 
     <string name="preferences_category_app_list">Apps</string>
     <string name="preferences_app_list_show_all_apps">Show All Apps</string>
+    <string name="preferences_app_list_enable_fuzzy_search">Enable Fuzzy Search</string>
+    <string name="preferences_app_list_enable_fuzzy_search_summary">Shows results close to the search term</string>
+    <string name="preferences_app_list_enable_open_last_option">Open App When Last Option</string>
+    <string name="preferences_app_list_enable_open_last_option_summary">Opens app when it is the last option and is spelled correctly</string>
     <string name="preferences_app_list_enable_category_search">Enable Searching by App Category</string>
     <string name="preferences_app_list_all_apps_hotkey">Enable "Show all apps" hotkey</string>
     <string name="preferences_app_list_all_apps_hotkey_summary">Searching \"...\" shows all apps</string>

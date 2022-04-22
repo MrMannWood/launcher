@@ -1,5 +1,6 @@
 package com.mrmannwood.hexlauncher.nux
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -88,12 +89,13 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
         viewLifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onResume(owner: LifecycleOwner) {
                 showKeyboardJob = viewLifecycleOwner.lifecycleScope.launch {
-                    forceShowKeyboard(searchView)
+                    activity?.let { forceShowKeyboard(it, searchView) }
                 }
             }
             override fun onPause(owner: LifecycleOwner) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     showKeyboardJob?.cancelAndJoin()
+                    activity?.let { hideKeyboard(it, searchView) }
                 }
             }
         })
@@ -167,11 +169,11 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
         )
     }
 
-    private suspend fun forceShowKeyboard(view: EditText) {
+    private suspend fun forceShowKeyboard(activity: Activity, view: EditText) {
         withContext(Dispatchers.Main) {
             view.requestFocus()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                val rootView = requireActivity().window.decorView
+                val rootView = activity.window.decorView
                 while (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
                     rootView.windowInsetsController!!.show(WindowInsets.Type.ime())
                     if (rootView.rootWindowInsets?.isVisible(WindowInsets.Type.ime()) == true) {
@@ -183,6 +185,21 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
                 val imm =
                     view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+            }
+        }
+    }
+
+    private suspend fun hideKeyboard(activity: Activity, view: EditText) {
+        withContext(Dispatchers.Main) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val controller = activity.window.decorView.windowInsetsController
+                controller?.hide(WindowInsets.Type.ime())
+            } else {
+                val windowToken = activity.currentFocus?.windowToken ?: view.windowToken
+                (activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+                    windowToken,
+                    0
+                )
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.mrmannwood.hexlauncher.iconpack
 
+import android.content.ComponentName
 import android.content.Context
 import android.graphics.drawable.Drawable
 import com.mrmannwood.hexlauncher.Result
@@ -18,39 +19,39 @@ import com.mrmannwood.launcher.databinding.ListAppItemBinding
 class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
 
     companion object {
-        private const val KEY_PACKAGE_NAME = "package_name"
+        private const val KEY_COMPONENT_NAME = "component_name"
 
-        fun newInstance(packageName: String): IconPackDisplayFragment {
+        fun newInstance(componentName: ComponentName): IconPackDisplayFragment {
             return IconPackDisplayFragment().apply {
                 arguments = Bundle().apply {
-                    putString(KEY_PACKAGE_NAME, packageName)
+                    putParcelable(KEY_COMPONENT_NAME, componentName)
                 }
             }
         }
     }
 
     private val viewModel: IconPackDisplayViewModel by viewModels {
-        IconPackDisplayViewModelFactory(requireContext().applicationContext, packageName)
+        IconPackDisplayViewModelFactory(requireContext().applicationContext, componentName!!)
     }
 
-    private lateinit var packageName: String
+    private var componentName: ComponentName? = null
     private lateinit var iconView: RecyclerView
     private lateinit var iconAdapter: Adapter<IconPackHexItem>
 
     private var installedApps: List<AppInfo>? = null
-    private var iconInfo: Map<String, IconPackIconInfo>? = null
+    private var iconInfo: Map<ComponentName, IconPackIconInfo>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        packageName = arguments?.getString(KEY_PACKAGE_NAME) ?: ""
-        if (packageName.isEmpty()) {
+        componentName = arguments?.getParcelable(KEY_COMPONENT_NAME)
+        if (componentName == null) {
             parentFragmentManager.popBackStack()
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (packageName.isEmpty()) return
+        if (componentName == null) return
 
         iconAdapter = createResultAdapter(view.context)
 
@@ -65,7 +66,7 @@ class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
         viewModel.iconPackLiveData.observe(viewLifecycleOwner) { result ->
             result.onFailure { println("02_MARSHALL:: Failed to open icon pack") }
             result.onSuccess {
-                iconInfo = it.associateBy { iconInfo -> iconInfo.component.packageName ?: "" }
+                iconInfo = it.associateBy { iconInfo -> iconInfo.componentName }
                 maybeShowIcons()
             }
         }
@@ -78,7 +79,7 @@ class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
         if (context == null || icons == null || apps == null) return
         iconAdapter.setData(
             IconPackHexItem::class,
-            apps.map { makeHexItem(context, it, icons[it.packageName]) }
+            apps.map { makeHexItem(context, it, icons[it.componentName]) }
         )
     }
 

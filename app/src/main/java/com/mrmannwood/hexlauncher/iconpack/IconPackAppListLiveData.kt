@@ -1,48 +1,62 @@
 package com.mrmannwood.hexlauncher.iconpack
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import com.mrmannwood.hexlauncher.executors.PackageManagerExecutor
 import com.mrmannwood.hexlauncher.launcher.AppInfo
-import com.mrmannwood.hexlauncher.launcher.getAppInfoForApps
-import java.util.concurrent.atomic.AtomicBoolean
+import com.mrmannwood.hexlauncher.launcher.getAppInfoLiveData
 
 class IconPackAppListLiveData(
-    private val application: Application
-): LiveData<List<AppInfo>>() {
+    application: Application
+): MediatorLiveData<List<AppInfo>>() {
 
-    companion object {
-        private val APP_ICON_ACTIONS = listOf(
-            "com.gau.go.launcherex.theme",
-            "org.adw.launcher.THEMES"
-        )
-    }
+    private var appInfo: Map<String, AppInfo>? = null
+    private var packages: List<String>? = null
 
-    private val isActive = AtomicBoolean(false)
-
-    override fun onActive() {
-        super.onActive()
-        isActive.set(true)
-        PackageManagerExecutor.execute {
-            val iconPackApps = APP_ICON_ACTIONS
-                .flatMap { action ->
-                    application.packageManager.queryIntentActivities(
-                        Intent(action), PackageManager.GET_META_DATA
-                    )
-                }
-                .map { it.activityInfo.packageName }
-                .distinct()
-            getAppInfoForApps(application, iconPackApps.distinct()) {
-                if (!isActive.get()) return@getAppInfoForApps
-                postValue(it)
-            }
+    init {
+        addSource(getAppInfoLiveData(application, true)) {
+            appInfo = it.associateBy { it.componentName.packageName }
+            combine()
+        }
+        addSource(IconPackLiveData(application)) {
+            packages = it
+            combine()
         }
     }
 
-    override fun onInactive() {
-        isActive.set(false)
-        super.onInactive()
+    private fun combine() {
+        val appInfo = appInfo ?: return
+        val packages = packages ?: return
+
+        postValue(packages.mapNotNull { appInfo[it] }.toList())
+    }
+
+    private class IconPackLiveData(private val context: Context): LiveData<List<String>>() {
+        companion object {
+            private val APP_ICON_ACTIONS = listOf(
+                "com.gau.go.launcherex.theme",
+                "org.adw.launcher.THEMES"
+            )
+        }
+
+        override fun onActive() {
+            super.onActive()
+            PackageManagerExecutor.execute {
+                postValue(
+                    APP_ICON_ACTIONS
+                    .flatMap { action ->
+                        context.packageManager.queryIntentActivities(
+                            Intent(action), PackageManager.GET_META_DATA
+                        )
+                    }
+                    .map { it.activityInfo.packageName }
+                    .distinct()
+                )
+            }
+        }
     }
 }

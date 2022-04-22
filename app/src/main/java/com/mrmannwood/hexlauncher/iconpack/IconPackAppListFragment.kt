@@ -48,7 +48,7 @@ class IconPackAppListFragment : Fragment(R.layout.fragment_icon_pack) {
     }
 
     private fun createResultAdapter(): Adapter<AppInfo> {
-        val idGenerator = Adapter.IdGenerator(listOf(AppInfo::class to { it.packageName }))
+        val idGenerator = Adapter.IdGenerator(listOf(AppInfo::class to { it.componentName }))
         return Adapter(
             context = requireContext(),
             order = arrayOf(AppInfo::class),
@@ -61,7 +61,7 @@ class IconPackAppListFragment : Fragment(R.layout.fragment_icon_pack) {
                 }
                 vdb.root.setOnClickListener {
                     parentFragmentManager.beginTransaction()
-                        .replace(R.id.settings_root, IconPackDisplayFragment.newInstance(appInfo.packageName))
+                        .replace(R.id.settings_root, IconPackDisplayFragment.newInstance(appInfo.componentName))
                         .addToBackStack(null)
                         .commit()
                 }

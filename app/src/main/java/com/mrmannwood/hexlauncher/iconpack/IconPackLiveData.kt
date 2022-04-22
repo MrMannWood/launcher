@@ -1,5 +1,6 @@
 package com.mrmannwood.hexlauncher.iconpack
 
+import android.content.ComponentName
 import android.content.Context
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.LiveData
@@ -12,7 +13,10 @@ import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.executors.cpuBoundTaskExecutor
 import com.mrmannwood.hexlauncher.launcher.Provider
 
-class IconPackLiveData(context: Context, private val packageName: String): LiveData<Result<List<IconPackIconInfo>>>() {
+class IconPackLiveData(
+    context: Context,
+    private val componentName: ComponentName
+): LiveData<Result<List<IconPackIconInfo>>>() {
 
     private val appContext = context.applicationContext
     private val isActive = AtomicBoolean(false)
@@ -32,7 +36,7 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
                     onParseFailure = { exception -> postValue(Result.failure(exception)) }
                 )
             },
-            { postValue(Result.failure(AppFilterDoesNotExistException(packageName))) }
+            { postValue(Result.failure(AppFilterDoesNotExistException(componentName))) }
         )
     }
 
@@ -46,9 +50,9 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
             val parser: XmlPullParser?
 
             val iconPackResources =
-                appContext.packageManager.getResourcesForApplication(packageName)
+                appContext.packageManager.getResourcesForApplication(componentName.packageName)
 
-            val id = iconPackResources.getIdentifier("appfilter", "xml", packageName)
+            val id = iconPackResources.getIdentifier("appfilter", "xml", componentName.packageName)
             if (id > 0) {
                 parser = iconPackResources.getXml(id)
             } else {
@@ -76,7 +80,7 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
         onParseFailure: (AppFilterParserException) -> Unit
     ) {
         cpuBoundTaskExecutor.execute {
-            val resources = appContext.packageManager.getResourcesForApplication(packageName)
+            val resources = appContext.packageManager.getResourcesForApplication(componentName.packageName)
             val icons = mutableListOf<IconPackIconInfo>()
             var success = true
             try {
@@ -90,7 +94,7 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
                                 "iconupon" -> println("02_MARSHALL: iconupon")
                                 "scale" -> println("02_MARSHALL: scale")
                                 "item" -> {
-                                    var componentInfo: Component? = null
+                                    var componentInfo: ComponentName? = null
                                     var drawableName: String? = null
                                     for (i in 0 until parser.attributeCount) {
                                         when (parser.getAttributeName(i)) {
@@ -100,7 +104,7 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
                                         }
                                     }
                                     if (componentInfo != null && drawableName != null) {
-                                        val id = resources.getIdentifier(drawableName, "drawable", packageName)
+                                        val id = resources.getIdentifier(drawableName, "drawable", componentName.packageName)
                                         if (id > 0) {
                                             icons.add(
                                                 IconPackIconInfo(
@@ -119,7 +123,7 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
                 }
             } catch (e: Exception) {
                 success = false
-                onParseFailure(AppFilterParserException(packageName, e))
+                onParseFailure(AppFilterParserException(componentName, e))
             }
             if (success) {
                 onParseSuccess(icons)
@@ -127,7 +131,7 @@ class IconPackLiveData(context: Context, private val packageName: String): LiveD
         }
     }
 
-    private class AppFilterDoesNotExistException(packageName: String): Exception("Could not find AppFilter for $packageName")
-    private class AppFilterParserException(packageName: String, e: Exception): Exception("Could not parse AppFilter for $packageName", e)
+    private class AppFilterDoesNotExistException(componentName: ComponentName): Exception("Could not find AppFilter for ${componentName.flattenToString()}")
+    private class AppFilterParserException(componentName: ComponentName, e: Exception): Exception("Could not parse AppFilter for ${componentName.flattenToString()}", e)
 
 }

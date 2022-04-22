@@ -9,8 +9,10 @@ import androidx.annotation.AnyThread
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.mrmannwood.applist.LauncherItem
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.LauncherApplication
+import com.mrmannwood.hexlauncher.applist.AppData
 import com.mrmannwood.hexlauncher.executors.cpuBoundTaskExecutor
 import com.mrmannwood.hexlauncher.executors.diskExecutor
 import com.mrmannwood.hexlauncher.executors.mainThreadExecutor
@@ -38,9 +40,10 @@ fun getAppInfoForApps(context: Context, apps: List<String>, callback: (List<AppI
     }
 }
 
-fun getSingleAppLiveData(context: Context, componentName: ComponentName): LiveData<AppInfo?> {
-    return Transformations.map(makeLiveData(context.applicationContext as Application, true)) {
-        it.firstOrNull { it.componentName == componentName }
+fun getSingleAppLiveData(context: Context, componentName: ComponentName) : LiveData<AppInfo?> {
+    val appContext = context.applicationContext
+    return Transformations.map(makeLiveData(appContext as Application, true)) {
+        it.firstOrNull{ it.componentName == componentName }
     }
 }
 
@@ -55,7 +58,7 @@ fun getAppInfoLiveData(context: Context, showHidden: Boolean = false) : LiveData
     return appInfoLiveData!!
 }
 
-private fun makeLiveData(appContext: Context, showHidden: Boolean = false): LiveData<List<AppInfo>> {
+private fun makeLiveData(appContext: Context, showHidden: Boolean = false) : LiveData<List<AppInfo>> {
     return (appContext as LauncherApplication).appListLiveData.combineWith(
         DB.get(appContext).appDataDao().watchApps(),
         cpuBoundTaskExecutor
@@ -65,16 +68,21 @@ private fun makeLiveData(appContext: Context, showHidden: Boolean = false): Live
         appList.map { it to decorationMap[it.componentName] }
             .filter { showHidden || it.second?.hidden == false }
             .map { (launcherItem, decoration) ->
-                AppInfo(
-                    launcherItem = launcherItem,
-                    backgroundColor = decoration?.bgcOverride ?: decoration?.backgroundColor ?: Color.TRANSPARENT,
-                    hidden = decoration?.hidden == true,
-                    backgroundHidden = decoration?.backgroundHidden == true,
-                    categories = getCategories(appContext, launcherItem.category),
-                    tags = decoration?.tags ?: emptyList()
-                )
+                transformAppInfo(appContext, launcherItem, decoration)
             }.toList()
     }
+}
+
+@MainThread
+private fun transformAppInfo(context: Context, launcherItem: LauncherItem, decoration: AppData?): AppInfo {
+    return AppInfo(
+        launcherItem = launcherItem,
+        backgroundColor = decoration?.bgcOverride ?: decoration?.backgroundColor ?: Color.TRANSPARENT,
+        hidden = decoration?.hidden == true,
+        backgroundHidden = decoration?.backgroundHidden == true,
+        categories = getCategories(context, launcherItem.category),
+        tags = decoration?.tags ?: emptyList()
+    )
 }
 
 @MainThread

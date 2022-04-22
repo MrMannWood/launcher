@@ -5,7 +5,7 @@ import java.io.IOException
 import java.nio.file.Files
 
 @Throws(IOException::class)
-fun File.copyContentsTo(dest: File) : List<File> {
+fun File.copyContentsTo(dest: File): List<File> {
     if (!dest.exists()) dest.mkdirs()
 
     val files = mutableListOf<File>()

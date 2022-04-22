@@ -48,31 +48,31 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
 
     // TODO this is really hacky, and should be replaced with ViewModel
     interface AppListHostActivity {
-        fun getAppListHost() : Host<*>
+        fun getAppListHost(): Host<*>
     }
 
     private lateinit var searchView: KeyboardEditText
     private lateinit var resultListView: RecyclerView
     private lateinit var resultListAdapter: Adapter<AppInfo>
-    private var showKeyboardJob : Job? = null
+    private var showKeyboardJob: Job? = null
 
-    private val viewModel : LauncherViewModel by activityViewModels()
+    private val viewModel: LauncherViewModel by activityViewModels()
 
-    private var apps : List<AppInfo>? = null
-    private var enableCategorySearch : Boolean = true
-    private var enableAllAppsSearch : Boolean = false
-    private var leftHandedLayout : Boolean = false
+    private var apps: List<AppInfo>? = null
+    private var enableCategorySearch: Boolean = true
+    private var enableAllAppsSearch: Boolean = false
+    private var leftHandedLayout: Boolean = false
 
-    private fun getAppListHost() : Host<*>? {
+    private fun getAppListHost(): Host<*>? {
         return (activity as? AppListHostActivity)?.getAppListHost()
     }
 
     override val nameForInstrumentation = "AppListFragment"
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View = inflater.inflate(R.layout.fragment_app_list, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -152,24 +152,24 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     private fun createResultAdapter(context: Context): Adapter<AppInfo> {
         val idGenerator = Adapter.IdGenerator(listOf(AppInfo::class to { it.componentName }))
         return Adapter(
-                context = context,
-                order = arrayOf(AppInfo::class),
-                idFunc = idGenerator::genId,
-                viewFunc = { R.layout.list_app_item },
-                bindFunc = { vdb, appInfo ->
-                    (vdb as ListAppItemBinding).apply {
-                        this.hexItem = appInfo
-                        this.adapter = LauncherFragmentDatabindingAdapter
-                    }
-                    getAppListHost()?.onAppInfoBinding(vdb.root, appInfo)
-                    vdb.root.setOnClickListener {
-                        getAppListHost()?.onAppSelected(appInfo)
-                    }
+            context = context,
+            order = arrayOf(AppInfo::class),
+            idFunc = idGenerator::genId,
+            viewFunc = { R.layout.list_app_item },
+            bindFunc = { vdb, appInfo ->
+                (vdb as ListAppItemBinding).apply {
+                    this.hexItem = appInfo
+                    this.adapter = LauncherFragmentDatabindingAdapter
                 }
+                getAppListHost()?.onAppInfoBinding(vdb.root, appInfo)
+                vdb.root.setOnClickListener {
+                    getAppListHost()?.onAppSelected(appInfo)
+                }
+            }
         )
     }
 
-    private fun createSearchTextListener() : TextWatcher = object : TextWatcher {
+    private fun createSearchTextListener(): TextWatcher = object : TextWatcher {
 
         override fun afterTextChanged(p0: Editable) {
             if (enableAllAppsSearch && searchView.text.toString() == "...") {
@@ -232,7 +232,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
                 RecyclerView.VERTICAL,
                 true /* reverseLayout */
             ) {
-                override fun isLayoutRTL() : Boolean = !leftHandedLayout
+                override fun isLayoutRTL(): Boolean = !leftHandedLayout
             }.apply {
                 spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                     override fun getSpanSize(position: Int) = 1
@@ -260,9 +260,9 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         )
     }
 
-    private fun searchApps(apps: List<AppInfo>?, term: String) : List<AppInfo> {
+    private fun searchApps(apps: List<AppInfo>?, term: String): List<AppInfo> {
         if (apps == null || term.isEmpty()) {
-            return Collections.emptyList();
+            return Collections.emptyList()
         }
         val matchingApps = mutableListOf<Triple<Int, SearchTermType, AppInfo>>()
         val length = term.length
@@ -278,11 +278,13 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
             }
         }
 
-        return matchingApps.sortedWith(compareBy(
-            { it.first },
-            { it.second },
-            { it.third.label }
-        ))
+        return matchingApps.sortedWith(
+            compareBy(
+                { it.first },
+                { it.second },
+                { it.third.label }
+            )
+        )
             .map { it.third }
             .distinct()
             .take(8)

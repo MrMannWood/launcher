@@ -55,10 +55,11 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
         if (result.data?.data == null) return@registerForActivityResult
         try {
-            startActivity(WallpaperManager.getInstance(context)
-                .getCropAndSetWallpaperIntent(result.data!!.data!!).apply {
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                }
+            startActivity(
+                WallpaperManager.getInstance(context)
+                    .getCropAndSetWallpaperIntent(result.data!!.data!!).apply {
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
             )
         } catch (e: IllegalArgumentException) {
             Toast.makeText(context, R.string.error_cannot_change_wallpaper, Toast.LENGTH_LONG).show()
@@ -104,11 +105,14 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         result.data.onAppListResult(
             onSuccess = { _, componentName ->
                 val context = context ?: return@onAppListResult
-                PreferencesRepository.getPrefs(context, OriginalThreadCallback.create {
-                    it.edit {
-                        putString(preferenceKey, componentName.flattenToString())
+                PreferencesRepository.getPrefs(
+                    context,
+                    OriginalThreadCallback.create {
+                        it.edit {
+                            putString(preferenceKey, componentName.flattenToString())
+                        }
                     }
-                })
+                )
             },
             onFailure = {
                 val context = context ?: return@onAppListResult
@@ -141,56 +145,64 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 viewModel.swipeNorthWestLiveData,
                 DefaultAppType.PHONE,
                 { databinder.hexItemNorthWest = it },
-                preferenceSwipeNorthWestResultContract),
+                preferenceSwipeNorthWestResultContract
+            ),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeNorth.PACKAGE_NAME,
                 databinder.north.root,
                 null,
                 null,
                 { databinder.hexItemNorth = it },
-                null),
+                null
+            ),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeNorthEast.PACKAGE_NAME,
                 databinder.northEast.root,
                 viewModel.swipeNorthEastLiveData,
                 DefaultAppType.CAMERA,
                 { databinder.hexItemNorthEast = it },
-                preferenceSwipeNorthEastResultContract),
+                preferenceSwipeNorthEastResultContract
+            ),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeWest.PACKAGE_NAME,
                 databinder.west.root,
                 viewModel.swipeWestLiveData,
                 DefaultAppType.SMS,
                 { databinder.hexItemWest = it },
-                preferenceSwipeWestResultContract),
+                preferenceSwipeWestResultContract
+            ),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeEast.PACKAGE_NAME,
                 databinder.east.root,
                 viewModel.swipeEastLiveData,
                 DefaultAppType.BROWSER,
                 { databinder.hexItemEast = it },
-                preferenceSwipeEastResultContract),
+                preferenceSwipeEastResultContract
+            ),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeSouthWest.PACKAGE_NAME,
                 databinder.southWest.root,
                 viewModel.swipeSouthWestLiveData,
                 DefaultAppType.EMAIL,
                 { databinder.hexItemSouthWest = it },
-                preferenceSwipeSouthWestResultContract),
+                preferenceSwipeSouthWestResultContract
+            ),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME,
                 databinder.south.root,
                 viewModel.swipeSouthLiveData,
                 null,
                 { databinder.hexItemSouth = it },
-                null),
+                null
+            ),
             GestureConfiguration(
                 PreferenceKeys.Gestures.SwipeSouthEast.PACKAGE_NAME,
                 databinder.southEast.root,
                 viewModel.swipeSouthEastLiveData,
                 DefaultAppType.MAP,
                 { databinder.hexItemSouthEast = it },
-                preferenceSwipeSouthEastResultContract),
+                preferenceSwipeSouthEastResultContract
+            ),
         )
 
         databinder.appInfoAdapter = LauncherFragmentDatabindingAdapter
@@ -225,21 +237,27 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             }
         }
         databinder.hexItemNorth = makeHexItem(context, R.string.gesture_search_apps, R.drawable.ic_apps)
-        databinder.north.root.setTag(R.id.gesture_icon_action, object : Runnable {
-            override fun run() {
-                showLauncherFragment()
+        databinder.north.root.setTag(
+            R.id.gesture_icon_action,
+            object : Runnable {
+                override fun run() {
+                    showLauncherFragment()
+                }
             }
-        })
+        )
         databinder.hexItemSouth = makeHexItem(context, R.string.gesture_search_apps, R.drawable.outline_notifications)
-        databinder.south.root.setTag(R.id.gesture_icon_action, object : Runnable {
-            override fun run() {
-                context?.let { NotificationShadeUtil.showNotificationShade(it) }
+        databinder.south.root.setTag(
+            R.id.gesture_icon_action,
+            object : Runnable {
+                override fun run() {
+                    context?.let { NotificationShadeUtil.showNotificationShade(it) }
+                }
             }
-        })
+        )
 
         gestures.filter {
             it.key != PreferenceKeys.Gestures.SwipeNorth.PACKAGE_NAME &&
-                    it.key != PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME
+                it.key != PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME
         }.forEach { config ->
             config.preferenceWatcher?.observe(viewLifecycleOwner) { componentName ->
                 setHexItemContextMenu(config)
@@ -258,9 +276,11 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                                     pacman.getLaunchIntentForPackage(componentName)
                                         ?.resolveActivity(pacman)
                                         ?.let { resolvedName ->
-                                            PreferencesRepository.getPrefs(context) { it.edit {
-                                                putString(config.key, resolvedName.flattenToString())
-                                            }}
+                                            PreferencesRepository.getPrefs(context) {
+                                                it.edit {
+                                                    putString(config.key, resolvedName.flattenToString())
+                                                }
+                                            }
                                         }
                                 }
                             }
@@ -299,7 +319,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         context: Context,
         @StringRes label: Int,
         @DrawableRes icon: Int,
-    ): HexItem = object: HexItem {
+    ): HexItem = object : HexItem {
         override val label = resources.getString(label)
         override val icon: Provider<Drawable> = Provider(
             {
@@ -308,18 +328,22 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                     ContextCompat.getDrawable(context, icon)!!
                 )
             },
-            InlineExecutor)
+            InlineExecutor
+        )
         override val hidden: Boolean = false
         override val backgroundColor: Int = Color.TRANSPARENT
         override val backgroundHidden: Boolean = true
     }
 
     private fun setCreateGestureAction(v: View, activityResultLauncher: ActivityResultLauncher<Intent>) {
-        v.setTag(R.id.gesture_icon_action, object : Runnable {
-            override fun run() {
-                showSetAppForGesture(activityResultLauncher)
+        v.setTag(
+            R.id.gesture_icon_action,
+            object : Runnable {
+                override fun run() {
+                    showSetAppForGesture(activityResultLauncher)
+                }
             }
-        })
+        )
     }
 
     private fun setAppInformationForGesture(config: GestureConfiguration) {
@@ -343,9 +367,11 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             }
             menu.add(R.string.gesture_item_menu_disable).setOnMenuItemClickListener {
                 val context = context ?: return@setOnMenuItemClickListener true
-                PreferencesRepository.getPrefs(context) { it.edit {
-                  putString(gesture.key, PreferenceKeys.Gestures.GESTURE_UNWANTED)
-                } }
+                PreferencesRepository.getPrefs(context) {
+                    it.edit {
+                        putString(gesture.key, PreferenceKeys.Gestures.GESTURE_UNWANTED)
+                    }
+                }
                 true
             }
         }
@@ -366,17 +392,17 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     private fun showSetAppForGesture(activityResultLauncher: ActivityResultLauncher<Intent>) {
         activityResultLauncher.launch(
             Intent(activity, AppListActivity::class.java)
-                .decorateForAppListLaunch(R.string.gesture_app_chooser_title))
+                .decorateForAppListLaunch(R.string.gesture_app_chooser_title)
+        )
     }
 
     private fun measureGestureView(databinder: FragmentHomeBinding) {
-        databinder.root.post(object: Runnable {
+        databinder.root.post(object : Runnable {
             override fun run() {
                 if (databinder.gestureContainer.height > 0) {
                     gestureViewHalfWidth = databinder.gestureContainer.width / 2
                     gestureViewHalfHeight = databinder.gestureContainer.height / 2
                     databinder.gestureContainer.visibility = View.GONE
-
                 } else {
                     databinder.root.post(this)
                 }
@@ -477,7 +503,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 showingItemContextMenu = true
             }
 
-            val xy = intArrayOf(0,0)
+            val xy = intArrayOf(0, 0)
             val rect = Rect()
             private fun getViewLocation(v: View): Rect {
                 v.getLocationOnScreen(xy)
@@ -492,10 +518,10 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 if (v.visibility != View.VISIBLE) return false
                 val rect = getViewLocation(v)
                 return rect.contains(me.rawX.toInt(), me.rawY.toInt()) ||
-                        doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left, rect.top, rect.left, rect.top + rect.height()) ||
-                        doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left, rect.top, rect.left + rect.width(), rect.top) ||
-                        doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left + rect.width(), rect.top, rect.left + rect.width(), rect.top + rect.height()) ||
-                        doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left, rect.top + rect.height(), rect.left + rect.width(), rect.top + rect.height())
+                    doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left, rect.top, rect.left, rect.top + rect.height()) ||
+                    doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left, rect.top, rect.left + rect.width(), rect.top) ||
+                    doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left + rect.width(), rect.top, rect.left + rect.width(), rect.top + rect.height()) ||
+                    doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left, rect.top + rect.height(), rect.left + rect.width(), rect.top + rect.height())
             }
 
             private fun doLinesIntersect(
@@ -506,7 +532,8 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 line2x1: Int,
                 line2y1: Int,
                 line2x2: Int,
-                line2y2: Int): Boolean {
+                line2y2: Int
+            ): Boolean {
 
                 val s1_x = line1x2 - line1x1
                 val s1_y = line1y2 - line1y1
@@ -514,7 +541,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 val s2_y = line2y2 - line2y1
 
                 val s = (-s1_y * (line1x1 - line2x1) + s1_x * (line1y1 - line2y1)) / (-s2_x * s1_y + s1_x * s2_y)
-                val t = ( s2_x * (line1y1 - line2y1) - s2_y * (line1x1 - line2x1)) / (-s2_x * s1_y + s1_x * s2_y)
+                val t = (s2_x * (line1y1 - line2y1) - s2_y * (line1x1 - line2x1)) / (-s2_x * s1_y + s1_x * s2_y)
 
                 return s >= 0 && s <= 1 && t >= 0 && t <= 1
             }
@@ -529,7 +556,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
 
             private fun stoppedTouchingView() {
                 currentlyActive?.let { current ->
-                    showGestureDetailsContextMenuRunnable?.let{ current.first.removeCallbacks(it) }
+                    showGestureDetailsContextMenuRunnable?.let { current.first.removeCallbacks(it) }
                     makeGreyscale(current.first)
                 }
                 currentlyActive = null
@@ -542,7 +569,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             try {
                 context?.packageManager?.getPackageInfo(componentName.packageName, 0) ?: return@execute
                 action()
-            } catch (_ : Exception) { /* package isn't installed */ }
+            } catch (_: Exception) { /* package isn't installed */ }
         }
     }
 

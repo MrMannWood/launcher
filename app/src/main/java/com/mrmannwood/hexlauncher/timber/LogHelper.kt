@@ -12,6 +12,6 @@ fun toPriorityString(priority: Int): String {
     }
 }
 
-fun isAtLeastWarn(priority: Int) : Boolean {
+fun isAtLeastWarn(priority: Int): Boolean {
     return priority >= android.util.Log.WARN
 }

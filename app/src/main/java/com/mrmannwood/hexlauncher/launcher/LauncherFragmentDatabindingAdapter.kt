@@ -10,38 +10,38 @@ object LauncherFragmentDatabindingAdapter {
 
     fun getAppName(hexItem: HexItem?) = hexItem?.label ?: ""
 
-    fun getAdaptiveIconVisibility(hexItem: HexItem?) : Int {
+    fun getAdaptiveIconVisibility(hexItem: HexItem?): Int {
         if (hexItem == null) return View.GONE
         return if (IconAdapter.INSTANCE.isAdaptive(hexItem.icon.get())) View.VISIBLE else View.GONE
     }
 
-    fun getNonAdaptiveIconVisibility(hexItem: HexItem?) : Int {
+    fun getNonAdaptiveIconVisibility(hexItem: HexItem?): Int {
         if (hexItem == null) return View.GONE
         return if (IconAdapter.INSTANCE.isAdaptive(hexItem.icon.get())) View.GONE else View.VISIBLE
     }
 
-    fun getHiddenVisibility(hexItem: HexItem?) : Int {
+    fun getHiddenVisibility(hexItem: HexItem?): Int {
         if (hexItem == null) return View.GONE
         return if (hexItem.hidden) View.VISIBLE else View.GONE
     }
 
-    fun getBackgroundColor(hexItem: HexItem?) : Int {
+    fun getBackgroundColor(hexItem: HexItem?): Int {
         return hexItem?.backgroundColor ?: Color.WHITE
     }
 
-    fun getForegroundIcon(hexItem: HexItem?) : Drawable? {
+    fun getForegroundIcon(hexItem: HexItem?): Drawable? {
         if (hexItem == null) return null
         val icon = hexItem.icon.get()
         return IconAdapter.INSTANCE.getForegroundDrawable(icon) ?: icon
     }
 
-    fun getBackgroundIcon(hexItem: HexItem?) : Drawable? {
+    fun getBackgroundIcon(hexItem: HexItem?): Drawable? {
         if (hexItem == null) return null
         val icon = hexItem.icon.get()
         return IconAdapter.INSTANCE.getBackgroundDrawable(icon) ?: icon
     }
 
-    fun getBackgroundIconVisibility(hexItem: HexItem?) : Int {
+    fun getBackgroundIconVisibility(hexItem: HexItem?): Int {
         if (hexItem == null) return View.GONE
         val icon = hexItem.icon.get()
         if (!IconAdapter.INSTANCE.isAdaptive(icon)) return View.GONE

@@ -11,12 +11,12 @@ import kotlin.reflect.KClass
 
 @MainThread
 class Adapter<T : Any>(
-        private val context: Context,
-        private val order: Array<KClass<out T>>,
-        private val idFunc: ((T) -> Long)? = null,
-        private val viewFunc: ((T) -> Int),
-        private val bindFunc: (ViewDataBinding, T) -> Unit
-): RecyclerView.Adapter<Adapter.Holder>() {
+    private val context: Context,
+    private val order: Array<KClass<out T>>,
+    private val idFunc: ((T) -> Long)? = null,
+    private val viewFunc: ((T) -> Int),
+    private val bindFunc: (ViewDataBinding, T) -> Unit
+) : RecyclerView.Adapter<Adapter.Holder>() {
 
     init {
         if (idFunc != null) {
@@ -25,7 +25,7 @@ class Adapter<T : Any>(
     }
 
     private val data: MutableList<List<T>> = (order.indices).map { emptyList<T>() }.toMutableList()
-    private var expandedData : List<T> = emptyList()
+    private var expandedData: List<T> = emptyList()
 
     fun setData(clazz: KClass<out T>, data: List<T>) {
         this.data[order.indexOf(clazz)] = data
@@ -34,7 +34,7 @@ class Adapter<T : Any>(
         notifyDataSetChanged()
     }
 
-    fun getItem(position: Int) : T = expandedData[position]
+    fun getItem(position: Int): T = expandedData[position]
 
     override fun getItemCount(): Int = expandedData.size
 
@@ -52,30 +52,31 @@ class Adapter<T : Any>(
                 LayoutInflater.from(context),
                 viewType,
                 parent,
-                false /* attachToParent */)
+                false /* attachToParent */
+            )
         )
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         bindFunc(holder.vdb, expandedData[position])
     }
 
-    class Holder(val vdb: ViewDataBinding): RecyclerView.ViewHolder(vdb.root)
+    class Holder(val vdb: ViewDataBinding) : RecyclerView.ViewHolder(vdb.root)
 
     class IdGenerator<T : Any>(defs: List<Pair<KClass<out T>, (T) -> Any>>) {
 
         private var id = 0L
-        private val map : Map<KClass<out T>, Pair<(T) -> Any, MutableMap<Any, Long>>> =
-                defs.map { (clazz, func) ->
-                    clazz to (func to mutableMapOf<Any, Long>())
-                }.toMap()
+        private val map: Map<KClass<out T>, Pair<(T) -> Any, MutableMap<Any, Long>>> =
+            defs.map { (clazz, func) ->
+                clazz to (func to mutableMapOf<Any, Long>())
+            }.toMap()
 
-        fun genId(result : T) : Long {
+        fun genId(result: T): Long {
             val (keyGet, idMap) = map.getOrElse(result::class, { throw IllegalArgumentException("Unknown type ${result::class}") })
             val key = keyGet(result)
             return getOrCreateId(key, idMap)
         }
 
-        private fun <T> getOrCreateId(key: T, map : MutableMap<T, Long>) : Long {
+        private fun <T> getOrCreateId(key: T, map: MutableMap<T, Long>): Long {
             var id = map[key]
             if (id == null) {
                 id = genNextId()
@@ -84,6 +85,6 @@ class Adapter<T : Any>(
             return id
         }
 
-        private fun genNextId() : Long = id++
+        private fun genNextId(): Long = id++
     }
 }

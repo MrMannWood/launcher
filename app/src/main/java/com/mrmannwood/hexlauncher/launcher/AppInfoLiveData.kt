@@ -13,16 +13,16 @@ import com.mrmannwood.hexlauncher.executors.cpuBoundTaskExecutor
 import com.mrmannwood.hexlauncher.livedata.combineWith
 import com.mrmannwood.launcher.R
 
-private var appInfoLiveData : LiveData<List<AppInfo>>? = null
+private var appInfoLiveData: LiveData<List<AppInfo>>? = null
 private val categoryMap: MutableMap<Int, List<String>> = HashMap()
 
-fun getSingleAppLiveData(context: Context, componentName: ComponentName) : LiveData<AppInfo?> {
+fun getSingleAppLiveData(context: Context, componentName: ComponentName): LiveData<AppInfo?> {
     return Transformations.map(makeLiveData(context.applicationContext as Application, true)) {
-        it.firstOrNull{ it.componentName == componentName }
+        it.firstOrNull { it.componentName == componentName }
     }
 }
 
-fun getAppInfoLiveData(appContext: Application, showHidden: Boolean = false) : LiveData<List<AppInfo>> {
+fun getAppInfoLiveData(appContext: Application, showHidden: Boolean = false): LiveData<List<AppInfo>> {
     if (showHidden) {
         return makeLiveData(appContext, true)
     }
@@ -32,7 +32,7 @@ fun getAppInfoLiveData(appContext: Application, showHidden: Boolean = false) : L
     return appInfoLiveData!!
 }
 
-private fun makeLiveData(appContext: Application, showHidden: Boolean = false) : LiveData<List<AppInfo>> {
+private fun makeLiveData(appContext: Application, showHidden: Boolean = false): LiveData<List<AppInfo>> {
     return (appContext as LauncherApplication).appListLiveData.combineWith(
         DB.get(appContext).appDataDao().watchApps(),
         cpuBoundTaskExecutor

@@ -14,20 +14,20 @@ interface AppDataDao {
     fun update(label: String, lastUpdateTime: Long, backgroundColor: Int, componentName: ComponentName)
 
     @Query("SELECT * FROM app_data")
-    fun getApps() : List<AppData>
+    fun getApps(): List<AppData>
 
     @Transaction
     @Query("SELECT * FROM app_data WHERE component_name = :componentName")
-    fun watchApp(componentName: ComponentName) : LiveData<AppData>
+    fun watchApp(componentName: ComponentName): LiveData<AppData>
 
     @Query("SELECT * FROM app_data")
-    fun watchApps() : LiveData<List<AppData>>
+    fun watchApps(): LiveData<List<AppData>>
 
     @Query("DELETE FROM app_data WHERE component_name NOT IN (:componentNames)")
     fun deleteNotIncluded(componentNames: List<ComponentName>)
 
     @Query("SELECT component_name, last_update_time FROM app_data")
-    fun getLastUpdateTimeStamps() : List<AppData.Timestamp>
+    fun getLastUpdateTimeStamps(): List<AppData.Timestamp>
 
     @Query("UPDATE app_data SET bgc_override = :backgroundColor WHERE component_name = :componentName")
     fun setColorOverride(componentName: ComponentName, backgroundColor: Int)

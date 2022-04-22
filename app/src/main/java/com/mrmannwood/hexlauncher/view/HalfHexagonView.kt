@@ -48,5 +48,4 @@ class HalfHexagonView @JvmOverloads constructor(
         setMeasuredDimension(width, height)
         calculatePath(width)
     }
-
 }

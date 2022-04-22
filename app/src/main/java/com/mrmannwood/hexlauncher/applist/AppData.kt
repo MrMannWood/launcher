@@ -1,7 +1,6 @@
 package com.mrmannwood.hexlauncher.applist
 
 import android.content.ComponentName
-import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -9,7 +8,7 @@ import androidx.room.TypeConverters
 import com.mrmannwood.hexlauncher.typeconverters.ManualRoomTypeConverters
 
 @Entity(tableName = "app_data")
-data class AppData (
+data class AppData(
     @field:TypeConverters(ManualRoomTypeConverters::class)
     @PrimaryKey @ColumnInfo(name = "component_name") val componentName: ComponentName,
     @ColumnInfo(name = "label") val label: String,

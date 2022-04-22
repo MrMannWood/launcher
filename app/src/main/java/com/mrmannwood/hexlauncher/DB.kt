@@ -5,7 +5,6 @@ import android.graphics.Color
 import androidx.core.content.contentValuesOf
 import androidx.room.OnConflictStrategy
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import timber.log.Timber
@@ -13,7 +12,7 @@ import java.util.concurrent.Executors
 
 object DB {
 
-    private var db : Database? = null
+    private var db: Database? = null
 
     fun get(context: Context): Database {
         var database = db
@@ -29,7 +28,8 @@ object DB {
                         .setQueryCallback(
                             { sqlQuery, bindArgs ->
                                 Timber.d("SQL Query: $sqlQuery Args: $bindArgs")
-                            }, Executors.newSingleThreadExecutor())
+                            }, Executors.newSingleThreadExecutor()
+                        )
                         .addMigrations(MIGRATION_9_10)
                         .fallbackToDestructiveMigration()
                         .build()
@@ -45,7 +45,8 @@ private val MIGRATION_9_10 = object : Migration(9, 10) {
     override fun migrate(db: SupportSQLiteDatabase) {
         Timber.d("Running room migration 9 -> 10")
 
-        db.execSQL("""
+        db.execSQL(
+            """
             CREATE TABLE app_data_new (
                 component_name TEXT PRIMARY KEY NOT NULL,
                 label TEXT NOT NULL,
@@ -56,7 +57,8 @@ private val MIGRATION_9_10 = object : Migration(9, 10) {
                 background_hidden INTEGER NOT NULL DEFAULT 0,
                 tags TEXT
             )
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         LauncherApplication.APPLICATION.appListManager.queryAppList()
             .forEach { launcherItem ->
@@ -74,7 +76,8 @@ private val MIGRATION_9_10 = object : Migration(9, 10) {
                         "tags" to ""
                     )
                 )
-                db.execSQL("""
+                db.execSQL(
+                    """
                     UPDATE app_data_new
                     SET
                         last_update_time = (SELECT last_update_time FROM app_data WHERE app_data.package_name = '${launcherItem.packageName}'),
@@ -84,7 +87,8 @@ private val MIGRATION_9_10 = object : Migration(9, 10) {
                         background_hidden = (SELECT background_hidden FROM app_data_decoration WHERE app_data_decoration.package_name_dec = '${launcherItem.packageName}'),
                         tags = (SELECT tags FROM app_data_decoration WHERE app_data_decoration.package_name_dec = '${launcherItem.packageName}')
                     WHERE component_name = '${launcherItem.componentName.flattenToString()}'
-                """.trimIndent())
+                    """.trimIndent()
+                )
             }
         db.execSQL("DROP TABLE app_data_decoration")
         db.execSQL("DROP TABLE app_data")

@@ -4,7 +4,7 @@ import android.content.ComponentName
 import android.graphics.drawable.Drawable
 import android.os.UserHandle
 
-data class LauncherItem (
+data class LauncherItem(
     val packageName: String,
     val componentName: ComponentName,
     val userHandle: UserHandle,

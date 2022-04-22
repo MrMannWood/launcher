@@ -9,9 +9,9 @@ import androidx.appcompat.widget.AppCompatEditText
 import com.mrmannwood.hexlauncher.HandleBackPressed
 
 @UiThread class KeyboardEditText @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int =  R.attr.editTextStyle
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = R.attr.editTextStyle
 ) : AppCompatEditText(context, attrs, defStyleAttr) {
 
     var handleBackPressed: HandleBackPressed? = null

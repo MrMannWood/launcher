@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +25,7 @@ class AllAppsListFragment : Fragment() {
     private lateinit var resultListView: RecyclerView
     private lateinit var resultListAdapter: Adapter<AppInfo>
 
-    private val viewModel : AllAppsViewModel by activityViewModels()
+    private val viewModel: AllAppsViewModel by activityViewModels()
 
     private var leftHandedLayout: Boolean = false
 
@@ -54,7 +53,7 @@ class AllAppsListFragment : Fragment() {
         }
     }
 
-    private fun createResultLayoutManager(context: Context) : RecyclerView.LayoutManager {
+    private fun createResultLayoutManager(context: Context): RecyclerView.LayoutManager {
         return LinearLayoutManager(context).apply {
             reverseLayout = true
         }
@@ -93,9 +92,11 @@ class AllAppsListFragment : Fragment() {
                         true
                     }
                     menu.add(R.string.menu_item_uninstall_app_title).setOnMenuItemClickListener {
-                        startActivity(Intent(Intent.ACTION_DELETE).apply {
-                            data = Uri.parse("package:${result.launcherItem.packageName}")
-                        })
+                        startActivity(
+                            Intent(Intent.ACTION_DELETE).apply {
+                                data = Uri.parse("package:${result.launcherItem.packageName}")
+                            }
+                        )
                         true
                     }
                 }

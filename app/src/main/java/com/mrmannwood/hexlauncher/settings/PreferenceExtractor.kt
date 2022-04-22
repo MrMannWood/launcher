@@ -4,14 +4,14 @@ import android.content.SharedPreferences
 
 sealed class PreferenceExtractor<T> {
 
-    abstract fun getValue(sharedPreferences: SharedPreferences, key: String) : T?
+    abstract fun getValue(sharedPreferences: SharedPreferences, key: String): T?
 
     object StringExtractor : PreferenceExtractor<String?>() {
         override fun getValue(sharedPreferences: SharedPreferences, key: String): String? {
             return sharedPreferences.getString(key, null)
         }
     }
-    abstract class PrimitiveExtractor<T>: PreferenceExtractor<T?>() {
+    abstract class PrimitiveExtractor<T> : PreferenceExtractor<T?>() {
         override fun getValue(sharedPreferences: SharedPreferences, key: String): T? {
             return if (sharedPreferences.contains(key)) {
                 extract(sharedPreferences, key)
@@ -19,7 +19,7 @@ sealed class PreferenceExtractor<T> {
                 null
             }
         }
-        abstract fun extract(sharedPreferences: SharedPreferences, key: String) : T
+        abstract fun extract(sharedPreferences: SharedPreferences, key: String): T
     }
     object BooleanExtractor : PrimitiveExtractor<Boolean>() {
         override fun extract(sharedPreferences: SharedPreferences, key: String): Boolean {

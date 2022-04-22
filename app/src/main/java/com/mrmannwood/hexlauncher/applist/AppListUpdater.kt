@@ -49,7 +49,7 @@ object AppListUpdater {
     }
 
     @WorkerThread
-    private fun convertToAppData(launcherItem: LauncherItem) : AppData {
+    private fun convertToAppData(launcherItem: LauncherItem): AppData {
         return AppData(
             componentName = launcherItem.componentName,
             label = launcherItem.label,

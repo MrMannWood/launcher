@@ -14,7 +14,7 @@ import com.mrmannwood.hexlauncher.launcher.FakeLauncherActivity
 sealed class RoleManagerHelper {
 
     companion object {
-        val INSTANCE : RoleManagerHelper =
+        val INSTANCE: RoleManagerHelper =
             when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> QRoleManagerHelper
                 else -> HackyAsShitRoleManagerHelper
@@ -27,13 +27,13 @@ sealed class RoleManagerHelper {
         ROLE_HELD
     }
 
-    abstract fun getRoleStatus(context: Context, role: String) : RoleManagerResult
-    abstract fun getRoleSetIntent(context: Context, role: String) : Pair<Intent, () -> Unit>
+    abstract fun getRoleStatus(context: Context, role: String): RoleManagerResult
+    abstract fun getRoleSetIntent(context: Context, role: String): Pair<Intent, () -> Unit>
 
     @TargetApi(Build.VERSION_CODES.Q)
     private object QRoleManagerHelper : RoleManagerHelper() {
 
-        override fun getRoleStatus(context: Context, role: String) : RoleManagerResult {
+        override fun getRoleStatus(context: Context, role: String): RoleManagerResult {
             val roleManager = context.getSystemService(RoleManager::class.java) as RoleManager
 
             return if (!roleManager.isRoleAvailable(RoleManager.ROLE_HOME)) {
@@ -45,7 +45,7 @@ sealed class RoleManagerHelper {
             }
         }
 
-        override fun getRoleSetIntent(context: Context, role: String) : Pair<Intent, () -> Unit> {
+        override fun getRoleSetIntent(context: Context, role: String): Pair<Intent, () -> Unit> {
             val roleManager = context.getSystemService(RoleManager::class.java) as RoleManager
             return roleManager.createRequestRoleIntent(role) to { }
         }
@@ -55,10 +55,10 @@ sealed class RoleManagerHelper {
      * Uses legacy interactions to fake role interactions
      * {@see https://stackoverflow.com/questions/27991656/how-to-set-default-app-launcher-programmatically}
      */
-    @SuppressWarnings( "deprecation" )
+    @SuppressWarnings("deprecation")
     private object HackyAsShitRoleManagerHelper : RoleManagerHelper() {
 
-        override fun getRoleStatus(context: Context, role: String) : RoleManagerResult {
+        override fun getRoleStatus(context: Context, role: String): RoleManagerResult {
             if (RoleManagerCompat.ROLE_HOME != role) {
                 return RoleManagerResult.ROLE_NOT_AVAILABLE
             }
@@ -76,7 +76,7 @@ sealed class RoleManagerHelper {
             }
         }
 
-        override fun getRoleSetIntent(context: Context, role: String) : Pair<Intent, () -> Unit> {
+        override fun getRoleSetIntent(context: Context, role: String): Pair<Intent, () -> Unit> {
             if (RoleManagerCompat.ROLE_HOME != role) {
                 throw UnsupportedOperationException("Roles other than HOME are not supported")
             }
@@ -88,10 +88,9 @@ sealed class RoleManagerHelper {
             return Intent(Intent.ACTION_MAIN).apply {
                 addCategory(Intent.CATEGORY_HOME)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            } to  {
+            } to {
                 pacman.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP)
             }
         }
     }
-
 }

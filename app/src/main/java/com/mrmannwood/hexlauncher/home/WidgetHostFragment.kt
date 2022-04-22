@@ -20,7 +20,7 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
 
     private val viewModel: WidgetHostViewModel by activityViewModels()
 
-    private lateinit var databinder : FragmentHomeBinding
+    private lateinit var databinder: FragmentHomeBinding
 
     final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         databinder = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
@@ -32,10 +32,12 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
     final override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         onViewCreated(databinder, savedInstanceState)
 
-        viewModel.widgetsLiveData.forEach { liveData -> liveData.observe(
-            viewLifecycleOwner,
-            WidgetLiveDataObserver(view.context)
-        ) }
+        viewModel.widgetsLiveData.forEach { liveData ->
+            liveData.observe(
+                viewLifecycleOwner,
+                WidgetLiveDataObserver(view.context)
+            )
+        }
     }
 
     open fun onViewCreated(databinder: FragmentHomeBinding, savedInstanceState: Bundle?) {}
@@ -48,14 +50,14 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
 
     fun isLoading(): Boolean = databinder.description!!.isLoading()
 
-    abstract fun makeDescription(isLoading: Boolean) : HomeViewDescription
+    abstract fun makeDescription(isLoading: Boolean): HomeViewDescription
 
     private inner class WidgetLiveDataObserver(
         context: Context
     ) : Observer<WidgetHostViewModel.WidgetPlacement> {
 
         private val context = context.applicationContext
-        private var widgetView : View? = null
+        private var widgetView: View? = null
 
         override fun onChanged(value: WidgetHostViewModel.WidgetPlacement) {
             if (!value.loaded) return
@@ -77,9 +79,9 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
             widgetView = view
 
             view.layoutParams = FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.CENTER_HORIZONTAL
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER_HORIZONTAL
             )
             view.y = yPos
             (view as TextView).setTextColor(color)

@@ -17,7 +17,7 @@ class AppListActivity : BaseActivity(), AppListFragment.AppListHostActivity {
         private const val KEY_COMPONENT_NAME = "component_name"
         private const val KEY_APP_NAME = "app_name"
 
-        fun Intent.decorateForAppListLaunch(@StringRes title: Int) : Intent {
+        fun Intent.decorateForAppListLaunch(@StringRes title: Int): Intent {
             putExtra(KEY_TITLE, title)
             return this
         }
@@ -28,7 +28,9 @@ class AppListActivity : BaseActivity(), AppListFragment.AppListHostActivity {
         }
 
         fun Intent?.onAppListResult(
-            onSuccess: (appName: String, componentName: ComponentName) -> Unit, onFailure: () -> Unit) {
+            onSuccess: (appName: String, componentName: ComponentName) -> Unit,
+            onFailure: () -> Unit
+        ) {
             val appName = this?.getStringExtra(KEY_APP_NAME)
             val componentName = this?.getParcelableExtra<ComponentName>(KEY_COMPONENT_NAME)
             if (appName == null || componentName == null) {

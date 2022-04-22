@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.Application
 import android.content.Intent
 import android.os.Build
-import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.FileProvider
 import com.mrmannwood.applist.AppListLiveData
@@ -71,7 +70,7 @@ class LauncherApplication : Application() {
             AppListUpdater.updateAppList(applicationContext, it)
         }
 
-        CoroutineScope(Dispatchers.IO).launch  {
+        CoroutineScope(Dispatchers.IO).launch {
             File(filesDir, "rage_shake").deleteRecursively()
         }
     }
@@ -100,11 +99,12 @@ class LauncherApplication : Application() {
             val uris = ArrayList(
                 rageShakeDir.listFiles()?.map {
                     FileProvider.getUriForFile(
-                        activity, "com.mrmannwood.hexlauncher.fileprovider", it)
+                        activity, "com.mrmannwood.hexlauncher.fileprovider", it
+                    )
                 } ?: emptyList()
             )
 
-            val debugInfo ="""
+            val debugInfo = """
                 OS Version: ${System.getProperty("os.version")} (${Build.VERSION.INCREMENTAL})
                 OS API Level: ${Build.VERSION.SDK_INT}
                 Device: ${Build.DEVICE}

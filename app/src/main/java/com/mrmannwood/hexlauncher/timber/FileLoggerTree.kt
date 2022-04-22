@@ -28,16 +28,16 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
         private const val MESSAGE_FLUSH = 2
         private const val MESSAGE_COPY_LOGS = 3
 
-        private var INSTANCE : FileLoggerTree? = null
+        private var INSTANCE: FileLoggerTree? = null
 
-        fun getAndInit(context: Context) : FileLoggerTree {
+        fun getAndInit(context: Context): FileLoggerTree {
             if (INSTANCE == null) {
                 INSTANCE = FileLoggerTree(context)
             }
             return INSTANCE!!
         }
 
-        fun get() : FileLoggerTree {
+        fun get(): FileLoggerTree {
             return INSTANCE!!
         }
     }
@@ -131,7 +131,7 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
             } finally {
                 try {
                     out.close()
-                } catch (e: IOException) { /* ignore */}
+                } catch (e: IOException) { /* ignore */ }
             }
 
             logs.clear()
@@ -148,7 +148,7 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
             }
         }
 
-        private fun countLinesInFile(file: File) : Int {
+        private fun countLinesInFile(file: File): Int {
             return BufferedReader(InputStreamReader(FileInputStream(file))).use { reader ->
                 var count = 0
                 while (true) {
@@ -161,21 +161,21 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
             }
         }
 
-        private fun openLastFile(context: Context) : File? {
+        private fun openLastFile(context: Context): File? {
             val fileNameFormat = getFileNameDateFormat()
             return openLogsFolder(context)?.listFiles()
                 ?.filter { it.name.endsWith(LOG_FILE_SUFFIX) }
                 ?.maxByOrNull { fileNameFormat.parse(it.nameWithoutExtension)?.time!! }
         }
 
-        private fun openNewFile(context: Context) : OutputStreamWriter {
+        private fun openNewFile(context: Context): OutputStreamWriter {
             val logsDir = openLogsFolder(context) ?: return OutputStreamWriter(NoOpOutputStream)
             deleteOldLogFiles(logsDir)
 
             return OutputStreamWriter(
                 try {
                     FileOutputStream(
-                        File(logsDir, "${getFileNameDateFormat().format(Date())}.${LOG_FILE_SUFFIX}")
+                        File(logsDir, "${getFileNameDateFormat().format(Date())}.$LOG_FILE_SUFFIX")
                     )
                 } catch (e: FileNotFoundException) {
                     logError("Unable to open output stream", e)
@@ -184,7 +184,7 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
             )
         }
 
-        private fun openLogsFolder(context: Context) : File? {
+        private fun openLogsFolder(context: Context): File? {
             return try {
                 context.getDir(LOGS_DIRECTORY, MODE_PRIVATE)
             } catch (e: SQLiteException) {
@@ -198,7 +198,7 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
                 ?.filter { it.name.endsWith(LOG_FILE_SUFFIX) }
                 ?.size
                 ?: 0
-            if(numFiles >= MAX_LOG_FILES) {
+            if (numFiles >= MAX_LOG_FILES) {
                 val fileNameFormat = getFileNameDateFormat()
                 logsDir.listFiles()
                     ?.filter { it.name.endsWith(LOG_FILE_SUFFIX) }
@@ -208,7 +208,7 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
             }
         }
 
-        private fun getFileNameDateFormat() : DateFormat {
+        private fun getFileNameDateFormat(): DateFormat {
             val df = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS", Locale.US)
             df.timeZone = TimeZone.getTimeZone("UTC")
             return df

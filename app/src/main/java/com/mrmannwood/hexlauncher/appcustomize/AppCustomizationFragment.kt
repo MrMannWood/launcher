@@ -11,7 +11,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mrmannwood.hexlauncher.DB
@@ -36,7 +35,7 @@ class AppCustomizationFragment : InstrumentedFragment() {
     companion object {
         private const val COMPONENT_NAME = "component_name"
 
-        fun forComponent(componentName: ComponentName) : AppCustomizationFragment {
+        fun forComponent(componentName: ComponentName): AppCustomizationFragment {
             return AppCustomizationFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(COMPONENT_NAME, componentName)
@@ -52,9 +51,9 @@ class AppCustomizationFragment : InstrumentedFragment() {
     private var appInfo: AppInfo? = null
     private lateinit var tagsAdapter: Adapter<SearchTerm>
 
-    private val viewModel : AppCustomizationViewModel by viewModels { AppCustomizationViewModelFactory(requireContext(), componentName) }
-    private val colorPickerViewModel : ColorPickerViewModel by activityViewModels()
-    private val textEntryDialogViewModel : TextEntryDialogViewModel by activityViewModels()
+    private val viewModel: AppCustomizationViewModel by viewModels { AppCustomizationViewModelFactory(requireContext(), componentName) }
+    private val colorPickerViewModel: ColorPickerViewModel by activityViewModels()
+    private val textEntryDialogViewModel: TextEntryDialogViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,20 +100,23 @@ class AppCustomizationFragment : InstrumentedFragment() {
                 binding.iconBgcOverride = color
             }
             colorPickerViewModel.colorLiveData.observe(viewLifecycleOwner, colorObserver)
-            colorPickerViewModel.completionLiveData.observe(viewLifecycleOwner, object : Observer<Boolean> {
-                override fun onChanged(complete: Boolean) {
-                    if (complete) {
-                        colorPickerViewModel.colorLiveData.removeObserver(colorObserver)
-                        colorPickerViewModel.completionLiveData.removeObserver(this)
+            colorPickerViewModel.completionLiveData.observe(
+                viewLifecycleOwner,
+                object : Observer<Boolean> {
+                    override fun onChanged(complete: Boolean) {
+                        if (complete) {
+                            colorPickerViewModel.colorLiveData.removeObserver(colorObserver)
+                            colorPickerViewModel.completionLiveData.removeObserver(this)
 
-                        binding.iconBgcOverride?.let { bgc ->
-                            updateAppInfo { dao ->
-                                dao.setColorOverride(appInfo!!.componentName, bgc)
+                            binding.iconBgcOverride?.let { bgc ->
+                                updateAppInfo { dao ->
+                                    dao.setColorOverride(appInfo!!.componentName, bgc)
+                                }
                             }
                         }
                     }
                 }
-            })
+            )
             colorPickerViewModel.cancellationLiveData.observe(viewLifecycleOwner) { canceled ->
                 if (canceled) {
                     binding.iconBgcOverride = null
@@ -129,7 +131,7 @@ class AppCustomizationFragment : InstrumentedFragment() {
             extractColorsForPicker(appInfo!!.icon) { iconAdapter, icon ->
                 iconAdapter.getPalette(
                     icon = icon,
-                    onPalette =  { palette: Palette ->
+                    onPalette = { palette: Palette ->
                         addColorsToColorPickerSuggestions(
                             listOfNotNull(
                                 palette.dominantSwatch,
@@ -199,8 +201,8 @@ class AppCustomizationFragment : InstrumentedFragment() {
             order = arrayOf(SearchTerm.Category::class, SearchTerm.Tag::class),
             idFunc = { appInfo?.categories?.indexOf(it.term)?.toLong() ?: -1L },
             viewFunc = { R.layout.list_app_customization_tag },
-            bindFunc = {  vdb, tag ->
-                when(vdb) {
+            bindFunc = { vdb, tag ->
+                when (vdb) {
                     is ListAppCustomizationTagBinding -> {
                         vdb.resources = resources
                         vdb.adapter = CustomizationFragmentDatabindingAdapter
@@ -252,7 +254,7 @@ class AppCustomizationFragment : InstrumentedFragment() {
     }
 
     sealed class SearchTerm(val term: String) {
-        class Category(term: String): SearchTerm(term)
-        class Tag(term: String): SearchTerm(term)
+        class Category(term: String) : SearchTerm(term)
+        class Tag(term: String) : SearchTerm(term)
     }
 }

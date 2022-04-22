@@ -47,7 +47,10 @@ class AppListManager(context: Context) {
             }
 
             override fun onPackagesAvailable(
-                packageNames: Array<String>, user: UserHandle, replacing: Boolean) {
+                packageNames: Array<String>,
+                user: UserHandle,
+                replacing: Boolean
+            ) {
                 Timber.d("AppListManager::onPackagesAvailable")
                 callback()
             }

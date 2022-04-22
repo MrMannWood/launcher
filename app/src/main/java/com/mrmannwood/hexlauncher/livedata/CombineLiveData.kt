@@ -4,18 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import java.util.concurrent.Executor
 
-fun <T,K,S> LiveData<T>.combineWith(
+fun <T, K, S> LiveData<T>.combineWith(
     liveData: LiveData<K>,
     executor: Executor,
     combine: (T?, K?) -> S?
 ): LiveData<S> = CombineLiveData(this, liveData, executor, combine)
 
-class CombineLiveData<T,K,S>(
+class CombineLiveData<T, K, S>(
     source1: LiveData<T>,
     source2: LiveData<K>,
     executor: Executor,
     combine: (T?, K?) -> S?,
-): MediatorLiveData<S>() {
+) : MediatorLiveData<S>() {
 
     private var data1: T? = null
     private var data2: K? = null

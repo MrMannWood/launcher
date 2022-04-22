@@ -21,11 +21,11 @@ import com.mrmannwood.launcher.databinding.FragmentHomeBinding
 
 class HomeArrangementFragment : WidgetHostFragment() {
 
-    private val colorPickerViewModel : ColorPickerViewModel by activityViewModels()
+    private val colorPickerViewModel: ColorPickerViewModel by activityViewModels()
 
     private lateinit var instructionMessage: TextView
     private lateinit var widgetContainer: FrameLayout
-    private var sharedPrefs : SharedPreferences? = null
+    private var sharedPrefs: SharedPreferences? = null
 
     private val widgets = mutableMapOf<WidgetDescription, View>()
     private var viewBottom = 0
@@ -83,7 +83,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
                 if (event.actionIndex != 0) return gestureDetector.onTouchEvent(event)
                 if (widget != null && event.y + yOffset < 0) return gestureDetector.onTouchEvent(event)
 
-                when(event.action) {
+                when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
                         widget = findTouchedWidget(event.x, event.y)?.also { widget ->
                             yOffset = widget.y - event.y
@@ -104,7 +104,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
                 return gestureDetector.onTouchEvent(event)
             }
 
-            private fun findTouchedWidget(x: Float, y: Float) : View? {
+            private fun findTouchedWidget(x: Float, y: Float): View? {
                 for ((_, widget) in widgets) {
                     if (x < widget.x) continue
                     if (y < widget.y) continue

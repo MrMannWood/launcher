@@ -1,7 +1,6 @@
 package com.mrmannwood.hexlauncher.nux
 
 import android.view.View
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mrmannwood.launcher.R
 
 class TouchTutorialFragment : AbstractGestureWheelTutorialFragment() {
@@ -100,8 +99,8 @@ class TouchTutorialFragment : AbstractGestureWheelTutorialFragment() {
             override var appSelected: Boolean = false
 
             override fun onBegin() {
-                gestures.find { it.id == R.id.north_container } ?.visibility = View.VISIBLE
-                gestures.find { it.id == R.id.south_container } ?.visibility = View.INVISIBLE
+                gestures.find { it.id == R.id.north_container }?.visibility = View.VISIBLE
+                gestures.find { it.id == R.id.south_container }?.visibility = View.INVISIBLE
                 pushMessage(R.string.nux_swipe_message)
             }
 

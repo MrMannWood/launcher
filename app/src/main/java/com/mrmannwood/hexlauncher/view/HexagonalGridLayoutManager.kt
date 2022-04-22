@@ -12,7 +12,7 @@ import kotlin.math.sqrt
  * Heavily used as a reference:
  * https://github.com/devunwired/recyclerview-playground/blob/299515e0cfe4caea78eaf7ba12f7c9cf926b6063/app/src/main/java/com/example/android/recyclerplayground/layout/FixedGridLayoutManager.java#L316
  */
-class HexagonalGridLayoutManager(private val corner: Corner): RecyclerView.LayoutManager() {
+class HexagonalGridLayoutManager(private val corner: Corner) : RecyclerView.LayoutManager() {
 
     enum class Corner(val top: Boolean, val left: Boolean) {
         TOP_LEFT(true, true),
@@ -21,7 +21,7 @@ class HexagonalGridLayoutManager(private val corner: Corner): RecyclerView.Layou
         BOTTOM_RIGHT(false, false)
     }
 
-    private var positions =  Array(8) { Rect(-1, -1, -1, -1) }
+    private var positions = Array(8) { Rect(-1, -1, -1, -1) }
     private var viewCache = SparseArray<View>(positions.size)
 
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
@@ -44,7 +44,7 @@ class HexagonalGridLayoutManager(private val corner: Corner): RecyclerView.Layou
         if (childCount == 0 && state.isPreLayout) return
 
         if (childCount == 0) {
-            //first or empty layout, remeasure
+            // first or empty layout, remeasure
             initPositions(recycler)
             recycler.setViewCacheSize(positions.size)
         } else {

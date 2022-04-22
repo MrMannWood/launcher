@@ -8,7 +8,7 @@ import com.mrmannwood.hexlauncher.executors.diskExecutor
 
 object PreferencesRepository {
 
-    @Volatile private var prefs : SharedPreferences? = null
+    @Volatile private var prefs: SharedPreferences? = null
 
     fun getPrefs(context: Context, callback: (SharedPreferences) -> Unit) {
         val appContext = context.applicationContext

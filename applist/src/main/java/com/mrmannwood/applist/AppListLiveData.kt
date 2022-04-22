@@ -1,7 +1,6 @@
 package com.mrmannwood.applist
 
 import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.pm.LauncherApps
 import androidx.lifecycle.LiveData
 import java.util.concurrent.Executor

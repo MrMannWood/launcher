@@ -12,18 +12,18 @@ import androidx.palette.graphics.Palette
 interface IconAdapter {
 
     companion object {
-        val INSTANCE : IconAdapter = DefaultIconAdapter()
+        val INSTANCE: IconAdapter = DefaultIconAdapter()
     }
 
-    fun isRecycled(icon: Drawable) : Boolean
+    fun isRecycled(icon: Drawable): Boolean
 
-    fun isAdaptive(icon : Drawable) : Boolean
+    fun isAdaptive(icon: Drawable): Boolean
 
-    fun getBackgroundColor(icon: Drawable) : Int
+    fun getBackgroundColor(icon: Drawable): Int
 
-    fun getForegroundDrawable(icon: Drawable) : Drawable?
+    fun getForegroundDrawable(icon: Drawable): Drawable?
 
-    fun getBackgroundDrawable(icon: Drawable) : Drawable?
+    fun getBackgroundDrawable(icon: Drawable): Drawable?
 
     @WorkerThread fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit)
 
@@ -40,9 +40,9 @@ interface IconAdapter {
             return false
         }
 
-        override fun isAdaptive(icon : Drawable) = icon is AdaptiveIconDrawable
+        override fun isAdaptive(icon: Drawable) = icon is AdaptiveIconDrawable
 
-        override fun getBackgroundColor(icon: Drawable) : Int {
+        override fun getBackgroundColor(icon: Drawable): Int {
             if (icon is AdaptiveIconDrawable) {
                 val result = drawableToBitmap(icon.background, false) { bitmap, _ ->
                     getDominantColor(bitmap)
@@ -96,7 +96,7 @@ interface IconAdapter {
             }
         }
 
-        fun <T> drawableToBitmap(drawable: Drawable, selfClose: Boolean, func: (Bitmap, () -> Unit) -> T) : T {
+        fun <T> drawableToBitmap(drawable: Drawable, selfClose: Boolean, func: (Bitmap, () -> Unit) -> T): T {
             if (drawable is BitmapDrawable && drawable.bitmap != null) {
                 return func(drawable.bitmap) { }
             }
@@ -109,7 +109,7 @@ interface IconAdapter {
             }
         }
 
-        fun drawableToBitmap(drawable: Drawable) : Bitmap {
+        fun drawableToBitmap(drawable: Drawable): Bitmap {
             if (drawable is BitmapDrawable && drawable.bitmap != null) {
                 return drawable.bitmap
             }
@@ -128,7 +128,7 @@ interface IconAdapter {
             return bitmap
         }
 
-        fun getDominantColor(bitmap: Bitmap) : Int? {
+        fun getDominantColor(bitmap: Bitmap): Int? {
             val result = intArrayOf(
                 0, 0,
                 0, 0,
@@ -153,7 +153,7 @@ interface IconAdapter {
                 }
             }
             var largest = -1
-            var color : Int? = null
+            var color: Int? = null
             for (i in 0 until (result.size / 2)) {
                 val count = result[i * 2 + 1]
                 val c = result[i * 2]

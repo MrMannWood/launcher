@@ -43,8 +43,8 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
     private lateinit var searchView: KeyboardEditText
     private lateinit var resultListView: RecyclerView
     private lateinit var resultListAdapter: Adapter<TutorialHexItem>
-    private var showKeyboardJob : Job? = null
-    private var leftHandedLayout : Boolean = false
+    private var showKeyboardJob: Job? = null
+    private var leftHandedLayout: Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -105,9 +105,11 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
 
         leftHandedSwitch.setOnCheckedChangeListener { _, checked ->
             val context = context ?: return@setOnCheckedChangeListener
-            PreferencesRepository.getPrefs(context) { it.edit {
-               putBoolean(PreferenceKeys.User.LEFT_HANDED, checked)
-            } }
+            PreferencesRepository.getPrefs(context) {
+                it.edit {
+                    putBoolean(PreferenceKeys.User.LEFT_HANDED, checked)
+                }
+            }
         }
     }
 

@@ -16,14 +16,14 @@ import com.mrmannwood.launcher.R
 import java.util.*
 import kotlin.math.pow
 
-abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment_nux_gesture_wheel_tutorial)  {
+abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment_nux_gesture_wheel_tutorial) {
 
     companion object {
         private val NEGATIVE = floatArrayOf(
             -1.0f, 0f, 0f, 0f, 255f, // red
             0f, -1.0f, 0f, 0f, 255f, // green
             0f, 0f, -1.0f, 0f, 255f, // blue
-            0f, 0f, 0f, 1.0f, 0f  // alpha
+            0f, 0f, 0f, 1.0f, 0f // alpha
         )
     }
 
@@ -97,13 +97,15 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
             gestureContainer.findViewById(R.id.south_east_container),
         )
 
-        view.setOnTouchListener(makeTouchListener(
-            gestureContainer = gestureContainer,
-            onDown = ::onDown,
-            onUp = ::onUp,
-            onAppSelected = ::onAppSelected,
-            onAppDeselected = ::onAppDeselected
-        ))
+        view.setOnTouchListener(
+            makeTouchListener(
+                gestureContainer = gestureContainer,
+                onDown = ::onDown,
+                onUp = ::onUp,
+                onAppSelected = ::onAppSelected,
+                onAppDeselected = ::onAppDeselected
+            )
+        )
 
         onViewCreated()
     }
@@ -121,7 +123,7 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
         onUp: () -> Unit,
         onAppSelected: (selected: View) -> Unit,
         onAppDeselected: () -> Unit
-    ) : View.OnTouchListener {
+    ): View.OnTouchListener {
         val longPressTime = (ViewConfiguration.getLongPressTimeout() * 1.5).toLong()
         val doubleTapTime = ViewConfiguration.getDoubleTapTimeout()
 
@@ -235,46 +237,46 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
                 if (v.visibility != View.VISIBLE) return false
                 val rect = getViewLocation(v)
                 return rect.contains(me.rawX.toInt(), me.rawY.toInt()) ||
-                        doLinesIntersect(
-                            me.rawX,
-                            me.rawY,
-                            downPosition.x,
-                            downPosition.y,
-                            rect.left,
-                            rect.top,
-                            rect.left,
-                            rect.top + rect.height()
-                        ) ||
-                        doLinesIntersect(
-                            me.rawX,
-                            me.rawY,
-                            downPosition.x,
-                            downPosition.y,
-                            rect.left,
-                            rect.top,
-                            rect.left + rect.width(),
-                            rect.top
-                        ) ||
-                        doLinesIntersect(
-                            me.rawX,
-                            me.rawY,
-                            downPosition.x,
-                            downPosition.y,
-                            rect.left + rect.width(),
-                            rect.top,
-                            rect.left + rect.width(),
-                            rect.top + rect.height()
-                        ) ||
-                        doLinesIntersect(
-                            me.rawX,
-                            me.rawY,
-                            downPosition.x,
-                            downPosition.y,
-                            rect.left,
-                            rect.top + rect.height(),
-                            rect.left + rect.width(),
-                            rect.top + rect.height()
-                        )
+                    doLinesIntersect(
+                        me.rawX,
+                        me.rawY,
+                        downPosition.x,
+                        downPosition.y,
+                        rect.left,
+                        rect.top,
+                        rect.left,
+                        rect.top + rect.height()
+                    ) ||
+                    doLinesIntersect(
+                        me.rawX,
+                        me.rawY,
+                        downPosition.x,
+                        downPosition.y,
+                        rect.left,
+                        rect.top,
+                        rect.left + rect.width(),
+                        rect.top
+                    ) ||
+                    doLinesIntersect(
+                        me.rawX,
+                        me.rawY,
+                        downPosition.x,
+                        downPosition.y,
+                        rect.left + rect.width(),
+                        rect.top,
+                        rect.left + rect.width(),
+                        rect.top + rect.height()
+                    ) ||
+                    doLinesIntersect(
+                        me.rawX,
+                        me.rawY,
+                        downPosition.x,
+                        downPosition.y,
+                        rect.left,
+                        rect.top + rect.height(),
+                        rect.left + rect.width(),
+                        rect.top + rect.height()
+                    )
             }
 
             private fun doLinesIntersect(

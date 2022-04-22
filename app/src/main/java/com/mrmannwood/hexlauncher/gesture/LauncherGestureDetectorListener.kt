@@ -35,7 +35,7 @@ class LauncherGestureDetectorListener(
             }
             return true
         } else if (abs(velocityY) > abs(velocityX)) {
-            //vertical
+            // vertical
             if (velocityY < 0) {
                 listener.onSwipeUp()
             } else {

@@ -17,7 +17,7 @@ class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
     private var greenValue = 0
     private var blueValue = 0
 
-    private val viewModel : ColorPickerViewModel by activityViewModels()
+    private val viewModel: ColorPickerViewModel by activityViewModels()
 
     private lateinit var redSlider: Slider
     private lateinit var greenSlider: Slider
@@ -99,7 +99,8 @@ class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
                 suggestionSwatches[i].setBackgroundColor(suggestion)
                 suggestionSwatches[i].contentDescription = getString(
                     R.string.dialog_color_picker_suggested_swatch_content_description,
-                    getString(ColorUtil.getColorNameFromHex(suggestion)))
+                    getString(ColorUtil.getColorNameFromHex(suggestion))
+                )
             }
             suggestionsContainer.visibility = if (suggestions.isNullOrEmpty()) { View.GONE } else { View.VISIBLE }
         }
@@ -110,7 +111,7 @@ class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
         dialog?.window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
     }
 
-    private fun getColor() : Int = Color.rgb(redValue, greenValue, blueValue)
+    private fun getColor(): Int = Color.rgb(redValue, greenValue, blueValue)
 
     private fun updateSwatch(swatch: View) {
         val color = getColor()
@@ -124,7 +125,7 @@ class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
         viewModel.colorLiveData.value = color
     }
 
-    private fun getHexCode() : String {
+    private fun getHexCode(): String {
         return String.format("#%02X%02X%02X", redValue, greenValue, blueValue)
     }
 }

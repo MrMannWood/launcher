@@ -10,7 +10,7 @@ import com.mrmannwood.launcher.R
 
 class TextEntryDialog : DialogFragment(R.layout.dialog_text_entry) {
 
-    private val viewModel : TextEntryDialogViewModel by activityViewModels()
+    private val viewModel: TextEntryDialogViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

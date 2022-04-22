@@ -25,7 +25,7 @@ val diskExecutor: ScheduledExecutorService = Executors.newSingleThreadScheduledE
     }
 }
 
-class OriginalThreadCallback<T>(private val callback: (T) -> Unit): Function<T> {
+class OriginalThreadCallback<T>(private val callback: (T) -> Unit) : Function<T> {
 
     companion object {
         private val threadHandler = ThreadLocal.withInitial {
@@ -47,11 +47,11 @@ class OriginalThreadCallback<T>(private val callback: (T) -> Unit): Function<T> 
     }
 }
 
-object InlineExecutor: Executor {
+object InlineExecutor : Executor {
     override fun execute(command: Runnable) = command.run()
 }
 
-object PackageManagerExecutor: Executor {
+object PackageManagerExecutor : Executor {
 
     private val thread = HandlerThread("PackageManagerThread").apply { start() }
     private val handler = Handler(thread.looper)

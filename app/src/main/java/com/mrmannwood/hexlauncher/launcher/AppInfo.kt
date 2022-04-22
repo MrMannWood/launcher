@@ -1,6 +1,5 @@
 package com.mrmannwood.hexlauncher.launcher
 
-import android.content.ComponentName
 import android.graphics.drawable.Drawable
 import com.mrmannwood.applist.LauncherItem
 import com.mrmannwood.hexlauncher.executors.InlineExecutor
@@ -30,17 +29,17 @@ data class AppInfo(
     override val backgroundHidden: Boolean,
     val categories: List<String>,
     val tags: List<String>
-): HexItem {
+) : HexItem {
     val componentName = launcherItem.componentName
     override val label = launcherItem.label
     override val icon = Provider({ launcherItem.icon })
     val lowerLabel = label.lowercase(Locale.ROOT)
-    val searchTerms : Map<String, SearchTermType> = (
-            categories.map { it to SearchTermType.Category }
-                    + tags.map { it to SearchTermType.Tag }
-                    + listOf(lowerLabel.removeChars(charArrayOf(' ','-','_')) to SearchTermType.Label)
-                    + lowerLabel.split(' ').map { it to SearchTermType.Label }
-            ).toMap()
+    val searchTerms: Map<String, SearchTermType> = (
+        categories.map { it to SearchTermType.Category } +
+            tags.map { it to SearchTermType.Tag } +
+            listOf(lowerLabel.removeChars(charArrayOf(' ', '-', '_')) to SearchTermType.Label) +
+            lowerLabel.split(' ').map { it to SearchTermType.Label }
+        ).toMap()
 }
 
 class Provider<T>(

@@ -2,7 +2,7 @@ package com.mrmannwood.hexlauncher
 
 import java.lang.Integer.min
 
-fun String.levenshtein(that : CharSequence) : Int {
+fun String.levenshtein(that: CharSequence): Int {
     val lhsLength = this.length
     val rhsLength = that.length
 
@@ -13,7 +13,7 @@ fun String.levenshtein(that : CharSequence) : Int {
         newCost[0] = i
 
         for (j in 1..lhsLength) {
-            val editCost= if(this[j - 1] == that[i - 1]) 0 else 1
+            val editCost = if (this[j - 1] == that[i - 1]) 0 else 1
 
             val costReplace = cost[j - 1] + editCost
             val costInsert = cost[j] + 1

@@ -14,7 +14,7 @@ object CustomizationFragmentDatabindingAdapter {
     fun getAdaptiveIconVisibility(appInfo: AppInfo?) =
         LauncherFragmentDatabindingAdapter.getAdaptiveIconVisibility(appInfo)
 
-    fun getNonAdaptiveIconVisibility(appInfo: AppInfo?) : Int =
+    fun getNonAdaptiveIconVisibility(appInfo: AppInfo?): Int =
         LauncherFragmentDatabindingAdapter.getNonAdaptiveIconVisibility(appInfo)
 
     fun getForegroundIcon(appInfo: AppInfo?) =
@@ -23,11 +23,11 @@ object CustomizationFragmentDatabindingAdapter {
     fun getBackgroundIcon(appInfo: AppInfo?) =
         LauncherFragmentDatabindingAdapter.getBackgroundIcon(appInfo)
 
-    fun getBackgroundColor(bgcOverride: java.lang.Integer?, appInfo: AppInfo?) : Int {
+    fun getBackgroundColor(bgcOverride: java.lang.Integer?, appInfo: AppInfo?): Int {
         return bgcOverride?.toInt() ?: LauncherFragmentDatabindingAdapter.getBackgroundColor(appInfo)
     }
 
-    fun getHideButtonText(res: Resources, appInfo: AppInfo?) : CharSequence? {
+    fun getHideButtonText(res: Resources, appInfo: AppInfo?): CharSequence? {
         if (appInfo == null) return null
         return if (appInfo.hidden) {
             res.getText(R.string.customize_show_app)
@@ -36,10 +36,10 @@ object CustomizationFragmentDatabindingAdapter {
         }
     }
 
-    fun getBackgroundIconVisibility(appInfo: AppInfo?) : Int =
+    fun getBackgroundIconVisibility(appInfo: AppInfo?): Int =
         LauncherFragmentDatabindingAdapter.getBackgroundIconVisibility(appInfo)
 
-    fun getBackgroundVisibilityIcon(res: Resources, appInfo: AppInfo?) : Drawable? {
+    fun getBackgroundVisibilityIcon(res: Resources, appInfo: AppInfo?): Drawable? {
         return when {
             appInfo == null -> {
                 null

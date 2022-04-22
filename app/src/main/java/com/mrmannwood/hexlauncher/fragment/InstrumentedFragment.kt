@@ -7,7 +7,7 @@ import timber.log.Timber
 
 abstract class InstrumentedFragment : Fragment() {
 
-    abstract val nameForInstrumentation : String
+    abstract val nameForInstrumentation: String
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {

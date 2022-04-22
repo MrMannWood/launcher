@@ -7,7 +7,7 @@ import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository.watchPref
 
-class LauncherViewModel(app: Application): AndroidViewModel(app) {
+class LauncherViewModel(app: Application) : AndroidViewModel(app) {
     val apps: LiveData<List<AppInfo>> = getAppInfoLiveData(app)
     val enableCategorySearch = watchPref(
         context = getApplication(),

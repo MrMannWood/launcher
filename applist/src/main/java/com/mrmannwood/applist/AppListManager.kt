@@ -1,6 +1,9 @@
 package com.mrmannwood.applist
 
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.LauncherActivityInfo
 import android.content.pm.LauncherApps
 import android.content.pm.LauncherApps.Callback

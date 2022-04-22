@@ -6,7 +6,8 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.graphics.Color
 import androidx.annotation.MainThread
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.executors.cpuBoundTaskExecutor

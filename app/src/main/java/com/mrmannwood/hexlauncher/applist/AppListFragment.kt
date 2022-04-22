@@ -16,19 +16,32 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
-import com.mrmannwood.hexlauncher.launcher.*
+import com.mrmannwood.hexlauncher.launcher.Adapter
+import com.mrmannwood.hexlauncher.launcher.AppInfo
+import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
+import com.mrmannwood.hexlauncher.launcher.LauncherViewModel
+import com.mrmannwood.hexlauncher.launcher.SearchTermType
 import com.mrmannwood.hexlauncher.levenshtein
 import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager
 import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager.Corner
 import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class AppListFragment : InstrumentedFragment(), HandleBackPressed {

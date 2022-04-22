@@ -34,7 +34,12 @@ import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager
 import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
 

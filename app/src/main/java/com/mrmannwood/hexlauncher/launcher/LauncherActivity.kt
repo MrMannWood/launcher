@@ -27,7 +27,6 @@ import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository.watchPref
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
-import java.lang.Exception
 
 class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
 

@@ -5,14 +5,21 @@ import android.app.WallpaperManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.graphics.*
+import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.PointF
+import android.graphics.Rect
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.view.*
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewConfiguration
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -45,7 +52,7 @@ import com.mrmannwood.hexlauncher.settings.SettingsActivity
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
 import timber.log.Timber
-import java.lang.Math.*
+import java.lang.Math.sqrt
 import kotlin.math.pow
 
 class HomeFragment : WidgetHostFragment(), HandleBackPressed {

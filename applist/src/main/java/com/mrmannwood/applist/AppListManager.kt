@@ -3,6 +3,7 @@ package com.mrmannwood.applist
 import android.content.*
 import android.content.pm.LauncherActivityInfo
 import android.content.pm.LauncherApps
+import android.content.pm.LauncherApps.Callback
 import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.UserHandle
@@ -28,42 +29,53 @@ class AppListManager(context: Context) {
 
     private val context = context.applicationContext
 
-    fun registerPackagesChangedReceiver(callback: () -> Unit): BroadcastReceiver {
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(ctx: Context, intent: Intent) {
-                Timber.d("PackagesChangedReceiver -> %s", intent.action)
+    fun registerPackagesChangedReceiver(callback: () -> Unit) {
+        getLauncherApps().registerCallback(object : Callback() {
+            override fun onPackageRemoved(packageName: String, user: UserHandle) {
+                Timber.d("AppListManager::onPackageRemoved")
                 callback()
             }
-        }
-        context.registerReceiver(
-            receiver,
-            IntentFilter().apply {
-                addAction(Intent.ACTION_PACKAGE_ADDED)
-                addAction(Intent.ACTION_PACKAGE_REMOVED)
-                addAction(Intent.ACTION_PACKAGE_CHANGED)
-                addAction(Intent.ACTION_PACKAGE_REPLACED)
-                addDataScheme("package")
-                addDataScheme("file")
+
+            override fun onPackageAdded(packageName: String, user: UserHandle) {
+                Timber.d("AppListManager::onPackageAdded")
+                callback()
             }
-        )
-        return receiver
+
+            override fun onPackageChanged(packageName: String, user: UserHandle) {
+                Timber.d("AppListManager::onPackageChanged")
+                callback()
+            }
+
+            override fun onPackagesAvailable(
+                packageNames: Array<String>, user: UserHandle, replacing: Boolean) {
+                Timber.d("AppListManager::onPackagesAvailable")
+                callback()
+            }
+
+            override fun onPackagesUnavailable(
+                packageNames: Array<String>,
+                user: UserHandle,
+                replacing: Boolean
+            ) {
+                Timber.d("AppListManager::onPackagesUnavailable")
+                callback()
+            }
+        })
     }
 
-    fun registerManagedEventReceiver(callback: () -> Unit): BroadcastReceiver {
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(ctx: Context, intent: Intent) {
-                Timber.d("ManagedEventReceiver -> %s", intent.action)
-                callback()
-            }
-        }
+    fun registerManagedEventReceiver(callback: () -> Unit) {
         context.registerReceiver(
-            receiver,
+            object : BroadcastReceiver() {
+                override fun onReceive(ctx: Context, intent: Intent) {
+                    Timber.d("ManagedEventReceiver -> %s", intent.action)
+                    callback()
+                }
+            },
             IntentFilter().apply {
                 addAction(Intent.ACTION_MANAGED_PROFILE_ADDED)
                 addAction(Intent.ACTION_MANAGED_PROFILE_REMOVED)
             }
         )
-        return receiver
     }
 
     @WorkerThread

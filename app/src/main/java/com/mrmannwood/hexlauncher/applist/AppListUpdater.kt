@@ -3,7 +3,6 @@ package com.mrmannwood.hexlauncher.applist
 import android.content.Context
 import android.database.sqlite.SQLiteException
 import androidx.annotation.WorkerThread
-import com.mrmannwood.applist.AppListManager
 import com.mrmannwood.applist.LauncherItem
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.executors.diskExecutor
@@ -12,16 +11,15 @@ import timber.log.Timber
 
 object AppListUpdater {
 
-    fun updateAppList(context: Context, appListManager: AppListManager) {
+    fun updateAppList(context: Context, installedApps: List<LauncherItem>) {
         diskExecutor.execute {
-            updateAppListOnWorkerThread(context.applicationContext, appListManager)
+            updateAppListOnWorkerThread(context.applicationContext, installedApps)
         }
     }
 
     @WorkerThread
-    fun updateAppListOnWorkerThread(context: Context, appListManager: AppListManager) {
+    fun updateAppListOnWorkerThread(context: Context, installedApps: List<LauncherItem>) {
         try {
-            val installedApps = appListManager.queryAppList()
             val appDao = DB.get(context).appDataDao()
 
             appDao.deleteNotIncluded(installedApps.map { it.componentName })
@@ -29,19 +27,20 @@ object AppListUpdater {
             val appUpdateTimes = appDao.getLastUpdateTimeStamps().associateBy({ it.componentName }, { it.timestamp })
             installedApps
                 .map { it to appUpdateTimes.getOrElse(it.componentName) { -1L } }
+                .onEach { Timber.d("${it.first.componentName.flattenToString()} -> ${it.second}") }
                 .filter { (launcherItem, lastUpdateTime) -> launcherItem.lastUpdateTime > lastUpdateTime }
-                .map { convertToAppData(it.first) }
-                .forEach {
+                .map { convertToAppData(it.first) to it.second }
+                .forEach { (appData, lastUpdateTime) ->
                     try {
-                        if (it.lastUpdateTime == -1L) {
-                            Timber.d("Inserting ${it.componentName.flattenToString()}")
-                            appDao.insert(it)
+                        if (lastUpdateTime == -1L) {
+                            Timber.d("Inserting ${appData.componentName.flattenToString()}")
+                            appDao.insert(appData)
                         } else {
-                            Timber.d("Updating ${it.componentName.flattenToString()}")
-                            appDao.update(it.label, it.lastUpdateTime, it.backgroundColor, it.componentName)
+                            Timber.d("Updating ${appData.componentName.flattenToString()}")
+                            appDao.update(appData.label, appData.lastUpdateTime, appData.backgroundColor, appData.componentName)
                         }
                     } catch (e: SQLiteException) {
-                        Timber.e(e, "An error occurred while writing app to db: $it")
+                        Timber.e(e, "An error occurred while writing app to db: $appData")
                     }
                 }
         } catch (e: Exception) {

@@ -29,8 +29,8 @@ class AppListManager(context: Context) {
 
     private val context = context.applicationContext
 
-    fun registerPackagesChangedReceiver(callback: () -> Unit) {
-        getLauncherApps().registerCallback(object : Callback() {
+    fun registerPackagesChangedReceiver(callback: () -> Unit): Callback {
+        val launcherAppsCallback = object : Callback() {
             override fun onPackageRemoved(packageName: String, user: UserHandle) {
                 Timber.d("AppListManager::onPackageRemoved")
                 callback()
@@ -60,32 +60,49 @@ class AppListManager(context: Context) {
                 Timber.d("AppListManager::onPackagesUnavailable")
                 callback()
             }
-        })
+        }
+        getLauncherApps().registerCallback(launcherAppsCallback)
+        return launcherAppsCallback
     }
 
-    fun registerManagedEventReceiver(callback: () -> Unit) {
+    fun unregisterPackagesChangedReceiver(callback: Callback) {
+        getLauncherApps().unregisterCallback(callback)
+    }
+
+    fun registerManagedEventReceiver(callback: () -> Unit): BroadcastReceiver {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(ctx: Context, intent: Intent) {
+                Timber.d("ManagedEventReceiver -> %s", intent.action)
+                callback()
+            }
+        }
         context.registerReceiver(
-            object : BroadcastReceiver() {
-                override fun onReceive(ctx: Context, intent: Intent) {
-                    Timber.d("ManagedEventReceiver -> %s", intent.action)
-                    callback()
-                }
-            },
+            receiver,
             IntentFilter().apply {
                 addAction(Intent.ACTION_MANAGED_PROFILE_ADDED)
                 addAction(Intent.ACTION_MANAGED_PROFILE_REMOVED)
             }
         )
+        return receiver
+    }
+
+    fun unregisterManagedEventReceiver(callback: BroadcastReceiver) {
+        context.unregisterReceiver(callback)
     }
 
     @WorkerThread
     fun queryAppList(): List<LauncherItem> {
-        val launcherApps = getLauncherApps()
-        return (context.getSystemService(Context.USER_SERVICE) as UserManager).userProfiles
-            .flatMap { launcherApps.getActivityList(null, it) }
-            .filter { it.applicationInfo.packageName != context.packageName }
-            .map { app -> loadAppDataFromPackageManager(app, context.packageManager) }
-            .toList()
+        Timber.d("queryAppList begin")
+        try {
+            val launcherApps = getLauncherApps()
+            return (context.getSystemService(Context.USER_SERVICE) as UserManager).userProfiles
+                .flatMap { launcherApps.getActivityList(null, it) }
+                .filter { it.applicationInfo.packageName != context.packageName }
+                .map { app -> loadAppDataFromPackageManager(app, context.packageManager) }
+                .toList()
+        } finally {
+            Timber.d("queryAppList complete")
+        }
     }
 
     @WorkerThread

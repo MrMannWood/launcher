@@ -54,9 +54,6 @@ class LauncherApplication : Application() {
 
         DB.get(this)
 
-        appListLiveData = AppListLiveData(this, appListManager, PackageManagerExecutor)
-        appListLiveData.observeForever {  }
-
         PreferencesRepository.watchPref(
             context = this@LauncherApplication,
             key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING,
@@ -69,12 +66,9 @@ class LauncherApplication : Application() {
             }
         }
 
-        AppListUpdater.updateAppList(applicationContext, appListManager)
-        appListManager.registerPackagesChangedReceiver {
-            AppListUpdater.updateAppList(this, appListManager)
-        }
-        appListManager.registerManagedEventReceiver {
-            AppListUpdater.updateAppList(this, appListManager)
+        appListLiveData = AppListLiveData(appListManager, PackageManagerExecutor)
+        appListLiveData.observeForever {
+            AppListUpdater.updateAppList(applicationContext, it)
         }
 
         CoroutineScope(Dispatchers.IO).launch  {
@@ -139,8 +133,8 @@ class LauncherApplication : Application() {
         override fun onApplicationCreate(application: Application) {
             Timber.plant(Timber.DebugTree())
 
-            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().detectAll().build())
-            StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder().detectAll().build())
+//            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().detectAll().build())
+//            StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder().detectAll().build())
         }
     }
 

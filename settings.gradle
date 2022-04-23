@@ -1,3 +1,4 @@
 rootProject.name = "TestApp"
 include ':app'
 include ':applist'
+include ':iconpack'

@@ -16,6 +16,7 @@ import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.hexlauncher.launcher.HexItem
 import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
 import com.mrmannwood.hexlauncher.launcher.Provider
+import com.mrmannwood.iconpack.IconPackIconInfo
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
 
@@ -89,7 +90,7 @@ class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
     private fun makeHexItem(context: Context, appInfo: AppInfo, iconInfo: IconPackIconInfo): IconPackHexItem {
         return IconPackHexItem(
             label = appInfo.label,
-            icon = iconInfo.drawableProvider,
+            icon = Provider(iconInfo.drawableProvider),
             hidden = appInfo.hidden,
             backgroundColor = ContextCompat.getColor(context, R.color.colorOnSecondary),
             backgroundHidden = false

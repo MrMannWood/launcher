@@ -1,13 +1,10 @@
-package com.mrmannwood.hexlauncher.iconpack
+package com.mrmannwood.iconpack
 
 import android.content.ComponentName
 import android.content.Context
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import com.mrmannwood.hexlauncher.Result
-import com.mrmannwood.hexlauncher.executors.cpuBoundTaskExecutor
-import com.mrmannwood.hexlauncher.launcher.Provider
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.IOException
@@ -17,7 +14,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 class IconPackLiveData(
     context: Context,
     private val componentName: ComponentName,
-    private val executor: Executor,
+    private val packageManagerExecutor: Executor,
+    private val cpuBoundTaskExecutor: Executor,
     private val installedAppsLiveData: LiveData<List<ComponentName>>
 ) : LiveData<Result<Map<ComponentName, IconPackIconInfo>>>() {
 
@@ -26,7 +24,7 @@ class IconPackLiveData(
 
     private val installedAppsObserver = Observer<List<ComponentName>> { installedApps ->
         if (!isActive.get()) return@Observer
-        executor.execute {
+        packageManagerExecutor.execute {
             if (!isActive.get()) return@execute
             val parser = getAppFilterParser()
             if (!isActive.get()) return@execute
@@ -46,7 +44,6 @@ class IconPackLiveData(
     override fun onActive() {
         super.onActive()
         isActive.set(true)
-        postValue(Result.loading())
         installedAppsLiveData.observeForever(installedAppsObserver)
     }
 
@@ -99,8 +96,7 @@ class IconPackLiveData(
                                     for (i in 0 until parser.attributeCount) {
                                         when (parser.getAttributeName(i)) {
                                             "component" -> {
-                                                componentInfo =
-                                                    Component.parse(parser.getAttributeValue(i))
+                                                componentInfo = parseComponentName(parser.getAttributeValue(i))
                                             }
                                             "drawable" -> drawableName = parser.getAttributeValue(i)
                                         }
@@ -110,9 +106,8 @@ class IconPackLiveData(
                                         if (id > 0) {
                                             icons[componentInfo] = IconPackIconInfo(
                                                 componentInfo,
-                                                drawableName,
-                                                Provider({ ResourcesCompat.getDrawable(resources, id, null) })
-                                            )
+                                                drawableName
+                                            ) { ResourcesCompat.getDrawable(resources, id, null) }
                                         }
                                     }
                                 }

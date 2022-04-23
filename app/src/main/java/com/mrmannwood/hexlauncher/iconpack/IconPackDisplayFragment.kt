@@ -69,31 +69,30 @@ class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
         viewModel.iconPackLiveData.observe(viewLifecycleOwner) { result ->
             result.onFailure { println("02_MARSHALL:: Failed to open icon pack") }
             result.onSuccess {
-                iconInfo = it.associateBy { iconInfo -> iconInfo.componentName }
+                iconInfo = it
                 maybeShowIcons()
             }
         }
     }
 
     private fun maybeShowIcons() {
-        val apps = installedApps
-        val icons = iconInfo
-        val context = context
-        if (context == null || icons == null || apps == null) return
+        val context = context ?: return
+        val apps = installedApps ?: return
+        val icons = iconInfo ?: return
         iconAdapter.setData(
             IconPackHexItem::class,
-            apps.map { makeHexItem(context, it, icons[it.componentName]) }
+            apps.filter { icons[it.componentName] != null }
+                .map { makeHexItem(context, it, icons[it.componentName]!!) }
         )
     }
 
-    private fun makeHexItem(context: Context, appInfo: AppInfo, iconInfo: IconPackIconInfo?): IconPackHexItem {
+    private fun makeHexItem(context: Context, appInfo: AppInfo, iconInfo: IconPackIconInfo): IconPackHexItem {
         return IconPackHexItem(
             label = appInfo.label,
-            icon = iconInfo?.drawableProvider ?: appInfo.icon,
+            icon = iconInfo.drawableProvider,
             hidden = appInfo.hidden,
-            backgroundColor = if (iconInfo != null)
-                ContextCompat.getColor(context, R.color.colorOnSecondary)else appInfo.backgroundColor,
-            backgroundHidden = if (iconInfo != null) false else appInfo.backgroundHidden
+            backgroundColor = ContextCompat.getColor(context, R.color.colorOnSecondary),
+            backgroundHidden = false
         )
     }
 

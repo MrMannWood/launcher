@@ -16,12 +16,9 @@ data class Component(
 ) {
     companion object {
         private val fullComponentInfoRegex = Regex("""ComponentInfo\{([^\/]+)\/([^}]+)\}""")
-        private val activityOnlyRegex = Regex("""ComponentInfo\{([^}]+)\}""")
         fun parse(componentString: String): ComponentName? {
-            var match = fullComponentInfoRegex.find(componentString)
-            if (match != null) return ComponentName.unflattenFromString(componentString)
-            match = activityOnlyRegex.find(componentString)
-            if (match != null) return ComponentName.unflattenFromString(componentString)
+            val match = fullComponentInfoRegex.find(componentString)
+            if (match != null) return ComponentName(match.groupValues[1], match.groupValues[2])
             return null
         }
     }

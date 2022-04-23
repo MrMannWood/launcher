@@ -26,14 +26,13 @@ class IconPackAppListFragment : Fragment(R.layout.fragment_icon_pack) {
         super.onViewCreated(view, savedInstanceState)
         iconPackAdapter = createResultAdapter()
         iconPackAppView = view.findViewById(R.id.icon_pack_app_list)
+        iconPackAppView.layoutManager = createLayoutManager()
         iconPackAppView.adapter = iconPackAdapter
 
         appListViewModel.leftHandedLayout.observe(viewLifecycleOwner) { leftHanded ->
-            leftHandedLayout = when {
-                leftHanded == null -> false
-                leftHandedLayout == leftHanded -> return@observe
-                else -> leftHanded
-            }
+            if (leftHanded == null) return@observe
+            if (leftHandedLayout == leftHanded) return@observe
+            leftHandedLayout = leftHanded
             iconPackAppView.layoutManager = createLayoutManager()
         }
         appListViewModel.iconPackAppsLiveData.observe(viewLifecycleOwner) { apps ->

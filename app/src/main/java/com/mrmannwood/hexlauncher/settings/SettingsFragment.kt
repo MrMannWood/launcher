@@ -124,16 +124,18 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     setDefaultValue(false)
                 }
             )
-            addPreference(Preference(activity).apply {
-                setTitle(R.string.preferences_app_list_icon_pack)
-                setOnPreferenceClickListener {
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.settings_root, IconPackAppListFragment())
-                        .addToBackStack(null)
-                        .commit()
-                    true
+            addPreference(
+                Preference(activity).apply {
+                    setTitle(R.string.preferences_app_list_icon_pack)
+                    setOnPreferenceClickListener {
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.settings_root, IconPackAppListFragment())
+                            .addToBackStack(null)
+                            .commit()
+                        true
+                    }
                 }
-            })
+            )
         }
 
         PreferenceCategory(activity).apply {

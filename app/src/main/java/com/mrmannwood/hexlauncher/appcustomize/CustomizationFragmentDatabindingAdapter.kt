@@ -3,7 +3,6 @@ package com.mrmannwood.hexlauncher.appcustomize
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
-import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import com.mrmannwood.hexlauncher.launcher.AppInfo
 import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter

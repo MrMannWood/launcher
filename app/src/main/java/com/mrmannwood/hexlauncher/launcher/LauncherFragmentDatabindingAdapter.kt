@@ -33,7 +33,7 @@ object LauncherFragmentDatabindingAdapter {
         return hexItem?.backgroundColor ?: Color.WHITE
     }
 
-    fun getForegroundIcon(context: Context, hexItem: HexItem?) : Drawable? {
+    fun getForegroundIcon(context: Context, hexItem: HexItem?): Drawable? {
         if (hexItem == null) return null
         val icon = hexItem.icon.get() ?: return getDefaultDrawable(context)
         return IconAdapter.INSTANCE.getForegroundDrawable(icon) ?: icon
@@ -55,12 +55,8 @@ object LauncherFragmentDatabindingAdapter {
     fun getLabelStartOf(leftHanded: Boolean): Int? = if (leftHanded) null else R.id.icon_parent
 
     fun getLabelEndOf(leftHanded: Boolean): Int? = if (leftHanded) R.id.icon_parent else null
-<<<<<<< HEAD
-}
-=======
 
     private fun getDefaultDrawable(context: Context): Drawable? {
         return ContextCompat.getDrawable(context, R.drawable.outline_question_mark)
     }
 }
->>>>>>> 9324413 (can load and show all icons in an icon pack)

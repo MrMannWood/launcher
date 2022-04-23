@@ -10,7 +10,7 @@ import com.mrmannwood.hexlauncher.launcher.getAppInfoLiveData
 class IconPackDisplayViewModel(
     context: Context,
     componentName: ComponentName
-): ViewModel() {
+) : ViewModel() {
     val iconPackLiveData = IconPackLiveData(context.applicationContext, componentName)
     val installedApps: LiveData<List<AppInfo>> = getAppInfoLiveData(context.applicationContext, false)
 }

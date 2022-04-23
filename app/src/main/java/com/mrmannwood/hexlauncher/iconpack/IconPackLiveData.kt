@@ -4,19 +4,19 @@ import android.content.ComponentName
 import android.content.Context
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.LiveData
+import com.mrmannwood.hexlauncher.Result
 import com.mrmannwood.hexlauncher.executors.PackageManagerExecutor
+import com.mrmannwood.hexlauncher.executors.cpuBoundTaskExecutor
+import com.mrmannwood.hexlauncher.launcher.Provider
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
-import com.mrmannwood.hexlauncher.Result
-import com.mrmannwood.hexlauncher.executors.cpuBoundTaskExecutor
-import com.mrmannwood.hexlauncher.launcher.Provider
 
 class IconPackLiveData(
     context: Context,
     private val componentName: ComponentName
-): LiveData<Result<List<IconPackIconInfo>>>() {
+) : LiveData<Result<List<IconPackIconInfo>>>() {
 
     private val appContext = context.applicationContext
     private val isActive = AtomicBoolean(false)
@@ -27,7 +27,7 @@ class IconPackLiveData(
         postValue(Result.loading())
         getAppFilterParser(
             { parser ->
-                if(!isActive.get()) return@getAppFilterParser
+                if (!isActive.get()) return@getAppFilterParser
                 readAppFilter(
                     parser = parser,
                     onParseSuccess = { icons ->
@@ -98,8 +98,9 @@ class IconPackLiveData(
                                     var drawableName: String? = null
                                     for (i in 0 until parser.attributeCount) {
                                         when (parser.getAttributeName(i)) {
-                                            "component" -> componentInfo =
-                                                Component.parse(parser.getAttributeValue(i))
+                                            "component" ->
+                                                componentInfo =
+                                                    Component.parse(parser.getAttributeValue(i))
                                             "drawable" -> drawableName = parser.getAttributeValue(i)
                                         }
                                     }
@@ -131,7 +132,6 @@ class IconPackLiveData(
         }
     }
 
-    private class AppFilterDoesNotExistException(componentName: ComponentName): Exception("Could not find AppFilter for ${componentName.flattenToString()}")
-    private class AppFilterParserException(componentName: ComponentName, e: Exception): Exception("Could not parse AppFilter for ${componentName.flattenToString()}", e)
-
+    private class AppFilterDoesNotExistException(componentName: ComponentName) : Exception("Could not find AppFilter for ${componentName.flattenToString()}")
+    private class AppFilterParserException(componentName: ComponentName, e: Exception) : Exception("Could not parse AppFilter for ${componentName.flattenToString()}", e)
 }

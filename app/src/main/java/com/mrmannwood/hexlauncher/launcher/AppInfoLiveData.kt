@@ -40,14 +40,14 @@ fun getAppInfoForApps(context: Context, apps: List<String>, callback: (List<AppI
     }
 }
 
-fun getSingleAppLiveData(context: Context, componentName: ComponentName) : LiveData<AppInfo?> {
+fun getSingleAppLiveData(context: Context, componentName: ComponentName): LiveData<AppInfo?> {
     val appContext = context.applicationContext
     return Transformations.map(makeLiveData(appContext as Application, true)) {
-        it.firstOrNull{ it.componentName == componentName }
+        it.firstOrNull { it.componentName == componentName }
     }
 }
 
-fun getAppInfoLiveData(context: Context, showHidden: Boolean = false) : LiveData<List<AppInfo>> {
+fun getAppInfoLiveData(context: Context, showHidden: Boolean = false): LiveData<List<AppInfo>> {
     val appContext = context.applicationContext
     if (showHidden) {
         return makeLiveData(appContext, true)
@@ -58,7 +58,7 @@ fun getAppInfoLiveData(context: Context, showHidden: Boolean = false) : LiveData
     return appInfoLiveData!!
 }
 
-private fun makeLiveData(appContext: Context, showHidden: Boolean = false) : LiveData<List<AppInfo>> {
+private fun makeLiveData(appContext: Context, showHidden: Boolean = false): LiveData<List<AppInfo>> {
     return (appContext as LauncherApplication).appListLiveData.combineWith(
         DB.get(appContext).appDataDao().watchApps(),
         cpuBoundTaskExecutor

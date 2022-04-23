@@ -15,5 +15,4 @@ class IconPackDisplayViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return IconPackDisplayViewModel(appContext.applicationContext, componentName) as T
     }
-
 }

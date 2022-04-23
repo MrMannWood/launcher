@@ -21,7 +21,7 @@ interface AppDataDao {
     fun getApps(): List<AppData>
 
     @Query("SELECT * FROM app_data WHERE component_name IN (:componentNames)")
-    fun getApps(componentNames: List<String>) : List<AppData>
+    fun getApps(componentNames: List<String>): List<AppData>
 
     @Transaction
     @Query("SELECT * FROM app_data WHERE component_name = :componentName")

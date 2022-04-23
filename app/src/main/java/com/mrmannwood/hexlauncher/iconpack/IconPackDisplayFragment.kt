@@ -3,7 +3,6 @@ package com.mrmannwood.hexlauncher.iconpack
 import android.content.ComponentName
 import android.content.Context
 import android.graphics.drawable.Drawable
-import com.mrmannwood.hexlauncher.Result
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -12,7 +11,11 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.mrmannwood.hexlauncher.launcher.*
+import com.mrmannwood.hexlauncher.launcher.Adapter
+import com.mrmannwood.hexlauncher.launcher.AppInfo
+import com.mrmannwood.hexlauncher.launcher.HexItem
+import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
+import com.mrmannwood.hexlauncher.launcher.Provider
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
 
@@ -121,5 +124,5 @@ class IconPackDisplayFragment : Fragment(R.layout.fragment_icon_pack_display) {
         override val hidden: Boolean,
         override val backgroundColor: Int,
         override val backgroundHidden: Boolean
-    ): HexItem
+    ) : HexItem
 }

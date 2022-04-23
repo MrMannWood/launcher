@@ -20,7 +20,7 @@ class IconPackAppListFragment : Fragment(R.layout.fragment_icon_pack) {
     private lateinit var iconPackAppView: RecyclerView
     private lateinit var iconPackAdapter: Adapter<AppInfo>
 
-    private var leftHandedLayout : Boolean? = null
+    private var leftHandedLayout: Boolean? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

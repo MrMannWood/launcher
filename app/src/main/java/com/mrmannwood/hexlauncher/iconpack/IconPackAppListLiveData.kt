@@ -12,7 +12,7 @@ import com.mrmannwood.hexlauncher.launcher.getAppInfoLiveData
 
 class IconPackAppListLiveData(
     application: Application
-): MediatorLiveData<List<AppInfo>>() {
+) : MediatorLiveData<List<AppInfo>>() {
 
     private var appInfo: Map<String, AppInfo>? = null
     private var packages: List<String>? = null
@@ -35,7 +35,7 @@ class IconPackAppListLiveData(
         postValue(packages.mapNotNull { appInfo[it] }.toList())
     }
 
-    private class IconPackLiveData(private val context: Context): LiveData<List<String>>() {
+    private class IconPackLiveData(private val context: Context) : LiveData<List<String>>() {
         companion object {
             private val APP_ICON_ACTIONS = listOf(
                 "com.gau.go.launcherex.theme",
@@ -48,13 +48,13 @@ class IconPackAppListLiveData(
             PackageManagerExecutor.execute {
                 postValue(
                     APP_ICON_ACTIONS
-                    .flatMap { action ->
-                        context.packageManager.queryIntentActivities(
-                            Intent(action), PackageManager.GET_META_DATA
-                        )
-                    }
-                    .map { it.activityInfo.packageName }
-                    .distinct()
+                        .flatMap { action ->
+                            context.packageManager.queryIntentActivities(
+                                Intent(action), PackageManager.GET_META_DATA
+                            )
+                        }
+                        .map { it.activityInfo.packageName }
+                        .distinct()
                 )
             }
         }

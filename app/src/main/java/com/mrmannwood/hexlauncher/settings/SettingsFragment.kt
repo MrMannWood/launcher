@@ -46,16 +46,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val screen = preferenceManager.createPreferenceScreen(activity)
 
-        Preference(activity).apply {
-            screen.addPreference(this)
-            homeRolePreference = this
-        }
-
-        updateHomeRolePreference(activity)
-
         PreferenceCategory(activity).apply {
             screen.addPreference(this)
             setTitle(R.string.preferences_category_preferences)
+            addPreference(Preference(activity).apply { homeRolePreference = this })
             addPreference(
                 SwitchPreference(activity).apply {
                     setTitle(R.string.preferences_preferences_left_handed)
@@ -124,6 +118,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     setDefaultValue(false)
                 }
             )
+        }
+
+        PreferenceCategory(activity).apply {
+            screen.addPreference(this)
+            setTitle(R.string.preferences_category_style)
             addPreference(
                 Preference(activity).apply {
                     setTitle(R.string.preferences_app_list_icon_pack)
@@ -270,6 +269,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             )
         }
 
+        updateHomeRolePreference(activity)
         preferenceScreen = screen
     }
 

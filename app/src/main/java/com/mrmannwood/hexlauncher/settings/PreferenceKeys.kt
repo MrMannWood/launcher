@@ -48,6 +48,9 @@ object PreferenceKeys {
         const val ENABLE_OPEN_WHEN_ONLY_OPTION = "enable_open_only_option"
         const val ENABLE_FUZZY_SEARCH = "enable_fuzzy_search"
     }
+    object Style {
+        const val ICON_PACK = "icon_pack"
+    }
     object User {
         const val LEFT_HANDED = "left_handed"
     }

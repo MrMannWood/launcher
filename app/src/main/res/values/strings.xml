@@ -48,6 +48,8 @@
     <string name="preferences_category_preferences">Preferences</string>
     <string name="preferences_preferences_left_handed">Left Handed</string>
 
+    <string name="preferences_category_style">Style</string>
+
     <string name="preferences_category_gestures">Gestures</string>
     <string name="preferences_gestures_opacity">Gesture Wheel Opacity</string>
     <string name="preferences_gestures_reset_disabled">Reset Disabled Items</string>

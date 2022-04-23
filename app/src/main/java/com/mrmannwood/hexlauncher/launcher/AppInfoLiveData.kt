@@ -5,7 +5,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.graphics.Color
-import androidx.annotation.AnyThread
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
@@ -14,31 +13,28 @@ import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.applist.AppData
 import com.mrmannwood.hexlauncher.executors.cpuBoundTaskExecutor
-import com.mrmannwood.hexlauncher.executors.diskExecutor
-import com.mrmannwood.hexlauncher.executors.mainThreadExecutor
 import com.mrmannwood.hexlauncher.livedata.combineWith
 import com.mrmannwood.launcher.R
-import java.util.concurrent.CountDownLatch
 
 private var appInfoLiveData: LiveData<List<AppInfo>>? = null
 private val categoryMap: MutableMap<Int, List<String>> = HashMap()
 
-@AnyThread
-fun getAppInfoForApps(context: Context, apps: List<String>, callback: (List<AppInfo>) -> Unit) {
-    val appContext = context.applicationContext
-    diskExecutor.execute {
-        val appInfo = Array<AppInfo?>(apps.size) { null }
-        val latch = CountDownLatch(appInfo.size)
-        DB.get(context).appDataDao().getApps(apps).forEachIndexed { idx, appData ->
-            mainThreadExecutor.execute {
-                appInfo[idx] = transformAppInfo(appContext, appData)
-                latch.countDown()
-            }
-        }
-        latch.await()
-        callback(appInfo.mapNotNull { it }.toList())
-    }
-}
+// @AnyThread
+// fun getAppInfoForApps(context: Context, apps: List<String>, callback: (List<AppInfo>) -> Unit) {
+//    val appContext = context.applicationContext
+//    diskExecutor.execute {
+//        val appInfo = Array<AppInfo?>(apps.size) { null }
+//        val latch = CountDownLatch(appInfo.size)
+//        DB.get(context).appDataDao().getApps(apps).forEachIndexed { idx, appData ->
+//            mainThreadExecutor.execute {
+//                appInfo[idx] = transformAppInfo(appContext, appData)
+//                latch.countDown()
+//            }
+//        }
+//        latch.await()
+//        callback(appInfo.mapNotNull { it }.toList())
+//    }
+// }
 
 fun getSingleAppLiveData(context: Context, componentName: ComponentName): LiveData<AppInfo?> {
     val appContext = context.applicationContext

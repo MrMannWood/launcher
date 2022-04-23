@@ -8,7 +8,6 @@ import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import timber.log.Timber
-import java.util.concurrent.Executors
 
 object DB {
 
@@ -25,11 +24,6 @@ object DB {
                         Database::class.java,
                         "database"
                     )
-                        .setQueryCallback(
-                            { sqlQuery, bindArgs ->
-                                Timber.d("SQL Query: $sqlQuery Args: $bindArgs")
-                            }, Executors.newSingleThreadExecutor()
-                        )
                         .addMigrations(MIGRATION_9_10)
                         .fallbackToDestructiveMigration()
                         .build()

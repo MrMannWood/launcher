@@ -11,7 +11,7 @@ Hex Launcher is a minimalist, performant, private, and open-source home screen r
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/com.mrmannwood.hexlauncher/)
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
+[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'"
      alt="Get it on Google Play"
      height="80">](https://play.google.com/store/apps/details?id=com.mrmannwood.hexlauncher)
 

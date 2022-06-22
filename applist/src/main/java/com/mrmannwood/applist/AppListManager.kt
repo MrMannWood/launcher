@@ -122,7 +122,9 @@ class AppListManager(context: Context) {
             componentName = info.componentName,
             userHandle = info.user,
             label = info.label.toString(),
-            lastUpdateTime = pacman.getPackageInfo(appInfo.packageName, 0).lastUpdateTime,
+            lastUpdateTime = try {
+                pacman.getPackageInfo(appInfo.packageName, 0).lastUpdateTime
+            } catch (e: Exception) { -1 /* force insert/replace */ },
             icon = info.getBadgedIcon(0),
             category = appInfo.category
         )

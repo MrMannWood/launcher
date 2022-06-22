@@ -28,7 +28,7 @@ object AppListUpdater {
             installedApps
                 .map { it to appUpdateTimes.getOrElse(it.componentName) { -1L } }
                 .onEach { Timber.d("${it.first.componentName.flattenToString()} -> ${it.second}") }
-                .filter { (launcherItem, lastUpdateTime) -> launcherItem.lastUpdateTime > lastUpdateTime }
+                .filter { (launcherItem, lastUpdateTime) -> lastUpdateTime == -1L || launcherItem.lastUpdateTime > lastUpdateTime }
                 .map { convertToAppData(it.first) to it.second }
                 .forEach { (appData, lastUpdateTime) ->
                     try {

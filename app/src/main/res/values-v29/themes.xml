@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -20,18 +21,12 @@
         <item name="android:textColor">@color/colorOnPrimary</item>
         <item name="android:textColorSecondary">@color/colorOnPrimary</item>
 
+        <item name="android:enforceNavigationBarContrast">false</item>
         <item name="android:windowShowWallpaper">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">@bool/windowLightStatusBar</item>
+        <item name="android:windowLightStatusBar">false</item>
         <item name="materialAlertDialogTheme">@style/AlertDialogStyle</item>
-    </style>
-
-    <style name="NonFullScreenTheme" parent="AppTheme">
-        <item name="android:statusBarColor">@color/colorPrimary</item>
-        <item name="android:navigationBarColor">@color/colorPrimary</item>
-        <item name="android:windowShowWallpaper">false</item>
-        <item name="android:windowBackground">@color/colorPrimary</item>
     </style>
 </resources>

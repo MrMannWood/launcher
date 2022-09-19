@@ -22,8 +22,8 @@
 
         <item name="android:windowShowWallpaper">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@color/primary_translucent</item>
+        <item name="android:navigationBarColor">@color/primary_translucent</item>
         <item name="android:windowLightStatusBar">@bool/windowLightStatusBar</item>
         <item name="materialAlertDialogTheme">@style/AlertDialogStyle</item>
     </style>

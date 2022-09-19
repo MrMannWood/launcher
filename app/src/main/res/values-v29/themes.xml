@@ -29,4 +29,13 @@
         <item name="android:windowLightStatusBar">false</item>
         <item name="materialAlertDialogTheme">@style/AlertDialogStyle</item>
     </style>
+
+    <style name="NonFullScreenTheme" parent="AppTheme">
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:windowBackground">@color/colorPrimary</item>
+        <item name="android:windowLightStatusBar">@bool/windowLightStatusBar</item>
+        <item name="android:enforceNavigationBarContrast">true</item>
+    </style>
 </resources>

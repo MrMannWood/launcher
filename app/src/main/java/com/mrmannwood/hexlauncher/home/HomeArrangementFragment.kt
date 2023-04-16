@@ -66,7 +66,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
             private val gestureDetector = GestureDetectorCompat(
                 context,
                 object : GestureDetector.SimpleOnGestureListener() {
-                    override fun onDown(e: MotionEvent?): Boolean {
+                    override fun onDown(e: MotionEvent): Boolean {
                         return true
                     }
                     override fun onLongPress(e: MotionEvent) {

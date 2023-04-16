@@ -11,8 +11,13 @@ fun measureScreen(activity: Activity): Int {
         val insets = windowMetrics.windowInsets.getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
         windowMetrics.bounds.width() - insets.left - insets.right
     } else {
-        val displayMetrics = DisplayMetrics()
-        activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
-        displayMetrics.widthPixels
+        measureScreenFallback(activity)
     }
+}
+
+@Suppress("DEPRECATION")
+private fun measureScreenFallback(activity: Activity): Int {
+    val displayMetrics = DisplayMetrics()
+    activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
+    return displayMetrics.widthPixels
 }

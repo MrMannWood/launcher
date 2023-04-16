@@ -7,7 +7,7 @@ import android.content.pm.ApplicationInfo
 import android.graphics.Color
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.executors.cpuBoundTaskExecutor
@@ -18,7 +18,7 @@ private var appInfoLiveData: LiveData<List<AppInfo>>? = null
 private val categoryMap: MutableMap<Int, List<String>> = HashMap()
 
 fun getSingleAppLiveData(context: Context, componentName: ComponentName): LiveData<AppInfo?> {
-    return Transformations.map(makeLiveData(context.applicationContext as Application, true)) {
+    return makeLiveData(context.applicationContext as Application, true).map {
         it.firstOrNull { it.componentName == componentName }
     }
 }

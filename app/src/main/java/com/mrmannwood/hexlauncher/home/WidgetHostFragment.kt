@@ -2,6 +2,7 @@ package com.mrmannwood.hexlauncher.home
 
 import android.content.Context
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
+import com.mrmannwood.hexlauncher.measureScreen
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.FragmentHomeBinding
 
@@ -84,7 +86,12 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
                 Gravity.NO_GRAVITY
             )
             view.y = yPos
-            xPos?.let { view.x = it }
+            if (xPos == null) {
+                val screenWidth = measureScreen(requireActivity())
+                view.x = (screenWidth / 2 - view.width / 2).toFloat()
+            } else {
+                view.x = xPos
+            }
             (view as TextView).setTextColor(color)
             databinder.container.addView(view)
         }

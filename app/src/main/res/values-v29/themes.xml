@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="BaseTheme">
+        <item name="android:enforceNavigationBarContrast">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="NonFullScreenTheme" parent="NonFullScreenBaseTheme">
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">@bool/windowLightStatusBar</item>
+        <item name="android:enforceNavigationBarContrast">true</item>
+    </style>
+    
+</resources>

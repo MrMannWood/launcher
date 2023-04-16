@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
+    <style name="BaseTheme" parent="Theme.MaterialComponents.DayNight">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -28,10 +28,14 @@
         <item name="materialAlertDialogTheme">@style/AlertDialogStyle</item>
     </style>
 
-    <style name="NonFullScreenTheme" parent="AppTheme">
+    <style name="NonFullScreenBaseTheme" parent="BaseTheme">
         <item name="android:statusBarColor">@color/colorPrimary</item>
         <item name="android:navigationBarColor">@color/colorPrimary</item>
         <item name="android:windowShowWallpaper">false</item>
         <item name="android:windowBackground">@color/colorPrimary</item>
     </style>
+
+    <style name="AppTheme" parent="BaseTheme"/>
+    <style name="NonFullScreenTheme" parent="NonFullScreenBaseTheme"/>
+
 </resources>

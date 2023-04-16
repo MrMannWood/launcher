@@ -3,10 +3,7 @@ package com.mrmannwood.hexlauncher.home
 import android.content.Context
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.annotation.LayoutRes
@@ -87,8 +84,22 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
             )
             view.y = yPos
             if (xPos == null) {
-                val screenWidth = measureScreen(requireActivity())
-                view.x = (screenWidth / 2 - view.width / 2).toFloat()
+                if (view.width == 0) {
+                    view.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
+                        override fun onLayoutChange(
+                            p0: View?,
+                            p1: Int, p2: Int, p3: Int, p4: Int,
+                            p5: Int, p6: Int, p7: Int, p8: Int
+                        ) {
+                            view.removeOnLayoutChangeListener(this)
+                            show(layout, yPos, xPos, color)
+                        }
+                    })
+                } else {
+                    val screenWidth = measureScreen(requireActivity())
+                    val x = (screenWidth / 2 - view.width / 2).toFloat()
+                    view.x = x
+                }
             } else {
                 view.x = xPos
             }

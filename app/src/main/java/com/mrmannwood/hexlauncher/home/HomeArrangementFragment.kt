@@ -35,6 +35,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
 
     private val widgets = mutableMapOf<WidgetDescription, View>()
     private var viewBottom = 0
+    private var viewEnd = 0
     private var showParentContextMenu = false
 
     override val nameForInstrumentation = "HomeArrangementFragment"
@@ -60,7 +61,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
         PreferencesRepository.getPrefs(context) { sharedPrefs = it }
 
         widgetContainer = databinder.container
-        widgetContainer.addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, _ -> viewBottom = bottom }
+        widgetContainer.addOnLayoutChangeListener { _, _, _, right, bottom, _, _, _, _ -> viewBottom = bottom; viewEnd = right; }
         widgetContainer.setOnTouchListener(object : View.OnTouchListener {
 
             private val gestureDetector = GestureDetectorCompat(
@@ -84,22 +85,29 @@ class HomeArrangementFragment : WidgetHostFragment() {
             )
             private var widget: View? = null
             private var yOffset: Float = 0f
+            private var xOffset: Float = 0f
 
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 if (event.actionIndex != 0) return gestureDetector.onTouchEvent(event)
-                if (widget != null && event.y + yOffset < 0) return gestureDetector.onTouchEvent(event)
+                if (widget != null &&
+                    (event.y + yOffset < 0 || event.x + xOffset < 0)) return gestureDetector.onTouchEvent(event)
 
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
                         widget = findTouchedWidget(event.x, event.y)?.also { widget ->
                             yOffset = widget.y - event.y
+                            xOffset = widget.x - event.x
                         }
                     }
                     MotionEvent.ACTION_MOVE -> {
                         widget?.let { widget ->
                             val newY = event.y + yOffset
+                            val newX = event.x + xOffset
                             if (newY > 0 && newY < viewBottom - widget.height) {
                                 widget.y = newY
+                            }
+                            if (newX > 0 && newX < viewEnd - widget.width) {
+                                widget.x = newX
                             }
                         }
                     }
@@ -199,7 +207,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
                     remove(Widgets.Color.key(widget))
                 }
             widgets.forEach { (widgetDescription, widgetView) ->
-                putFloat(Widgets.Position.key(widgetDescription.widget), widgetView.y)
+                putString(Widgets.Position.key(widgetDescription.widget), "${widgetView.x},${widgetView.y}")
                 putInt(Widgets.Color.key(widgetDescription.widget), (widgetView as TextView).currentTextColor)
             }
         }

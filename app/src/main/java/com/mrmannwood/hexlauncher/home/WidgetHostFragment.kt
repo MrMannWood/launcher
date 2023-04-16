@@ -64,12 +64,12 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
             if (value.yPosition == null || value.color == null) {
                 hide()
             } else {
-                show(value.layout, value.yPosition, value.color)
+                show(value.layout, value.yPosition, value.xPosition, value.color)
             }
             onWidgetLoaded(widgetView, value.widget)
         }
 
-        private fun show(@LayoutRes layout: Int, yPos: Float, color: Int) {
+        private fun show(@LayoutRes layout: Int, yPos: Float, xPos: Float?, color: Int) {
             val view = widgetView?.let { widget ->
                 (widget.parent as? ViewGroup)?.removeView(widget)
                 widget
@@ -81,9 +81,10 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
             view.layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
-                Gravity.CENTER_HORIZONTAL
+                Gravity.NO_GRAVITY
             )
             view.y = yPos
+            xPos?.let { view.x = it }
             (view as TextView).setTextColor(color)
             databinder.container.addView(view)
         }

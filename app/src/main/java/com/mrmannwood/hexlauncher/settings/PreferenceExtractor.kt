@@ -2,16 +2,16 @@ package com.mrmannwood.hexlauncher.settings
 
 import android.content.SharedPreferences
 
-sealed class PreferenceExtractor<T> {
+interface PreferenceExtractor<T> {
 
-    abstract fun getValue(sharedPreferences: SharedPreferences, key: String): T?
+    fun getValue(sharedPreferences: SharedPreferences, key: String): T?
 
-    object StringExtractor : PreferenceExtractor<String?>() {
+    object StringExtractor : PreferenceExtractor<String?> {
         override fun getValue(sharedPreferences: SharedPreferences, key: String): String? {
             return sharedPreferences.getString(key, null)
         }
     }
-    abstract class PrimitiveExtractor<T> : PreferenceExtractor<T?>() {
+    abstract class PrimitiveExtractor<T> : PreferenceExtractor<T?> {
         override fun getValue(sharedPreferences: SharedPreferences, key: String): T? {
             return if (sharedPreferences.contains(key)) {
                 extract(sharedPreferences, key)

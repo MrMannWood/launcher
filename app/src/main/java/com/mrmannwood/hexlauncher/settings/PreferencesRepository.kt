@@ -2,6 +2,7 @@ package com.mrmannwood.hexlauncher.settings
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import com.mrmannwood.hexlauncher.executors.diskExecutor
@@ -12,21 +13,49 @@ object PreferencesRepository {
 
     fun getPrefs(context: Context, callback: (SharedPreferences) -> Unit) {
         val appContext = context.applicationContext
-        if (prefs != null) {
-            callback(prefs!!)
+        val sp = prefs
+        if (sp != null) {
+            callback(sp)
         } else {
             diskExecutor.execute {
-                if (prefs != null) {
-                    callback(prefs!!)
+                val sp = prefs
+                if (sp != null) {
+                    callback(sp)
                 } else {
-                    synchronized(this@PreferencesRepository) {
-                        if (prefs == null) {
-                            prefs = PreferenceManager.getDefaultSharedPreferences(appContext)
+                    val sp: SharedPreferences = synchronized(this@PreferencesRepository) {
+                        var sp = prefs
+                        if (sp != null) {
+                            sp
+                        } else {
+                            sp = PreferenceManager.getDefaultSharedPreferences(appContext)
+                            prefs = sp
+                            convert(sp)
+                            sp
                         }
                     }
-                    callback(prefs!!)
+                    callback(sp)
                 }
             }
+        }
+    }
+    
+    private fun convert(prefs: SharedPreferences) {
+        prefs.edit {
+            arrayOf("home_widget_date_position", "home_widget_time_position")
+                .mapNotNull { key ->
+                    try {
+                        val value = prefs.getFloat(key, -1f)
+                        if (value < 0) null
+                        else key to value
+                    } catch (e: ClassCastException) {
+                        // we've already run the conversion and can ignore
+                        null
+                    }
+                }
+                .forEach { (key, value) ->
+                    remove(key)
+                    putString(key, "null,$value")
+                }
         }
     }
 

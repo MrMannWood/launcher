@@ -56,7 +56,7 @@ interface IconAdapter {
 
         override fun getForegroundDrawable(icon: Drawable): Drawable? {
             return if (icon is AdaptiveIconDrawable) {
-                icon.foreground.constantState!!.newDrawable().mutate()
+                icon.foreground?.constantState?.newDrawable()?.mutate()
             } else {
                 null
             }
@@ -64,7 +64,7 @@ interface IconAdapter {
 
         override fun getBackgroundDrawable(icon: Drawable): Drawable? {
             return if (icon is AdaptiveIconDrawable) {
-                icon.background.constantState!!.newDrawable().mutate()
+                icon.background?.constantState?.newDrawable()?.mutate()
             } else {
                 null
             }

@@ -15,33 +15,25 @@ import android.view.WindowInsets
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
-import com.mrmannwood.hexlauncher.launcher.Adapter
-import com.mrmannwood.hexlauncher.launcher.AppInfo
-import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
-import com.mrmannwood.hexlauncher.launcher.LauncherViewModel
-import com.mrmannwood.hexlauncher.launcher.SearchTermType
+import com.mrmannwood.hexlauncher.launcher.*
 import com.mrmannwood.hexlauncher.levenshtein
 import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager
 import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager.Corner
 import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import com.mrmannwood.launcher.R
 import com.mrmannwood.launcher.databinding.ListAppItemBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import timber.log.Timber
 import java.util.*
 
 class AppListFragment : InstrumentedFragment(), HandleBackPressed {
@@ -277,10 +269,17 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         }
 
         val search = searchView.text.toString().trim().lowercase(Locale.ROOT)
-        resultListAdapter.setData(
-            AppInfo::class,
-            searchApps(apps, search).map { it }
-        )
+        val result = try {
+            searchApps(apps, search)
+        } catch (e: Exception) {
+            // reports of users crashing
+            Timber.e(e, "Crashed while searching apps. Term %s", search)
+            context?.let {
+                Toast.makeText(it, R.string.error_exception_while_searching, Toast.LENGTH_LONG).show()
+            }
+            Collections.emptyList()
+        }
+        resultListAdapter.setData(AppInfo::class, result)
     }
 
     private fun searchApps(apps: List<AppInfo>?, term: String): List<AppInfo> {

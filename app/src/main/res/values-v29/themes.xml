@@ -12,5 +12,5 @@
         <item name="android:windowLightStatusBar">@bool/windowLightStatusBar</item>
         <item name="android:enforceNavigationBarContrast">true</item>
     </style>
-    
+
 </resources>

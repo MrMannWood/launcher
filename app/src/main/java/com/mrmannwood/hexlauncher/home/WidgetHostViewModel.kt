@@ -8,7 +8,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
-import com.mrmannwood.hexlauncher.settings.PreferenceExtractor.FloatExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor.IntExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository.watchPref

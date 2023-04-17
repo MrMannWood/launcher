@@ -22,7 +22,7 @@ class WidgetHostViewModel(application: Application) : AndroidViewModel(applicati
     class WidgetPlacement(
         val widget: String,
         @LayoutRes val layout: Int,
-        val yPosition: Float?, // TODO ensure null is allowed
+        val yPosition: Float?,
         val xPosition: Float?,
         val color: Int?,
         val loaded: Boolean

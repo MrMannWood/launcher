@@ -3,7 +3,6 @@ package com.mrmannwood.hexlauncher.settings
 import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.room.*
 import com.mrmannwood.hexlauncher.executors.diskExecutor
 
@@ -45,8 +44,7 @@ abstract class PreferencesDao {
         }
         if (liveData.value == null) {
             diskExecutor.execute {
-                val a = getPreference(key)
-                liveData.postValue(a)
+                liveData.postValue(getPreference(key))
             }
         }
         return liveData

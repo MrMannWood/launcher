@@ -65,7 +65,9 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
         private var widgetView: View? = null
 
         override fun onChanged(value: WidgetHostViewModel.WidgetPlacement) {
-            if (!value.loaded) return
+            if (!value.loaded) {
+                return
+            }
             if (value.yPosition == null || value.color == null) {
                 hide()
             } else {

@@ -204,7 +204,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
                 }
             data.forEach { (widget, data) ->
                 prefs.dao.putString(Widgets.Position.key(widget), data.first)
-                prefs.dao.putInt(Widgets.Position.key(widget), data.second)
+                prefs.dao.putInt(Widgets.Color.key(widget), data.second)
             }
         }
     }

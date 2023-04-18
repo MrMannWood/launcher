@@ -9,7 +9,7 @@ import com.mrmannwood.hexlauncher.settings.PreferenceEntity
 import com.mrmannwood.hexlauncher.settings.PreferencesDao
 import com.mrmannwood.hexlauncher.typeconverters.ManualRoomTypeConverters
 
-@Database(version = 11, entities = [AppData::class, PreferenceEntity::class])
+@Database(version = 11, entities = [AppData::class])
 @TypeConverters(ManualRoomTypeConverters::class)
 abstract class Database : RoomDatabase() {
     abstract fun appDataDao(): AppDataDao

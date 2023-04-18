@@ -112,6 +112,7 @@
     <string name="dialog_color_picker_red_content_description">red</string>
     <string name="dialog_color_picker_green_content_description">green</string>
     <string name="dialog_color_picker_blue_content_description">blue</string>
+    <string name="color_picker_button_image_selector">From Image</string>
     <string name="color_picker_button_positive">OK</string>
     <string name="color_picker_button_negative">Cancel</string>
 

@@ -30,6 +30,9 @@ interface IconAdapter {
 
     @WorkerThread
     fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit, onFailure: () -> Unit)
+    
+    @WorkerThread
+    fun getPalette(bitmap: Bitmap, onPalette: (Palette) -> Unit)
 
     private open class DefaultIconAdapter : IconAdapter {
 
@@ -93,10 +96,6 @@ interface IconAdapter {
                         onPalette = {
                             close()
                             onPalette(it)
-                        },
-                        onFailure = {
-                            close()
-                            onFailure()
                         }
                     )
                 }
@@ -177,7 +176,7 @@ interface IconAdapter {
         }
 
         @WorkerThread
-        fun getPalette(bitmap: Bitmap, onPalette: (Palette) -> Unit, onFailure: () -> Unit) {
+        override fun getPalette(bitmap: Bitmap, onPalette: (Palette) -> Unit) {
             Palette.Builder(bitmap).generate().let { onPalette(it) }
         }
     }

@@ -1,22 +1,66 @@
 package com.mrmannwood.hexlauncher.colorpicker
 
+import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.ImageDecoder
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.slider.Slider
+import com.mrmannwood.hexlauncher.executors.cpuBoundTaskExecutor
+import com.mrmannwood.hexlauncher.icon.IconAdapter
 import com.mrmannwood.launcher.R
 
 class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
 
+    private val imagePickerContract = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri == null) return@registerForActivityResult
+        cpuBoundTaskExecutor.execute {
+            val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                ImageDecoder.decodeBitmap(
+                    ImageDecoder.createSource(
+                        requireContext().contentResolver,
+                        uri
+                    )
+                )
+            } else {
+                MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
+            }.copy(Bitmap.Config.ARGB_8888, true)
+            
+            IconAdapter.INSTANCE.getPalette(bitmap) { palette ->
+                viewModel.colorSuggestionLiveData.postValue(
+                    listOfNotNull(
+                        palette.vibrantSwatch,
+                        palette.lightVibrantSwatch,
+                        palette.darkVibrantSwatch,
+                        palette.darkMutedSwatch,
+                        palette.lightMutedSwatch,
+                        palette.mutedSwatch,
+                        palette.dominantSwatch,
+                    )
+                        .sortedBy { it.population }
+                        .map { it.rgb }
+                        .distinct()
+                )
+            }
+        }
+    }
+
+
     private var redValue = 0
     private var greenValue = 0
     private var blueValue = 0
-
+    
     private val viewModel: ColorPickerViewModel by activityViewModels()
 
     private lateinit var redSlider: Slider
@@ -38,6 +82,9 @@ class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
         val swatch = view.findViewById<View>(R.id.controller_swatch)
         swatch.setBackgroundColor(Color.rgb(redValue, greenValue, blueValue))
 
+        view.findViewById<Button>(R.id.image_selector).setOnClickListener {
+            imagePickerContract.launch("image/*")
+        }
         redSlider = view.findViewById<Slider>(R.id.slider_red).apply {
             value = redValue.toFloat()
             addOnChangeListener { _, value, _ ->

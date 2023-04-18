@@ -3,9 +3,12 @@ package com.mrmannwood.hexlauncher
 import android.app.Activity
 import android.app.Application
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.FileProvider
+import androidx.core.content.edit
+import androidx.preference.PreferenceManager
 import com.mrmannwood.applist.AppListLiveData
 import com.mrmannwood.applist.AppListManager
 import com.mrmannwood.hexlauncher.applist.AppListUpdater
@@ -31,6 +34,7 @@ class LauncherApplication : Application() {
         lateinit var APPLICATION: LauncherApplication
     }
 
+    val prefsMigrationLock = CountDownLatch(1)
     lateinit var appListManager: AppListManager
     lateinit var appListLiveData: AppListLiveData
 
@@ -74,6 +78,8 @@ class LauncherApplication : Application() {
         CoroutineScope(Dispatchers.IO).launch {
             File(filesDir, "rage_shake").deleteRecursively()
         }
+        
+        migratePreferencesIfNecessary()
     }
 
     private fun installUncaughtExceptionHandler() {
@@ -130,6 +136,32 @@ class LauncherApplication : Application() {
         }
     }
 
+    private fun migratePreferencesIfNecessary() {
+        PreferencesRepository.getPrefs(context = this@LauncherApplication) { repo ->
+            // todo probably make the activity wait for this
+            // running on disk executor thread
+            val lastVersion = repo.dao.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null)
+            var sharedPrefs: SharedPreferences? = null
+            if (lastVersion == null) {
+                sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this@LauncherApplication)
+                sharedPrefs.all.forEach { (key, value) ->
+                    when (value) {
+                        is String -> repo.dao.putString(key, value)
+                        is Int -> repo.dao.putInt(key, value)
+                        is Long -> repo.dao.putLong(key, value)
+                        is Float -> repo.dao.putFloat(key, value)
+                        is Double -> repo.dao.putDouble(key, value)
+                        is Boolean -> repo.dao.putBoolean(key, value)
+                        null -> { /* no-op */ }
+                        else -> Timber.e("Unknown type when migrating preferences: %s", value.javaClass.name)
+                    }
+                }
+            }
+            prefsMigrationLock.countDown()
+            sharedPrefs?.edit { clear() }
+        }
+    }
+    
     private interface BuildModeConfiguration {
         fun onApplicationCreate(application: Application)
     }

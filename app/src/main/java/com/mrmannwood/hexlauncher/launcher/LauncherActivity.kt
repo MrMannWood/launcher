@@ -11,6 +11,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.view.WindowCompat
 import com.mrmannwood.applist.AppListManager
 import com.mrmannwood.hexlauncher.HandleBackPressed
+import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.TestLabUtil.isTestLab
 import com.mrmannwood.hexlauncher.activity.BaseActivity
 import com.mrmannwood.hexlauncher.appcustomize.AppCustomizationFragment
@@ -33,6 +34,7 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
         supportActionBar?.hide()
 
         PreferencesRepository.getPrefs(this) { repo ->
+            (application as LauncherApplication).prefsMigrationLock.await()
             if (checkShouldShowNux(repo.dao)) {
                 runOnUiThread {
                     if (isDestroyed) return@runOnUiThread

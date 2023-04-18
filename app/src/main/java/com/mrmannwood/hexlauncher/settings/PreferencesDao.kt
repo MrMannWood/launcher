@@ -10,7 +10,6 @@ import com.mrmannwood.hexlauncher.executors.diskExecutor
 @Dao
 abstract class PreferencesDao {
 
-    private val globalWatcher: MutableLiveData<Preference<*>?> = MutableLiveData()
     private val watchers: MutableMap<String, MutableLiveData<Preference<*>?>> = mutableMapOf()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -58,7 +57,7 @@ abstract class PreferencesDao {
         if (value !is Preference.StringPreference) throw ClassCastException("$key does not represent a String")
         return value.value
     }
-
+    
     fun getBoolean(key: String, default: Boolean): Boolean {
         val value = getPreference(key) ?: return default
         if (value !is Preference.BooleanPreference) throw ClassCastException("$key does not represent a Boolean")
@@ -77,18 +76,36 @@ abstract class PreferencesDao {
         return value.value
     }
 
+    fun getDouble(key: String, default: Double): Double {
+        val value = getPreference(key) ?: return default
+        if (value !is Preference.DoublePreference) throw ClassCastException("$key does not represent a Double")
+        return value.value
+    }
+
     fun getLong(key: String, default: Long): Long {
         val value = getPreference(key) ?: return default
         if (value !is Preference.LongPreference) throw ClassCastException("$key does not represent a Long")
         return value.value
     }
-
+    
     fun putString(key: String, value: String) {
         insert(Preference.StringPreference(key, value))
     }
 
     fun putInt(key: String, value: Int) {
         insert(Preference.IntPreference(key, value))
+    }
+
+    fun putLong(key: String, value: Long) {
+        insert(Preference.LongPreference(key, value))
+    }
+
+    fun putFloat(key: String, value: Float) {
+        insert(Preference.FloatPreference(key, value))
+    }
+    
+    fun putDouble(key: String, value: Double) {
+        insert(Preference.DoublePreference(key, value))
     }
 
     fun putBoolean(key: String, value: Boolean) {
@@ -100,21 +117,11 @@ abstract class PreferencesDao {
         operations.forEach { it.invoke() }
     }
 
-    fun registerGlobalWatcher(watcher: Observer<Preference<*>?>) {
-        globalWatcher.observeForever(watcher)
-    }
-
-    fun unregisterGlobalWatcher(watcher: Observer<Preference<*>?>) {
-        globalWatcher.removeObserver(watcher)
-    }
-
     private fun callWatchers(key: String, preference: Preference<*>?) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             watchers[key]?.value = preference
-            globalWatcher.value = preference
         } else {
             watchers[key]?.postValue(preference)
-            globalWatcher.postValue(preference)
         }
     }
 }

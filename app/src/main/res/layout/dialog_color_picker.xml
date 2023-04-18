@@ -74,7 +74,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp">
 
         <TextView
             android:id="@+id/hex_code"
@@ -82,9 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:textSize="18sp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"/>
+            android:textSize="18sp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/image_selector"

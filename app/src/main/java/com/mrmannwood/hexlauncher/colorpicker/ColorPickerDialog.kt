@@ -3,7 +3,6 @@ package com.mrmannwood.hexlauncher.colorpicker
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.ImageDecoder
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build

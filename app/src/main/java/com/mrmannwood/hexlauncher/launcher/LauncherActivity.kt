@@ -2,14 +2,12 @@ package com.mrmannwood.hexlauncher.launcher
 
 import android.app.SearchManager
 import android.content.Intent
-import android.content.SharedPreferences
-import android.content.pm.ActivityInfo
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.core.content.edit
+import androidx.annotation.WorkerThread
 import androidx.core.view.WindowCompat
 import com.mrmannwood.applist.AppListManager
 import com.mrmannwood.hexlauncher.HandleBackPressed
@@ -17,15 +15,13 @@ import com.mrmannwood.hexlauncher.TestLabUtil.isTestLab
 import com.mrmannwood.hexlauncher.activity.BaseActivity
 import com.mrmannwood.hexlauncher.appcustomize.AppCustomizationFragment
 import com.mrmannwood.hexlauncher.applist.AppListFragment
-import com.mrmannwood.hexlauncher.executors.OriginalThreadCallback
 import com.mrmannwood.hexlauncher.home.HomeFragment
 import com.mrmannwood.hexlauncher.isVersionStringLess
 import com.mrmannwood.hexlauncher.nux.NUXHostFragment
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
+import com.mrmannwood.hexlauncher.settings.PreferencesDao
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository
-import com.mrmannwood.hexlauncher.settings.PreferencesRepository.watchPref
-import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 
 class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
@@ -36,29 +32,31 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
         setContentView(R.layout.activity_launcher)
         supportActionBar?.hide()
 
-        if (supportFragmentManager.findFragmentById(R.id.container) == null) {
-            supportFragmentManager.beginTransaction()
-                .add(R.id.container, HomeFragment())
-                .addToBackStack("HomeFragment")
-                .commit()
-        }
-
-        PreferencesRepository.getPrefs(
-            this,
-            OriginalThreadCallback.create { prefs ->
-                if (checkShouldShowNux(prefs)) {
+        PreferencesRepository.getPrefs(this) { repo ->
+            if (checkShouldShowNux(repo.dao)) {
+                runOnUiThread {
+                    if (isDestroyed) return@runOnUiThread
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.container, NUXHostFragment())
                         .commit()
                 }
+            } else {
+                runOnUiThread {
+                    if (isDestroyed) return@runOnUiThread
+                    if (supportFragmentManager.findFragmentById(R.id.container) == null) {
+                        supportFragmentManager.beginTransaction()
+                            .add(R.id.container, HomeFragment())
+                            .addToBackStack("HomeFragment")
+                            .commit()
+                    }
+                }
             }
-        )
-        watchPref(
-            context = applicationContext,
-            key = PreferenceKeys.Home.ORIENTATION,
-            extractor = PreferenceExtractor.StringExtractor
-        ).observe(this) { orientation ->
-            requestedOrientation = orientation?.toIntOrNull() ?: ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT
+            repo.watchPref(
+                key = PreferenceKeys.Home.ORIENTATION,
+                extractor = PreferenceExtractor.StringExtractor
+            ).observe(this) { orientation ->
+                requestedOrientation = orientation?.toIntOrNull() ?: return@observe
+            }
         }
     }
 
@@ -79,15 +77,12 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
         return appListFragmentHost
     }
 
-    private fun checkShouldShowNux(prefs: SharedPreferences): Boolean {
+    @WorkerThread
+    private fun checkShouldShowNux(prefs: PreferencesDao): Boolean {
         if (isTestLab(this)) return false
-        val showNux = prefs.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null)?.let {
-            isVersionStringLess(it, "1.4.1")
-        } ?: run { true }
-        prefs.edit {
-            putString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, BuildConfig.VERSION_NAME)
-        }
-        return showNux
+        val version =
+            prefs.getString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, null) ?: return true
+        return isVersionStringLess(version, "1.4.1")
     }
 
     private fun goFullscreen() {
@@ -114,7 +109,11 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     )
                 } catch (e: Exception) {
-                    Toast.makeText(this@LauncherActivity, R.string.unable_to_start_app, Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@LauncherActivity,
+                        R.string.unable_to_start_app,
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
             end()
@@ -137,7 +136,10 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
                 menu.add(R.string.menu_item_app_customize).setOnMenuItemClickListener {
                     end()
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.container, AppCustomizationFragment.forComponent(appInfo.componentName))
+                        .replace(
+                            R.id.container,
+                            AppCustomizationFragment.forComponent(appInfo.componentName)
+                        )
                         .addToBackStack("AppCustomizationFragment")
                         .commit()
                     true

@@ -30,6 +30,9 @@ class TextEntryDialog : DialogFragment(R.layout.dialog_text_entry) {
 
     override fun onStart() {
         super.onStart()
-        dialog?.window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        dialog?.window?.setLayout(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
     }
 }

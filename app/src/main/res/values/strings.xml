@@ -133,6 +133,7 @@
     <string name="customize_app_background_icon">Background Icon</string>
     <string name="customize_app_tags_delete_tag_content_description">Delete tag %s</string>
 
+    <string name="error_cannot_set_app">Unable to use that app as a shortchut</string>
     <string name="error_cannot_change_wallpaper">Unable to set that wallpaper</string>
     <string name="error_exception_while_searching">An unknown error occurred while searching. Please submit an error report in Settings.</string>
 

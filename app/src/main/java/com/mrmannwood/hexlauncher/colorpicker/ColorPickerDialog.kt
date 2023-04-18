@@ -102,13 +102,20 @@ class ColorPickerDialog : DialogFragment(R.layout.dialog_color_picker) {
                     getString(ColorUtil.getColorNameFromHex(suggestion))
                 )
             }
-            suggestionsContainer.visibility = if (suggestions.isNullOrEmpty()) { View.GONE } else { View.VISIBLE }
+            suggestionsContainer.visibility = if (suggestions.isNullOrEmpty()) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
         }
     }
 
     override fun onStart() {
         super.onStart()
-        dialog?.window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        dialog?.window?.setLayout(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
     }
 
     private fun getColor(): Int = Color.rgb(redValue, greenValue, blueValue)

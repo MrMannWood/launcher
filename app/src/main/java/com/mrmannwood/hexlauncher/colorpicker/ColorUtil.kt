@@ -152,24 +152,26 @@ object ColorUtil {
     private data class ColorName(@StringRes val name: Int, val r: Int, val g: Int, val b: Int) {
         fun computeMSE(pixR: Int, pixG: Int, pixB: Int): Int {
             return (
-                (
-                    (pixR - r) * (pixR - r) + (pixG - g) * (pixG - g) + (
-                        (pixB - b) *
-                            (pixB - b)
-                        )
-                    ) / 3
-                )
+                    (
+                            (pixR - r) * (pixR - r) + (pixG - g) * (pixG - g) + (
+                                    (pixB - b) *
+                                            (pixB - b)
+                                    )
+                            ) / 3
+                    )
         }
     }
 
-    @StringRes fun getColorNameFromHex(hexColor: Int): Int {
+    @StringRes
+    fun getColorNameFromHex(hexColor: Int): Int {
         val r = hexColor and 0xFF0000 shr 16
         val g = hexColor and 0xFF00 shr 8
         val b = hexColor and 0xFF
         return getColorNameFromRgb(r, g, b)
     }
 
-    @StringRes private fun getColorNameFromRgb(r: Int, g: Int, b: Int): Int {
+    @StringRes
+    private fun getColorNameFromRgb(r: Int, g: Int, b: Int): Int {
         var closestMatch: ColorName? = null
         var minMSE = Int.MAX_VALUE
         var mse: Int

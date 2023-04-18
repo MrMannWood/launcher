@@ -57,10 +57,11 @@ class TouchTutorialFragment : AbstractGestureWheelTutorialFragment() {
                 pushMessage(R.string.nux_touch_tutorial_message)
                 gestures.filter { it.id != R.id.north_container }.forEach {
                     it.setOnCreateContextMenuListener { menu, _, _ ->
-                        menu.add(R.string.nux_customize_tutorial_customize).setOnMenuItemClickListener {
-                            nextTutorial()
-                            true
-                        }
+                        menu.add(R.string.nux_customize_tutorial_customize)
+                            .setOnMenuItemClickListener {
+                                nextTutorial()
+                                true
+                            }
                     }
                 }
             }

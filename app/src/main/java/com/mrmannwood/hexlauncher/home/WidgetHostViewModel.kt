@@ -1,16 +1,16 @@
 package com.mrmannwood.hexlauncher.home
 
 import android.app.Application
-import android.content.SharedPreferences
 import android.graphics.Color
 import androidx.annotation.LayoutRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import com.mrmannwood.hexlauncher.settings.Preference
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor.IntExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys.Home.Widgets
-import com.mrmannwood.hexlauncher.settings.PreferencesRepository.watchPref
+import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.launcher.R
 
 class WidgetHostViewModel(application: Application) : AndroidViewModel(application) {
@@ -36,25 +36,36 @@ class WidgetHostViewModel(application: Application) : AndroidViewModel(applicati
         init {
             var posSet = false
             var colorSet = false
-            addSource(watchPref(application, Widgets.Position.key(widget), WidgetPositionExtractor)) { pos ->
-                val xPos = pos?.first
-                val yPos = pos?.second
-                value = WidgetPlacement(widget, layout, yPos, xPos, value?.color, colorSet)
-                posSet = true
-            }
-            addSource(watchPref(application, Widgets.Color.key(widget), IntExtractor)) { color ->
-                value = WidgetPlacement(widget, layout, value?.yPosition, value?.xPosition, color ?: Color.WHITE, posSet)
-                colorSet = true
+            PreferencesRepository.getPrefs(application) { repo ->
+                addSource(
+                    repo.watchPref(
+                        Widgets.Position.key(widget),
+                        WidgetPositionExtractor
+                    )
+                ) { pos ->
+                    val xPos = pos?.first
+                    val yPos = pos?.second
+                    value = WidgetPlacement(widget, layout, yPos, xPos, value?.color, colorSet)
+                    posSet = true
+                }
+                addSource(repo.watchPref(Widgets.Color.key(widget), IntExtractor)) { color ->
+                    value = WidgetPlacement(
+                        widget,
+                        layout,
+                        value?.yPosition,
+                        value?.xPosition,
+                        color ?: Color.WHITE,
+                        posSet
+                    )
+                    colorSet = true
+                }
             }
         }
     }
-    
+
     private object WidgetPositionExtractor : PreferenceExtractor<Pair<Float?, Float>?> {
-        override fun getValue(
-            sharedPreferences: SharedPreferences,
-            key: String
-        ): Pair<Float?, Float>? {
-            val raw = sharedPreferences.getString(key, null) ?: return null
+        override fun getValue(pref: Preference<*>): Pair<Float?, Float>? {
+            val raw = PreferenceExtractor.StringExtractor.getValue(pref)
             val split = raw.split(",")
             if (split.size != 2) return null
             val xPos = split[0].toFloatOrNull()

@@ -14,7 +14,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
@@ -30,7 +29,6 @@ import com.mrmannwood.hexlauncher.launcher.Provider
 import com.mrmannwood.hexlauncher.settings.PreferenceExtractor
 import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository
-import com.mrmannwood.hexlauncher.settings.PreferencesRepository.watchPref
 import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager
 import com.mrmannwood.hexlauncher.view.KeyboardEditText
 import com.mrmannwood.launcher.R
@@ -87,6 +85,7 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
                     activity?.let { forceShowKeyboard(it, searchView) }
                 }
             }
+
             override fun onPause(owner: LifecycleOwner) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     showKeyboardJob?.cancelAndJoin()
@@ -96,21 +95,21 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
         })
 
         leftHandedSwitch = view.findViewById(R.id.nux_search_left_switch)
-        watchPref(view.context, PreferenceKeys.User.LEFT_HANDED, PreferenceExtractor.BooleanExtractor)
-            .observe(viewLifecycleOwner) { leftHanded ->
-                if (leftHanded == null) return@observe
-                if (leftHandedLayout == leftHanded) return@observe
-                leftHandedLayout = leftHanded
-                resultListView.layoutManager = createLayoutManager()
-                leftHandedSwitch.isChecked = leftHanded
-            }
+        PreferencesRepository.getPrefs(view.context) { repo ->
+            repo.watchPref(PreferenceKeys.User.LEFT_HANDED, PreferenceExtractor.BooleanExtractor)
+                .observe(viewLifecycleOwner) { leftHanded ->
+                    if (leftHanded == null) return@observe
+                    if (leftHandedLayout == leftHanded) return@observe
+                    leftHandedLayout = leftHanded
+                    resultListView.layoutManager = createLayoutManager()
+                    leftHandedSwitch.isChecked = leftHanded
+                }
+        }
 
         leftHandedSwitch.setOnCheckedChangeListener { _, checked ->
             val context = context ?: return@setOnCheckedChangeListener
-            PreferencesRepository.getPrefs(context) {
-                it.edit {
-                    putBoolean(PreferenceKeys.User.LEFT_HANDED, checked)
-                }
+            PreferencesRepository.getPrefs(context) { repo ->
+                repo.dao.putBoolean(PreferenceKeys.User.LEFT_HANDED, checked)
             }
         }
     }

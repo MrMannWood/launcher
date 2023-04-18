@@ -51,7 +51,12 @@ class AppCustomizationFragment : InstrumentedFragment() {
     private var appInfo: AppInfo? = null
     private lateinit var tagsAdapter: Adapter<SearchTerm>
 
-    private val viewModel: AppCustomizationViewModel by viewModels { AppCustomizationViewModelFactory(requireContext(), componentName) }
+    private val viewModel: AppCustomizationViewModel by viewModels {
+        AppCustomizationViewModelFactory(
+            requireContext(),
+            componentName
+        )
+    }
     private val colorPickerViewModel: ColorPickerViewModel by activityViewModels()
     private val textEntryDialogViewModel: TextEntryDialogViewModel by activityViewModels()
 
@@ -65,7 +70,8 @@ class AppCustomizationFragment : InstrumentedFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_app_customization, container, false)
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_app_customization, container, false)
         return binding.root
     }
 
@@ -79,7 +85,9 @@ class AppCustomizationFragment : InstrumentedFragment() {
             app?.let { info ->
                 binding.appInfo = info
                 appInfo = info
-                tagsAdapter.setData(SearchTerm.Category::class, app.categories.map { SearchTerm.Category(it) })
+                tagsAdapter.setData(
+                    SearchTerm.Category::class,
+                    app.categories.map { SearchTerm.Category(it) })
                 tagsAdapter.setData(SearchTerm.Tag::class, app.tags.map { SearchTerm.Tag(it) })
             } ?: run {
                 parentFragmentManager.beginTransaction()
@@ -173,7 +181,11 @@ class AppCustomizationFragment : InstrumentedFragment() {
                 t.trim().takeIf { it.isNotBlank() }?.lowercase()?.let { tag ->
                     if (tag.contains(",")) {
                         context?.let { context ->
-                            Toast.makeText(context, R.string.text_entry_cannot_contain_comma, Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                context,
+                                R.string.text_entry_cannot_contain_comma,
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     } else if (appInfo?.searchTerms?.contains(tag) != true) {
                         updateAppInfo { dao ->
@@ -234,7 +246,10 @@ class AppCustomizationFragment : InstrumentedFragment() {
         }
     }
 
-    private fun extractColorsForPicker(drawableProvider: Provider<Drawable>, action: (iconAdapter: IconAdapter, drawable: Drawable) -> List<Int>) {
+    private fun extractColorsForPicker(
+        drawableProvider: Provider<Drawable>,
+        action: (iconAdapter: IconAdapter, drawable: Drawable) -> List<Int>
+    ) {
         drawableProvider.get { drawable ->
             cpuBoundTaskExecutor.execute {
                 addColorsToColorPickerSuggestions(action(IconAdapter.INSTANCE, drawable))
@@ -247,7 +262,8 @@ class AppCustomizationFragment : InstrumentedFragment() {
             return
         }
         colorPickerViewModel.colorSuggestionLiveData.postValue(
-            (colorPickerViewModel.colorSuggestionLiveData.value?.toMutableList() ?: ArrayList()).also {
+            (colorPickerViewModel.colorSuggestionLiveData.value?.toMutableList()
+                ?: ArrayList()).also {
                 it.addAll(colors)
             }
         )

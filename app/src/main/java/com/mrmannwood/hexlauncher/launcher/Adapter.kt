@@ -71,7 +71,9 @@ class Adapter<T : Any>(
             }.toMap()
 
         fun genId(result: T): Long {
-            val (keyGet, idMap) = map.getOrElse(result::class, { throw IllegalArgumentException("Unknown type ${result::class}") })
+            val (keyGet, idMap) = map.getOrElse(
+                result::class,
+                { throw IllegalArgumentException("Unknown type ${result::class}") })
             val key = keyGet(result)
             return getOrCreateId(key, idMap)
         }

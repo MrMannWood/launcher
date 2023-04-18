@@ -23,7 +23,11 @@ abstract class WidgetHostFragment : InstrumentedFragment() {
 
     private lateinit var databinder: FragmentHomeBinding
 
-    final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    final override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         databinder = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         databinder.adapter = HomeViewDatabindingAdapter
         databinder.description = makeDescription(isLoading = true)

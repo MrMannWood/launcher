@@ -47,8 +47,8 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         }
 
         abstract fun onAppSelected(appInfo: AppInfo)
-        open fun onSearchButtonPressed(searchTerm: String) { }
-        open fun onAppInfoBinding(view: View, appInfo: AppInfo) { }
+        open fun onSearchButtonPressed(searchTerm: String) {}
+        open fun onAppInfoBinding(view: View, appInfo: AppInfo) {}
     }
 
     // TODO this is really hacky, and should be replaced with ViewModel
@@ -114,6 +114,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
                     forceShowKeyboard(searchView)
                 }
             }
+
             override fun onStop(owner: LifecycleOwner) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     showKeyboardJob?.cancelAndJoin()
@@ -239,7 +240,8 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
 
         if (resultListView.layoutManager !is GridLayoutManager) {
             val displayMetrics: DisplayMetrics = resources.displayMetrics
-            val numColumns = (displayMetrics.widthPixels / (resources.getDimension(R.dimen.hex_view_height) + 24)).toInt()
+            val numColumns =
+                (displayMetrics.widthPixels / (resources.getDimension(R.dimen.hex_view_height) + 24)).toInt()
 
             resultListView.layoutManager = object : GridLayoutManager(
                 activity,
@@ -275,7 +277,8 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
             // reports of users crashing
             Timber.e(e, "Crashed while searching apps. Term %s", search)
             context?.let {
-                Toast.makeText(it, R.string.error_exception_while_searching, Toast.LENGTH_LONG).show()
+                Toast.makeText(it, R.string.error_exception_while_searching, Toast.LENGTH_LONG)
+                    .show()
             }
             Collections.emptyList()
         }

@@ -1,14 +1,12 @@
 package com.mrmannwood.hexlauncher.home
 
 import android.annotation.SuppressLint
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.core.content.edit
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -25,7 +23,6 @@ class HomeArrangementFragment : WidgetHostFragment() {
 
     private lateinit var instructionMessage: TextView
     private lateinit var widgetContainer: FrameLayout
-    private var sharedPrefs: SharedPreferences? = null
 
     private val widgets = mutableMapOf<WidgetDescription, View>()
     private var viewBottom = 0
@@ -52,10 +49,10 @@ class HomeArrangementFragment : WidgetHostFragment() {
     override fun onViewCreated(databinder: FragmentHomeBinding, savedInstanceState: Bundle?) {
         val context = databinder.root.context
 
-        PreferencesRepository.getPrefs(context) { sharedPrefs = it }
-
         widgetContainer = databinder.container
-        widgetContainer.addOnLayoutChangeListener { _, _, _, right, bottom, _, _, _, _ -> viewBottom = bottom; viewEnd = right; }
+        widgetContainer.addOnLayoutChangeListener { _, _, _, right, bottom, _, _, _, _ ->
+            viewBottom = bottom; viewEnd = right
+        }
         widgetContainer.setOnTouchListener(object : View.OnTouchListener {
 
             private val gestureDetector = GestureDetectorCompat(
@@ -64,6 +61,7 @@ class HomeArrangementFragment : WidgetHostFragment() {
                     override fun onDown(e: MotionEvent): Boolean {
                         return true
                     }
+
                     override fun onLongPress(e: MotionEvent) {
                         super.onLongPress(e)
                         widget = null
@@ -84,7 +82,8 @@ class HomeArrangementFragment : WidgetHostFragment() {
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 if (event.actionIndex != 0) return gestureDetector.onTouchEvent(event)
                 if (widget != null &&
-                    (event.y + yOffset < 0 || event.x + xOffset < 0)) return gestureDetector.onTouchEvent(event)
+                    (event.y + yOffset < 0 || event.x + xOffset < 0)
+                ) return gestureDetector.onTouchEvent(event)
 
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
@@ -192,17 +191,20 @@ class HomeArrangementFragment : WidgetHostFragment() {
 
     override fun onStop() {
         super.onStop()
-        sharedPrefs?.edit {
+        val data = widgets.map { (widgetDescription, widgetView) ->
+            widgetDescription.widget to ("${widgetView.x},${widgetView.y}" to (widgetView as TextView).currentTextColor)
+        }
+        PreferencesRepository.getPrefs(requireContext()) { prefs ->
             allWidgets
                 .filter { !widgets.contains(it.value) }
                 .map { it.key }
                 .forEach { widget ->
-                    remove(Widgets.Position.key(widget))
-                    remove(Widgets.Color.key(widget))
+                    prefs.dao.delete(Widgets.Position.key(widget))
+                    prefs.dao.delete(Widgets.Color.key(widget))
                 }
-            widgets.forEach { (widgetDescription, widgetView) ->
-                putString(Widgets.Position.key(widgetDescription.widget), "${widgetView.x},${widgetView.y}")
-                putInt(Widgets.Color.key(widgetDescription.widget), (widgetView as TextView).currentTextColor)
+            data.forEach { (widget, data) ->
+                prefs.dao.putString(Widgets.Position.key(widget), data.first)
+                prefs.dao.putInt(Widgets.Position.key(widget), data.second)
             }
         }
     }
@@ -235,7 +237,10 @@ class HomeArrangementFragment : WidgetHostFragment() {
                     }
                 }
                 colorPickerViewModel.colorLiveData.observe(viewLifecycleOwner, colorObserver)
-                colorPickerViewModel.completionLiveData.observe(viewLifecycleOwner, completionObserver)
+                colorPickerViewModel.completionLiveData.observe(
+                    viewLifecycleOwner,
+                    completionObserver
+                )
                 ColorPickerDialog().show(childFragmentManager, null)
                 true
             }
@@ -252,8 +257,16 @@ class HomeArrangementFragment : WidgetHostFragment() {
     }
 
     private val allWidgets = mapOf(
-        Widgets.DATE to WidgetDescription(Widgets.DATE, R.string.preferences_home_widgets_date_name, R.layout.widget_date),
-        Widgets.TIME to WidgetDescription(Widgets.TIME, R.string.preferences_home_widgets_time_name, R.layout.widget_time)
+        Widgets.DATE to WidgetDescription(
+            Widgets.DATE,
+            R.string.preferences_home_widgets_date_name,
+            R.layout.widget_date
+        ),
+        Widgets.TIME to WidgetDescription(
+            Widgets.TIME,
+            R.string.preferences_home_widgets_time_name,
+            R.layout.widget_time
+        )
     )
 
     private class WidgetDescription(val widget: String, val name: Int, val layout: Int)

@@ -6,6 +6,7 @@ import androidx.room.Room
 object DB {
 
     private var db: Database? = null
+    private var prefsDb: PrefsDatabase? = null
 
     fun get(context: Context): Database {
         var database = db
@@ -21,6 +22,27 @@ object DB {
                         .fallbackToDestructiveMigration()
                         .build()
                     db = database
+                }
+            }
+        }
+        return database!!
+    }
+
+    fun getPrefsDatabase(context: Context): PrefsDatabase {
+        var database = prefsDb
+        if (database == null) {
+            synchronized(DB::class) {
+                database = prefsDb
+                if (database == null) {
+                    database = Room.databaseBuilder(
+                        context.applicationContext,
+                        PrefsDatabase::class.java,
+                        "prefs_db"
+                    )
+                        .allowMainThreadQueries()
+                        .fallbackToDestructiveMigration()
+                        .build()
+                    prefsDb = database
                 }
             }
         }

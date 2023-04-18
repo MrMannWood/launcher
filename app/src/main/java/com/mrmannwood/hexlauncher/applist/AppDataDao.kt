@@ -11,7 +11,12 @@ interface AppDataDao {
     fun insert(app: AppData): Long
 
     @Query("UPDATE app_data SET label = :label, last_update_time = :lastUpdateTime, background_color = :backgroundColor WHERE component_name = :componentName")
-    fun update(label: String, lastUpdateTime: Long, backgroundColor: Int, componentName: ComponentName)
+    fun update(
+        label: String,
+        lastUpdateTime: Long,
+        backgroundColor: Int,
+        componentName: ComponentName
+    )
 
     @Query("SELECT * FROM app_data")
     fun getApps(): List<AppData>

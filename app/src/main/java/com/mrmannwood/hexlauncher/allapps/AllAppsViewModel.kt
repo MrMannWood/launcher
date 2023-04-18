@@ -11,8 +11,7 @@ import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 
 class AllAppsViewModel(app: Application) : AndroidViewModel(app) {
     val apps: LiveData<List<AppInfo>> = getAppInfoLiveData(appContext = app, showHidden = true)
-    val leftHandedLayout = PreferencesRepository.watchPref(
-        context = getApplication(),
+    val leftHandedLayout = PreferencesRepository.getPrefsBlocking(app).watchPref(
         key = PreferenceKeys.User.LEFT_HANDED,
         extractor = PreferenceExtractor.BooleanExtractor
     )

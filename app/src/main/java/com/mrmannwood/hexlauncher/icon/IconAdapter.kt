@@ -25,9 +25,11 @@ interface IconAdapter {
 
     fun getBackgroundDrawable(icon: Drawable): Drawable?
 
-    @WorkerThread fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit)
+    @WorkerThread
+    fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit)
 
-    @WorkerThread fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit, onFailure: () -> Unit)
+    @WorkerThread
+    fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit, onFailure: () -> Unit)
 
     private open class DefaultIconAdapter : IconAdapter {
 
@@ -51,7 +53,8 @@ interface IconAdapter {
                     return result
                 }
             }
-            return drawableToBitmap(icon, false) { bitmap, _ -> getDominantColor(bitmap) } ?: 0xFFC1CC
+            return drawableToBitmap(icon, false) { bitmap, _ -> getDominantColor(bitmap) }
+                ?: 0xFFC1CC
         }
 
         override fun getForegroundDrawable(icon: Drawable): Drawable? {
@@ -76,7 +79,11 @@ interface IconAdapter {
         }
 
         @WorkerThread
-        override fun getPalette(icon: Drawable?, onPalette: (Palette) -> Unit, onFailure: () -> Unit) {
+        override fun getPalette(
+            icon: Drawable?,
+            onPalette: (Palette) -> Unit,
+            onFailure: () -> Unit
+        ) {
             if (icon == null) {
                 onFailure()
             } else {
@@ -96,7 +103,11 @@ interface IconAdapter {
             }
         }
 
-        fun <T> drawableToBitmap(drawable: Drawable, selfClose: Boolean, func: (Bitmap, () -> Unit) -> T): T {
+        fun <T> drawableToBitmap(
+            drawable: Drawable,
+            selfClose: Boolean,
+            func: (Bitmap, () -> Unit) -> T
+        ): T {
             if (drawable is BitmapDrawable && drawable.bitmap != null) {
                 return func(drawable.bitmap) { }
             }
@@ -165,8 +176,9 @@ interface IconAdapter {
             return color
         }
 
-        @WorkerThread fun getPalette(bitmap: Bitmap, onPalette: (Palette) -> Unit, onFailure: () -> Unit) {
-            Palette.Builder(bitmap).generate()?.let { onPalette(it) } ?: run { onFailure() }
+        @WorkerThread
+        fun getPalette(bitmap: Bitmap, onPalette: (Palette) -> Unit, onFailure: () -> Unit) {
+            Palette.Builder(bitmap).generate().let { onPalette(it) }
         }
     }
 }

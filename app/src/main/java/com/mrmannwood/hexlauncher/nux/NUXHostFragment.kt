@@ -9,6 +9,9 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.home.HomeFragment
+import com.mrmannwood.hexlauncher.settings.PreferenceKeys
+import com.mrmannwood.hexlauncher.settings.PreferencesRepository
+import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 
 class NUXHostFragment : Fragment(R.layout.fragment_nux_host), HandleBackPressed {
@@ -30,6 +33,12 @@ class NUXHostFragment : Fragment(R.layout.fragment_nux_host), HandleBackPressed 
             if (fragment is AcceptsNuxCompleted) {
                 fragment.acceptNuxCompleted(object : NuxCompleted {
                     override fun onNuxCompleted() {
+                        PreferencesRepository.getPrefs(requireContext()) { repo ->
+                            repo.dao.putString(
+                                PreferenceKeys.Version.LAST_RUN_VERSION_NAME,
+                                BuildConfig.VERSION_NAME
+                            )
+                        }
                         parentFragmentManager.beginTransaction()
                             .replace(R.id.container, HomeFragment())
                             .commit()

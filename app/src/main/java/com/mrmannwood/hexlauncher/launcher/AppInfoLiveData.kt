@@ -23,7 +23,10 @@ fun getSingleAppLiveData(context: Context, componentName: ComponentName): LiveDa
     }
 }
 
-fun getAppInfoLiveData(appContext: Application, showHidden: Boolean = false): LiveData<List<AppInfo>> {
+fun getAppInfoLiveData(
+    appContext: Application,
+    showHidden: Boolean = false
+): LiveData<List<AppInfo>> {
     if (showHidden) {
         return makeLiveData(appContext, true)
     }
@@ -33,7 +36,10 @@ fun getAppInfoLiveData(appContext: Application, showHidden: Boolean = false): Li
     return appInfoLiveData!!
 }
 
-private fun makeLiveData(appContext: Application, showHidden: Boolean = false): LiveData<List<AppInfo>> {
+private fun makeLiveData(
+    appContext: Application,
+    showHidden: Boolean = false
+): LiveData<List<AppInfo>> {
     return (appContext as LauncherApplication).appListLiveData.combineWith(
         DB.get(appContext).appDataDao().watchApps(),
         cpuBoundTaskExecutor
@@ -45,7 +51,8 @@ private fun makeLiveData(appContext: Application, showHidden: Boolean = false): 
             .map { (launcherItem, decoration) ->
                 AppInfo(
                     launcherItem = launcherItem,
-                    backgroundColor = decoration?.bgcOverride ?: decoration?.backgroundColor ?: Color.TRANSPARENT,
+                    backgroundColor = decoration?.bgcOverride ?: decoration?.backgroundColor
+                    ?: Color.TRANSPARENT,
                     hidden = decoration?.hidden == true,
                     backgroundHidden = decoration?.backgroundHidden == true,
                     categories = getCategories(appContext, launcherItem.category),

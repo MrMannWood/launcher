@@ -24,7 +24,8 @@ object CustomizationFragmentDatabindingAdapter {
         LauncherFragmentDatabindingAdapter.getBackgroundIcon(appInfo)
 
     fun getBackgroundColor(bgcOverride: java.lang.Integer?, appInfo: AppInfo?): Int {
-        return bgcOverride?.toInt() ?: LauncherFragmentDatabindingAdapter.getBackgroundColor(appInfo)
+        return bgcOverride?.toInt()
+            ?: LauncherFragmentDatabindingAdapter.getBackgroundColor(appInfo)
     }
 
     fun getHideButtonText(res: Resources, appInfo: AppInfo?): CharSequence? {

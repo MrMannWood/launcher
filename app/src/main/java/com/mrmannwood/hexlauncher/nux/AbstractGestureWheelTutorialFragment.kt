@@ -16,7 +16,8 @@ import com.mrmannwood.launcher.R
 import java.util.*
 import kotlin.math.pow
 
-abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment_nux_gesture_wheel_tutorial) {
+abstract class AbstractGestureWheelTutorialFragment :
+    Fragment(R.layout.fragment_nux_gesture_wheel_tutorial) {
 
     companion object {
         private val NEGATIVE = floatArrayOf(
@@ -65,9 +66,21 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
     }
 
     private fun showMessages() {
-        message0.text = if (messageQueue.size > 0) { messageQueue[0] } else { "" }
-        message1.text = if (messageQueue.size > 1) { messageQueue[1] } else { "" }
-        message2.text = if (messageQueue.size > 2) { messageQueue[2] } else { "" }
+        message0.text = if (messageQueue.size > 0) {
+            messageQueue[0]
+        } else {
+            ""
+        }
+        message1.text = if (messageQueue.size > 1) {
+            messageQueue[1]
+        } else {
+            ""
+        }
+        message2.text = if (messageQueue.size > 2) {
+            messageQueue[2]
+        } else {
+            ""
+        }
     }
 
     protected fun next() {
@@ -76,15 +89,18 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        floatingMessageMarginBottom = resources.getDimension(R.dimen.tutorial_floating_message_margin).toInt()
+        floatingMessageMarginBottom =
+            resources.getDimension(R.dimen.tutorial_floating_message_margin).toInt()
         edgeExclusionZone = resources.getDimension(R.dimen.edge_exclusion_zone).toInt()
         screenWidth = measureScreen(requireActivity())
 
         val gestureContainer = view.findViewById<View>(R.id.gesture_container)
         messageContainer = view.findViewById(R.id.nux_gesture_wheel_tutorial_message_container)
         message0 = view.findViewById(R.id.nux_gesture_wheel_message_1)
-        message1 = view.findViewById<TextView>(R.id.nux_gesture_wheel_message_2).also { it.alpha = 0.50f }
-        message2 = view.findViewById<TextView>(R.id.nux_gesture_wheel_message_3).also { it.alpha = 0.25f }
+        message1 =
+            view.findViewById<TextView>(R.id.nux_gesture_wheel_message_2).also { it.alpha = 0.50f }
+        message2 =
+            view.findViewById<TextView>(R.id.nux_gesture_wheel_message_3).also { it.alpha = 0.25f }
 
         gestures = listOf(
             gestureContainer.findViewById(R.id.north_west_container),
@@ -158,9 +174,10 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
                         gestureContainer.visibility = View.VISIBLE
                         onMoveGestureWheel(gestureContainer.x, gestureContainer.y)
                         if (now() - lastDown <= doubleTapTime) {
-                            showContextMenuRunnable = makeShowContextMenuRunnable(gestureContainer).also {
-                                view.postDelayed(it, longPressTime)
-                            }
+                            showContextMenuRunnable =
+                                makeShowContextMenuRunnable(gestureContainer).also {
+                                    view.postDelayed(it, longPressTime)
+                                }
                         }
                         lastDown = now()
                     }
@@ -237,46 +254,46 @@ abstract class AbstractGestureWheelTutorialFragment : Fragment(R.layout.fragment
                 if (v.visibility != View.VISIBLE) return false
                 val rect = getViewLocation(v)
                 return rect.contains(me.rawX.toInt(), me.rawY.toInt()) ||
-                    doLinesIntersect(
-                        me.rawX,
-                        me.rawY,
-                        downPosition.x,
-                        downPosition.y,
-                        rect.left,
-                        rect.top,
-                        rect.left,
-                        rect.top + rect.height()
-                    ) ||
-                    doLinesIntersect(
-                        me.rawX,
-                        me.rawY,
-                        downPosition.x,
-                        downPosition.y,
-                        rect.left,
-                        rect.top,
-                        rect.left + rect.width(),
-                        rect.top
-                    ) ||
-                    doLinesIntersect(
-                        me.rawX,
-                        me.rawY,
-                        downPosition.x,
-                        downPosition.y,
-                        rect.left + rect.width(),
-                        rect.top,
-                        rect.left + rect.width(),
-                        rect.top + rect.height()
-                    ) ||
-                    doLinesIntersect(
-                        me.rawX,
-                        me.rawY,
-                        downPosition.x,
-                        downPosition.y,
-                        rect.left,
-                        rect.top + rect.height(),
-                        rect.left + rect.width(),
-                        rect.top + rect.height()
-                    )
+                        doLinesIntersect(
+                            me.rawX,
+                            me.rawY,
+                            downPosition.x,
+                            downPosition.y,
+                            rect.left,
+                            rect.top,
+                            rect.left,
+                            rect.top + rect.height()
+                        ) ||
+                        doLinesIntersect(
+                            me.rawX,
+                            me.rawY,
+                            downPosition.x,
+                            downPosition.y,
+                            rect.left,
+                            rect.top,
+                            rect.left + rect.width(),
+                            rect.top
+                        ) ||
+                        doLinesIntersect(
+                            me.rawX,
+                            me.rawY,
+                            downPosition.x,
+                            downPosition.y,
+                            rect.left + rect.width(),
+                            rect.top,
+                            rect.left + rect.width(),
+                            rect.top + rect.height()
+                        ) ||
+                        doLinesIntersect(
+                            me.rawX,
+                            me.rawY,
+                            downPosition.x,
+                            downPosition.y,
+                            rect.left,
+                            rect.top + rect.height(),
+                            rect.left + rect.width(),
+                            rect.top + rect.height()
+                        )
             }
 
             private fun doLinesIntersect(

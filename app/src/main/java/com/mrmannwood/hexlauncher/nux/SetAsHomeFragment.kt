@@ -8,7 +8,8 @@ import androidx.fragment.app.Fragment
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.launcher.R
 
-class SetAsHomeFragment : Fragment(R.layout.fragment_nux_set_home), NUXHostFragment.AcceptsNuxCompleted {
+class SetAsHomeFragment : Fragment(R.layout.fragment_nux_set_home),
+    NUXHostFragment.AcceptsNuxCompleted {
 
     private val setHomeLauncherResultContract = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()

@@ -24,7 +24,8 @@ object AppListUpdater {
 
             appDao.deleteNotIncluded(installedApps.map { it.componentName })
 
-            val appUpdateTimes = appDao.getLastUpdateTimeStamps().associateBy({ it.componentName }, { it.timestamp })
+            val appUpdateTimes =
+                appDao.getLastUpdateTimeStamps().associateBy({ it.componentName }, { it.timestamp })
             installedApps
                 .map { it to appUpdateTimes.getOrElse(it.componentName) { -1L } }
                 .onEach { Timber.d("${it.first.componentName.flattenToString()} -> ${it.second}") }
@@ -37,7 +38,12 @@ object AppListUpdater {
                             appDao.insert(appData)
                         } else {
                             Timber.d("Updating ${appData.componentName.flattenToString()}")
-                            appDao.update(appData.label, appData.lastUpdateTime, appData.backgroundColor, appData.componentName)
+                            appDao.update(
+                                appData.label,
+                                appData.lastUpdateTime,
+                                appData.backgroundColor,
+                                appData.componentName
+                            )
                         }
                     } catch (e: SQLiteException) {
                         Timber.e(e, "An error occurred while writing app to db: $appData")

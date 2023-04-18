@@ -64,7 +64,12 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
     override fun isLoggable(tag: String?, priority: Int) = true
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        handler.sendMessage(handler.obtainMessage(MESSAGE_GOT_LOG, Log(Date(), priority, tag, message, t)))
+        handler.sendMessage(
+            handler.obtainMessage(
+                MESSAGE_GOT_LOG,
+                Log(Date(), priority, tag, message, t)
+            )
+        )
     }
 
     private val handler = object : Handler(HandlerThread("LoggerThread").apply { start() }.looper) {
@@ -131,7 +136,8 @@ class FileLoggerTree private constructor(context: Context) : Timber.Tree() {
             } finally {
                 try {
                     out.close()
-                } catch (e: IOException) { /* ignore */ }
+                } catch (e: IOException) { /* ignore */
+                }
             }
 
             logs.clear()

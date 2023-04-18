@@ -16,7 +16,10 @@ data class AppData(
     @ColumnInfo(name = "background_color") val backgroundColor: Int,
     @ColumnInfo(name = "hidden", defaultValue = "0") val hidden: Boolean = false,
     @ColumnInfo(name = "bgc_override") val bgcOverride: Int? = null,
-    @ColumnInfo(name = "background_hidden", defaultValue = "0") val backgroundHidden: Boolean = false,
+    @ColumnInfo(
+        name = "background_hidden",
+        defaultValue = "0"
+    ) val backgroundHidden: Boolean = false,
     @field:TypeConverters(ManualRoomTypeConverters::class)
     @ColumnInfo(name = "tags") val tags: List<String>?
 ) {

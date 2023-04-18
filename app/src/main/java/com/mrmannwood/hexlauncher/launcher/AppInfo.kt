@@ -35,11 +35,19 @@ data class AppInfo(
     override val icon = Provider({ launcherItem.icon })
     val lowerLabel = label.lowercase(Locale.ROOT)
     val searchTerms: Map<String, SearchTermType> = (
-        categories.map { it to SearchTermType.Category } +
-            tags.map { it to SearchTermType.Tag } +
-            listOf(lowerLabel.removeChars(charArrayOf(' ', '-', '_')) to SearchTermType.Label) +
-            lowerLabel.split(' ').map { it to SearchTermType.Label }
-        ).toMap()
+            categories.map { it to SearchTermType.Category } +
+                    tags.map { it to SearchTermType.Tag } +
+                    listOf(
+                        lowerLabel.removeChars(
+                            charArrayOf(
+                                ' ',
+                                '-',
+                                '_'
+                            )
+                        ) to SearchTermType.Label
+                    ) +
+                    lowerLabel.split(' ').map { it to SearchTermType.Label }
+            ).toMap()
 }
 
 class Provider<T>(

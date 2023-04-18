@@ -1,91 +1,80 @@
 package com.mrmannwood.hexlauncher.settings
 
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.core.content.edit
 import androidx.lifecycle.LiveData
-import androidx.preference.PreferenceManager
+import androidx.lifecycle.map
+import com.mrmannwood.hexlauncher.DB
 import com.mrmannwood.hexlauncher.executors.diskExecutor
+import java.util.concurrent.CountDownLatch
 
-object PreferencesRepository {
+class PreferencesRepository private constructor(
+    val dao: PreferencesDao
+) {
 
-    @Volatile private var prefs: SharedPreferences? = null
+    companion object {
+        @Volatile
+        private var prefs: PreferencesRepository? = null
 
-    fun getPrefs(context: Context, callback: (SharedPreferences) -> Unit) {
-        val appContext = context.applicationContext
-        val sp = prefs
-        if (sp != null) {
-            callback(sp)
-        } else {
+        fun getPrefsBlocking(context: Context): PreferencesRepository {
+            var prefs = this.prefs
+            if (prefs != null) return prefs
+
+            val lock = CountDownLatch(1)
+            getPrefs(context) { prefs = it; lock.countDown() }
+            lock.await()
+            return prefs!!
+        }
+
+        fun getPrefs(context: Context, callback: (PreferencesRepository) -> Unit) {
+            val appContext = context.applicationContext
             diskExecutor.execute {
-                val sp = prefs
-                if (sp != null) {
-                    callback(sp)
+                val prefs = this.prefs
+                if (prefs != null) {
+                    callback(prefs)
                 } else {
-                    val sp: SharedPreferences = synchronized(this@PreferencesRepository) {
-                        var sp = prefs
-                        if (sp != null) {
-                            sp
+                    val prefs: PreferencesRepository = synchronized(this) {
+                        var prefs = this.prefs
+                        if (prefs == null) {
+                            prefs = PreferencesRepository(
+                                DB.getPrefsDatabase(appContext).preferencesDao()
+                            )
+                            this.prefs = prefs
+                            convert(prefs.dao)
+                            prefs
                         } else {
-                            sp = PreferenceManager.getDefaultSharedPreferences(appContext)
-                            prefs = sp
-                            convert(sp)
-                            sp
+                            prefs
                         }
                     }
-                    callback(sp)
+                    callback(prefs)
                 }
             }
         }
-    }
-    
-    private fun convert(prefs: SharedPreferences) {
-        prefs.edit {
+
+        private fun convert(prefs: PreferencesDao) {
             arrayOf("home_widget_date_position", "home_widget_time_position")
                 .mapNotNull { key ->
                     try {
-                        val value = prefs.getFloat(key, -1f)
-                        if (value < 0) null
-                        else key to value
+                        val value = prefs.getPreference(key)
+                        if (value is Preference.FloatPreference) {
+                            key to value.value
+                        } else {
+                            null
+                        }
                     } catch (e: ClassCastException) {
                         // we've already run the conversion and can ignore
                         null
                     }
                 }
                 .forEach { (key, value) ->
-                    remove(key)
-                    putString(key, "null,$value")
+                    prefs.delete(key)
+                    prefs.insert(Preference.StringPreference(key, "null,$value"))
                 }
         }
     }
 
-    fun <T> watchPref(context: Context, key: String, extractor: PreferenceExtractor<T>): LiveData<T?> {
-        return object : LiveData<T?>() {
-
-            private val listener = object : SharedPreferences.OnSharedPreferenceChangeListener {
-                override fun onSharedPreferenceChanged(
-                    prefs: SharedPreferences,
-                    changedKey: String?
-                ) {
-                    if (changedKey != key) return
-                    postValue(extractor.getValue(prefs, key))
-                }
-            }
-
-            override fun onActive() {
-                super.onActive()
-                getPrefs(context) { prefs ->
-                    postValue(extractor.getValue(prefs, key))
-                    prefs.registerOnSharedPreferenceChangeListener(listener)
-                }
-            }
-
-            override fun onInactive() {
-                super.onInactive()
-                getPrefs(context) { prefs ->
-                    prefs.unregisterOnSharedPreferenceChangeListener(listener)
-                }
-            }
+    fun <T> watchPref(key: String, extractor: PreferenceExtractor<T>): LiveData<T?> {
+        return dao.watchPreference(key).map {
+            it?.let { extractor.getValue(it) }
         }
     }
 }

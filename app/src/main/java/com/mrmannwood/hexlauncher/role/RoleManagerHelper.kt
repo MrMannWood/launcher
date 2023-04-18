@@ -67,7 +67,11 @@ sealed class RoleManagerHelper {
             filters.add(IntentFilter(Intent.ACTION_MAIN).apply { addCategory(Intent.CATEGORY_HOME) })
 
             val activities = ArrayList<ComponentName>()
-            context.packageManager.getPreferredActivities(filters, activities, null /* packageName */)
+            context.packageManager.getPreferredActivities(
+                filters,
+                activities,
+                null /* packageName */
+            )
 
             return if (activities.filter { it.packageName == context.packageName }.any()) {
                 RoleManagerResult.ROLE_HELD
@@ -83,13 +87,21 @@ sealed class RoleManagerHelper {
 
             val pacman = context.packageManager
             val componentName = ComponentName(context, FakeLauncherActivity::class.java)
-            pacman.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+            pacman.setComponentEnabledSetting(
+                componentName,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP
+            )
 
             return Intent(Intent.ACTION_MAIN).apply {
                 addCategory(Intent.CATEGORY_HOME)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             } to {
-                pacman.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP)
+                pacman.setComponentEnabledSetting(
+                    componentName,
+                    PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
+                    PackageManager.DONT_KILL_APP
+                )
             }
         }
     }

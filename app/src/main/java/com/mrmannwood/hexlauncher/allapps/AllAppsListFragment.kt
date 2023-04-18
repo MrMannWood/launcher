@@ -86,7 +86,10 @@ class AllAppsListFragment : Fragment() {
                     }
                     menu.add(R.string.menu_item_app_customize).setOnMenuItemClickListener {
                         parentFragmentManager.beginTransaction()
-                            .replace(R.id.settings_root, AppCustomizationFragment.forComponent(result.componentName))
+                            .replace(
+                                R.id.settings_root,
+                                AppCustomizationFragment.forComponent(result.componentName)
+                            )
                             .addToBackStack("AppCustomizationFragment")
                             .commit()
                         true

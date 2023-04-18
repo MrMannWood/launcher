@@ -25,7 +25,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
-import androidx.core.content.edit
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import com.mrmannwood.hexlauncher.HandleBackPressed
@@ -53,21 +52,23 @@ import kotlin.math.pow
 
 class HomeFragment : WidgetHostFragment(), HandleBackPressed {
 
-    private val wallpaperPickerContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val context = context ?: return@registerForActivityResult
-        if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
-        if (result.data?.data == null) return@registerForActivityResult
-        try {
-            startActivity(
-                WallpaperManager.getInstance(context)
-                    .getCropAndSetWallpaperIntent(result.data!!.data!!).apply {
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    }
-            )
-        } catch (e: IllegalArgumentException) {
-            Toast.makeText(context, R.string.error_cannot_change_wallpaper, Toast.LENGTH_LONG).show()
+    private val wallpaperPickerContract =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val context = context ?: return@registerForActivityResult
+            if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
+            if (result.data?.data == null) return@registerForActivityResult
+            try {
+                startActivity(
+                    WallpaperManager.getInstance(context)
+                        .getCropAndSetWallpaperIntent(result.data!!.data!!).apply {
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                )
+            } catch (e: IllegalArgumentException) {
+                Toast.makeText(context, R.string.error_cannot_change_wallpaper, Toast.LENGTH_LONG)
+                    .show()
+            }
         }
-    }
 
     private val preferenceSwipeNorthWestResultContract = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -108,14 +109,9 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         result.data.onAppListResult(
             onSuccess = { _, componentName ->
                 val context = context ?: return@onAppListResult
-                PreferencesRepository.getPrefs(
-                    context,
-                    OriginalThreadCallback.create {
-                        it.edit {
-                            putString(preferenceKey, componentName.flattenToString())
-                        }
-                    }
-                )
+                PreferencesRepository.getPrefs(context) { prefs ->
+                    prefs.dao.putString(preferenceKey, componentName.flattenToString())
+                }
             },
             onFailure = {
                 val context = context ?: return@onAppListResult
@@ -220,7 +216,9 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 return@setOnCreateContextMenuListener
             }
             menu.add(R.string.menu_item_home_choose_wallpaper).setOnMenuItemClickListener {
-                wallpaperPickerContract.launch(Intent(Intent.ACTION_PICK).apply { type = "image/*" })
+                wallpaperPickerContract.launch(Intent(Intent.ACTION_PICK).apply {
+                    type = "image/*"
+                })
                 true
             }
             menu.add(R.string.menu_item_home_manage_widgets).setOnMenuItemClickListener {
@@ -234,12 +232,19 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         }
 
         gestures.forEach { config ->
-            config.setHexItemFunc(makeHexItem(context, R.string.gesture_set_quick_access_item, R.drawable.ic_add))
+            config.setHexItemFunc(
+                makeHexItem(
+                    context,
+                    R.string.gesture_set_quick_access_item,
+                    R.drawable.ic_add
+                )
+            )
             if (config.launcher != null) {
                 setCreateGestureAction(config.view, config.launcher)
             }
         }
-        databinder.hexItemNorth = makeHexItem(context, R.string.gesture_search_apps, R.drawable.ic_apps)
+        databinder.hexItemNorth =
+            makeHexItem(context, R.string.gesture_search_apps, R.drawable.ic_apps)
         databinder.north.root.setTag(
             R.id.gesture_icon_action,
             object : Runnable {
@@ -248,7 +253,8 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 }
             }
         )
-        databinder.hexItemSouth = makeHexItem(context, R.string.gesture_search_apps, R.drawable.outline_notifications)
+        databinder.hexItemSouth =
+            makeHexItem(context, R.string.gesture_search_apps, R.drawable.outline_notifications)
         databinder.south.root.setTag(
             R.id.gesture_icon_action,
             object : Runnable {
@@ -260,29 +266,42 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
 
         gestures.filter {
             it.key != PreferenceKeys.Gestures.SwipeNorth.PACKAGE_NAME &&
-                it.key != PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME
+                    it.key != PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME
         }.forEach { config ->
             config.preferenceWatcher?.observe(viewLifecycleOwner) { componentName ->
                 setHexItemContextMenu(config)
                 when (componentName) {
-                    null -> { /* ignore */ }
+                    null -> { /* ignore */
+                    }
                     PreferenceKeys.Gestures.GESTURE_UNWANTED -> {
                         config.view.visibility = View.GONE
                     }
                     else -> {
                         ComponentName.unflattenFromString(componentName)?.let {
-                            ensureAppInstalled(it) { config.componentName = it }
-                            setAppInformationForGesture(config)
+                            ensureAppInstalled(requireContext(), it,
+                                {
+                                    config.componentName = it
+                                    setAppInformationForGesture(config)
+                                },
+                                {
+                                    Toast.makeText(
+                                        context,
+                                        R.string.error_cannot_set_app,
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            )
                         } ?: run {
                             context?.let { context ->
                                 context.packageManager?.let { pacman ->
                                     pacman.getLaunchIntentForPackage(componentName)
                                         ?.resolveActivity(pacman)
                                         ?.let { resolvedName ->
-                                            PreferencesRepository.getPrefs(context) {
-                                                it.edit {
-                                                    putString(config.key, resolvedName.flattenToString())
-                                                }
+                                            PreferencesRepository.getPrefs(context) { prefs ->
+                                                prefs.dao.putString(
+                                                    config.key,
+                                                    resolvedName.flattenToString()
+                                                )
                                             }
                                         }
                                 }
@@ -338,7 +357,10 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         override val backgroundHidden: Boolean = true
     }
 
-    private fun setCreateGestureAction(v: View, activityResultLauncher: ActivityResultLauncher<Intent>) {
+    private fun setCreateGestureAction(
+        v: View,
+        activityResultLauncher: ActivityResultLauncher<Intent>
+    ) {
         v.setTag(
             R.id.gesture_icon_action,
             object : Runnable {
@@ -350,12 +372,13 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     }
 
     private fun setAppInformationForGesture(config: GestureConfiguration) {
-        appList?.firstOrNull { info -> info.componentName == config.componentName }?.let { appInfo ->
-            config.setHexItemFunc(appInfo)
-            config.view.visibility = View.VISIBLE
-            config.appName = appInfo.label
-            setOpenAppAction(config.view, appInfo)
-        }
+        appList?.firstOrNull { info -> info.componentName == config.componentName }
+            ?.let { appInfo ->
+                config.setHexItemFunc(appInfo)
+                config.view.visibility = View.VISIBLE
+                config.appName = appInfo.label
+                setOpenAppAction(config.view, appInfo)
+            }
     }
 
     private fun setHexItemContextMenu(gesture: GestureConfiguration) {
@@ -370,10 +393,8 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
             }
             menu.add(R.string.gesture_item_menu_disable).setOnMenuItemClickListener {
                 val context = context ?: return@setOnMenuItemClickListener true
-                PreferencesRepository.getPrefs(context) {
-                    it.edit {
-                        putString(gesture.key, PreferenceKeys.Gestures.GESTURE_UNWANTED)
-                    }
+                PreferencesRepository.getPrefs(context) { prefs ->
+                    prefs.dao.putString(gesture.key, PreferenceKeys.Gestures.GESTURE_UNWANTED)
                 }
                 true
             }
@@ -461,7 +482,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                         }
                         gestures.map { it.view }.forEach { removeGreyscale(it) }
                         stoppedTouchingView()
-                        showContextMenuRunnable?.let { view?.removeCallbacks(it) }
+                        showContextMenuRunnable?.let { view.removeCallbacks(it) }
                         databinder.gestureContainer.visibility = View.GONE
                     }
                     MotionEvent.ACTION_MOVE -> {
@@ -480,8 +501,12 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 }
                 downPosition.let { dp ->
                     showContextMenuRunnable?.let { r ->
-                        if (20 < sqrt((me.rawX - dp.x).toDouble().pow(2) + (me.rawY - dp.y).toDouble().pow(2))) {
-                            view?.removeCallbacks(r)
+                        if (20 < sqrt(
+                                (me.rawX - dp.x).toDouble().pow(2) + (me.rawY - dp.y).toDouble()
+                                    .pow(2)
+                            )
+                        ) {
+                            view.removeCallbacks(r)
                         }
                     }
                 }
@@ -501,7 +526,11 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
 
             private fun makeShowGestureDetailsContextMenuRunnable(v: View) = Runnable {
                 if (lastAction == MotionEvent.ACTION_UP) return@Runnable
-                if (!getViewLocation(v).contains(lastPosition.x.toInt(), lastPosition.y.toInt())) return@Runnable
+                if (!getViewLocation(v).contains(
+                        lastPosition.x.toInt(),
+                        lastPosition.y.toInt()
+                    )
+                ) return@Runnable
                 v.showContextMenu(v.width.toFloat() / 2, v.height.toFloat() / 2)
                 showingItemContextMenu = true
             }
@@ -521,10 +550,46 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 if (v.visibility != View.VISIBLE) return false
                 val rect = getViewLocation(v)
                 return rect.contains(me.rawX.toInt(), me.rawY.toInt()) ||
-                    doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left, rect.top, rect.left, rect.top + rect.height()) ||
-                    doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left, rect.top, rect.left + rect.width(), rect.top) ||
-                    doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left + rect.width(), rect.top, rect.left + rect.width(), rect.top + rect.height()) ||
-                    doLinesIntersect(me.rawX, me.rawY, downPosition.x, downPosition.y, rect.left, rect.top + rect.height(), rect.left + rect.width(), rect.top + rect.height())
+                        doLinesIntersect(
+                            me.rawX,
+                            me.rawY,
+                            downPosition.x,
+                            downPosition.y,
+                            rect.left,
+                            rect.top,
+                            rect.left,
+                            rect.top + rect.height()
+                        ) ||
+                        doLinesIntersect(
+                            me.rawX,
+                            me.rawY,
+                            downPosition.x,
+                            downPosition.y,
+                            rect.left,
+                            rect.top,
+                            rect.left + rect.width(),
+                            rect.top
+                        ) ||
+                        doLinesIntersect(
+                            me.rawX,
+                            me.rawY,
+                            downPosition.x,
+                            downPosition.y,
+                            rect.left + rect.width(),
+                            rect.top,
+                            rect.left + rect.width(),
+                            rect.top + rect.height()
+                        ) ||
+                        doLinesIntersect(
+                            me.rawX,
+                            me.rawY,
+                            downPosition.x,
+                            downPosition.y,
+                            rect.left,
+                            rect.top + rect.height(),
+                            rect.left + rect.width(),
+                            rect.top + rect.height()
+                        )
             }
 
             private fun doLinesIntersect(
@@ -543,8 +608,10 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
                 val s2_x = line2x2 - line2x1
                 val s2_y = line2y2 - line2y1
 
-                val s = (-s1_y * (line1x1 - line2x1) + s1_x * (line1y1 - line2y1)) / (-s2_x * s1_y + s1_x * s2_y)
-                val t = (s2_x * (line1y1 - line2y1) - s2_y * (line1x1 - line2x1)) / (-s2_x * s1_y + s1_x * s2_y)
+                val s =
+                    (-s1_y * (line1x1 - line2x1) + s1_x * (line1y1 - line2y1)) / (-s2_x * s1_y + s1_x * s2_y)
+                val t =
+                    (s2_x * (line1y1 - line2y1) - s2_y * (line1x1 - line2x1)) / (-s2_x * s1_y + s1_x * s2_y)
 
                 return s >= 0 && s <= 1 && t >= 0 && t <= 1
             }
@@ -567,18 +634,26 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
         }
     }
 
-    private fun ensureAppInstalled(componentName: ComponentName, action: () -> Unit) {
+    private fun ensureAppInstalled(
+        context: Context,
+        componentName: ComponentName,
+        installed: () -> Unit,
+        notInstalled: () -> Unit
+    ) {
         PackageManagerExecutor.execute {
             try {
-                context?.packageManager?.getPackageInfo(componentName.packageName, 0) ?: return@execute
-                action()
-            } catch (_: Exception) { /* package isn't installed */ }
+                context.packageManager.getPackageInfo(componentName.packageName, 0)
+                installed()
+            } catch (_: Exception) {
+                notInstalled()
+            }
         }
     }
 
     private fun makeOpenAppRunnable(appInfo: AppInfo): Runnable = Runnable {
         try {
-            startActivity(Intent().apply { component = appInfo.componentName }.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            startActivity(Intent().apply { component = appInfo.componentName }
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         } catch (e: Exception) {
             Timber.e(e, "Unable to open app: ${appInfo.componentName}")
         }

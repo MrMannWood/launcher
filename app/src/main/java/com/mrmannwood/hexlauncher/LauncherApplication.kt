@@ -53,15 +53,16 @@ class LauncherApplication : Application() {
 
         DB.get(this)
 
-        PreferencesRepository.watchPref(
-            context = this@LauncherApplication,
-            key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING,
-            extractor = PreferenceExtractor.BooleanExtractor
-        ).observeForever { enable ->
-            if (enable == true) {
-                FileLoggerTree.get().enableDiskFlush()
-            } else {
-                FileLoggerTree.get().disableDiskFlush()
+        PreferencesRepository.getPrefs(context = this@LauncherApplication) { repo ->
+            repo.watchPref(
+                key = PreferenceKeys.Logging.ENABLE_DISK_LOGGING,
+                extractor = PreferenceExtractor.BooleanExtractor
+            ).observeForever { enable ->
+                if (enable == true) {
+                    FileLoggerTree.get().enableDiskFlush()
+                } else {
+                    FileLoggerTree.get().disableDiskFlush()
+                }
             }
         }
 
@@ -80,7 +81,8 @@ class LauncherApplication : Application() {
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             try {
                 Timber.e(throwable, "An uncaught exception occurred on thread ${thread.name}")
-            } catch (ignored: Throwable) { }
+            } catch (ignored: Throwable) {
+            }
             exceptionHandler?.uncaughtException(thread, throwable)
         }
     }
@@ -118,7 +120,10 @@ class LauncherApplication : Application() {
                     putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.dev_email)))
                     putExtra(Intent.EXTRA_SUBJECT, "Rage Shake Report")
                     putExtra(Intent.EXTRA_STREAM, uris)
-                    putExtra(Intent.EXTRA_TEXT, getString(R.string.rage_shake_email_body, debugInfo))
+                    putExtra(
+                        Intent.EXTRA_TEXT,
+                        getString(R.string.rage_shake_email_body, debugInfo)
+                    )
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
             )
@@ -139,6 +144,6 @@ class LauncherApplication : Application() {
     }
 
     private object ReleaseBuildModeConfiguration : BuildModeConfiguration {
-        override fun onApplicationCreate(application: Application) { }
+        override fun onApplicationCreate(application: Application) {}
     }
 }

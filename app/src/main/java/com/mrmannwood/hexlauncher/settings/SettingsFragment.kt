@@ -9,18 +9,17 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.edit
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.role.RoleManagerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.preference.*
+import androidx.preference.Preference
 import com.mrmannwood.hexlauncher.LauncherApplication
 import com.mrmannwood.hexlauncher.allapps.AllAppsListFragment
 import com.mrmannwood.hexlauncher.executors.OriginalThreadCallback
 import com.mrmannwood.hexlauncher.executors.PackageManagerExecutor
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper
 import com.mrmannwood.hexlauncher.role.RoleManagerHelper.RoleManagerResult.*
-import com.mrmannwood.hexlauncher.settings.PreferencesRepository.watchPref
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
 
@@ -30,11 +29,18 @@ class SettingsFragment : PreferenceFragmentCompat() {
         ActivityResultContracts.StartActivityForResult()
     ) { activity?.let { updateHomeRolePreference(it) } }
 
-    private lateinit var homeRolePreference: Preference
-    private lateinit var feedbackCategory: Preference
+    private lateinit var homeRolePreference: androidx.preference.Preference
+    private lateinit var feedbackCategory: androidx.preference.Preference
+
+    private lateinit var prefsRepo: PreferencesRepository
+    private lateinit var prefsDataStore: PreferenceDataStore
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val activity = requireActivity()
+
+        prefsRepo = PreferencesRepository.getPrefsBlocking(requireContext())
+        prefsDataStore = SqlitePreferenceDataStore(prefsRepo.dao)
+        preferenceManager.preferenceDataStore = prefsDataStore
 
         val screen = preferenceManager.createPreferenceScreen(activity)
 
@@ -135,23 +141,24 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 Preference(activity).apply {
                     setTitle(R.string.preferences_gestures_reset_disabled)
                     setOnPreferenceClickListener {
-                        val context = context ?: return@setOnPreferenceClickListener true
-                        PreferencesRepository.getPrefs(context) { prefs ->
-                            prefs.edit {
-                                listOf(
-                                    PreferenceKeys.Gestures.SwipeNorthWest.PACKAGE_NAME,
-                                    PreferenceKeys.Gestures.SwipeNorth.PACKAGE_NAME,
-                                    PreferenceKeys.Gestures.SwipeNorthEast.PACKAGE_NAME,
-                                    PreferenceKeys.Gestures.SwipeWest.PACKAGE_NAME,
-                                    PreferenceKeys.Gestures.SwipeEast.PACKAGE_NAME,
-                                    PreferenceKeys.Gestures.SwipeSouthWest.PACKAGE_NAME,
-                                    PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME,
-                                    PreferenceKeys.Gestures.SwipeSouthEast.PACKAGE_NAME,
-                                ).forEach { key ->
-                                    if (prefs.getString(key, null) == PreferenceKeys.Gestures.GESTURE_UNWANTED) {
-                                        remove(key)
-                                    }
-                                }
+                        val context = context
+                        prefsRepo
+                        listOf(
+                            PreferenceKeys.Gestures.SwipeNorthWest.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeNorth.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeNorthEast.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeWest.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeEast.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeSouthWest.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeSouth.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeSouthEast.PACKAGE_NAME,
+                        ).forEach { key ->
+                            if (prefsRepo.dao.getString(
+                                    key,
+                                    null
+                                ) == PreferenceKeys.Gestures.GESTURE_UNWANTED
+                            ) {
+                                prefsRepo.dao.delete(key)
                             }
                         }
                         true
@@ -162,22 +169,18 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 Preference(activity).apply {
                     setTitle(R.string.preferences_gestures_disable_all)
                     setOnPreferenceClickListener {
-                        val context = context ?: return@setOnPreferenceClickListener true
-                        PreferencesRepository.getPrefs(context) { prefs ->
-                            prefs.edit {
-                                listOf(
-                                    PreferenceKeys.Gestures.SwipeNorthWest.PACKAGE_NAME,
-                                    PreferenceKeys.Gestures.SwipeNorthEast.PACKAGE_NAME,
-                                    PreferenceKeys.Gestures.SwipeWest.PACKAGE_NAME,
-                                    PreferenceKeys.Gestures.SwipeEast.PACKAGE_NAME,
-                                    PreferenceKeys.Gestures.SwipeSouthWest.PACKAGE_NAME,
-                                    PreferenceKeys.Gestures.SwipeSouthEast.PACKAGE_NAME,
-                                ).forEach { key ->
-                                    putString(key, PreferenceKeys.Gestures.GESTURE_UNWANTED)
-                                }
-                                putInt(PreferenceKeys.Gestures.OPACITY, 0)
-                            }
+                        val context = context
+                        listOf(
+                            PreferenceKeys.Gestures.SwipeNorthWest.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeNorthEast.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeWest.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeEast.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeSouthWest.PACKAGE_NAME,
+                            PreferenceKeys.Gestures.SwipeSouthEast.PACKAGE_NAME,
+                        ).forEach { key ->
+                            prefsRepo.dao.putString(key, PreferenceKeys.Gestures.GESTURE_UNWANTED)
                         }
+                        prefsRepo.dao.putInt(PreferenceKeys.Gestures.OPACITY, 0)
                         true
                     }
                 }
@@ -190,10 +193,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
             setTitle(R.string.preferences_category_feedback)
             addPreference(
                 Preference(activity).apply {
-                    title = getString(R.string.preferences_feedback_rate, getString(R.string.app_name))
+                    title =
+                        getString(R.string.preferences_feedback_rate, getString(R.string.app_name))
                     setOnPreferenceClickListener {
                         openFeedback(activity)
-                        sharedPreferences?.edit { putBoolean(PreferenceKeys.Feedback.RATE, true) }
+                        preferenceDataStore?.putBoolean(PreferenceKeys.Feedback.RATE, true)
                         true
                     }
                 }
@@ -228,7 +232,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 Preference(activity).apply {
                     setTitle(R.string.preferences_privacy_policy)
                     setOnPreferenceClickListener {
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://mrmannwood.github.io/launcher/")))
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://mrmannwood.github.io/launcher/")
+                            )
+                        )
                         true
                     }
                 }
@@ -240,12 +249,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
             setTitle(R.string.preferences_category_version_info)
             addPreference(
                 Preference(activity).apply {
-                    title = getString(R.string.preferences_version_name, getString(R.string.app_version))
+                    title = getString(
+                        R.string.preferences_version_name,
+                        getString(R.string.app_version)
+                    )
                 }
             )
             addPreference(
                 Preference(activity).apply {
-                    title = getString(R.string.preferences_version_build_type, BuildConfig.BUILD_TYPE)
+                    title =
+                        getString(R.string.preferences_version_build_type, BuildConfig.BUILD_TYPE)
                 }
             )
         }
@@ -256,21 +269,32 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setDivider(
-            ResourcesCompat.getDrawable(resources, R.drawable.preference_divider, requireActivity().theme)
+            ResourcesCompat.getDrawable(
+                resources,
+                R.drawable.preference_divider,
+                requireActivity().theme
+            )
         )
-        watchPref(requireActivity(), PreferenceKeys.Feedback.RATE, PreferenceExtractor.BooleanExtractor)
+        prefsRepo.watchPref(PreferenceKeys.Feedback.RATE, PreferenceExtractor.BooleanExtractor)
             .observe(viewLifecycleOwner) { feedbackCategory.isVisible = it != true }
     }
 
     private fun updateHomeRolePreference(activity: FragmentActivity) {
         when (RoleManagerHelper.INSTANCE.getRoleStatus(activity, RoleManagerCompat.ROLE_HOME)) {
-            ROLE_HELD -> { homeRolePreference.isVisible = false }
-            ROLE_NOT_AVAILABLE -> { homeRolePreference.isVisible = false }
+            ROLE_HELD -> {
+                homeRolePreference.isVisible = false
+            }
+            ROLE_NOT_AVAILABLE -> {
+                homeRolePreference.isVisible = false
+            }
             ROLE_NOT_HELD -> {
                 homeRolePreference.apply {
                     setTitle(R.string.preferences_role_set_home)
                     setOnPreferenceClickListener {
-                        val (intent, func) = RoleManagerHelper.INSTANCE.getRoleSetIntent(activity, RoleManagerCompat.ROLE_HOME)
+                        val (intent, func) = RoleManagerHelper.INSTANCE.getRoleSetIntent(
+                            activity,
+                            RoleManagerCompat.ROLE_HOME
+                        )
                         setHomeLauncherResultContract.launch(intent)
                         func()
                         true
@@ -288,11 +312,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     "com.android.vending" -> {
                         try {
                             startActivity(
-                                Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${context.packageName}")).apply {
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("market://details?id=${context.packageName}")
+                                ).apply {
                                     addFlags(
                                         Intent.FLAG_ACTIVITY_NO_HISTORY or
-                                            Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
-                                            Intent.FLAG_ACTIVITY_MULTIPLE_TASK
+                                                Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
+                                                Intent.FLAG_ACTIVITY_MULTIPLE_TASK
                                     )
                                 }
                             )
@@ -327,7 +354,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     @Suppress("DEPRECATION")
                     context.packageManager.getInstallerPackageName(context.packageName)
                 }
-            } catch (e: Exception) { null }
+            } catch (e: Exception) {
+                null
+            }
             callback(installer)
         }
     }

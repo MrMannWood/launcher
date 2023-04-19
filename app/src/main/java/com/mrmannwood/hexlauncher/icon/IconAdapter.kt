@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.WorkerThread
 import androidx.core.graphics.get
 import androidx.palette.graphics.Palette
+import timber.log.Timber
 
 interface IconAdapter {
 
@@ -61,17 +62,22 @@ interface IconAdapter {
         }
 
         override fun getForegroundDrawable(icon: Drawable): Drawable? {
-            return if (icon is AdaptiveIconDrawable) {
-                icon.foreground?.constantState?.newDrawable()?.mutate()
-            } else {
-                null
-            }
+            if (icon !is AdaptiveIconDrawable) return null
+            return cloneConstantState(icon.foreground)
         }
 
         override fun getBackgroundDrawable(icon: Drawable): Drawable? {
-            return if (icon is AdaptiveIconDrawable) {
-                icon.background?.constantState?.newDrawable()?.mutate()
-            } else {
+            if (icon !is AdaptiveIconDrawable) return null
+            return cloneConstantState(icon.background)
+        }
+        
+        private fun cloneConstantState(drawable: Drawable?): Drawable? {
+            if (drawable == null) return null
+            return try {
+                drawable.constantState?.newDrawable()?.mutate()
+            } catch (e: NullPointerException) {
+                // https://github.com/MrMannWood/launcher/issues/35#issuecomment-1514899374
+                Timber.e(e, "Unexpected null pointer occurred in cloneConstantState")
                 null
             }
         }

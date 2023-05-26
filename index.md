@@ -13,8 +13,6 @@ We follow simple principles when it comes to your data:
 ## Information you provide
 **Installed Apps.** HexLauncher requires accesses to all applications installed on your device in order to function. This information is originally accessed through the Android system, and may be stored on-device in order to allow customization of app features. This information is only used on-device, and is not shared with any third-party. If you choose to share a bug report, you may choose to send a list of your apps and some metadata to us. This information will only be used to diagnose and fix problems.
 
-**Contacts.** HexLauncher can optionally provide the ability to search your contacts. HexLauncher does not use your contacts for anything other than displaying them to you while searching. This information is accessed only with express user consent, is only accessed on your device, and only held while actively in use.
-
 **Managing your information.** All information used by HexLauncher is stored on-device, and can be managed through HexLauncher’s application Settings, or through Android’s system controls.
 
 ## How we share your information

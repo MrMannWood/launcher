@@ -36,8 +36,8 @@ class TakeScreenshotsTest {
     @Before
     fun setup() {
         PreferencesRepository.getPrefs(getApplicationContext()) {
-            it.edit { clear() }
-            it.edit { putString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, BuildConfig.VERSION_NAME) }
+            it.dao.deleteAll()
+            it.dao.putString(PreferenceKeys.Version.LAST_RUN_VERSION_NAME, BuildConfig.VERSION_NAME)
         }
     }
 
@@ -52,7 +52,7 @@ class TakeScreenshotsTest {
     @Test
     fun searchLeftHanded() {
         PreferencesRepository.getPrefs(getApplicationContext()) {
-            it.edit { putBoolean(PreferenceKeys.User.LEFT_HANDED, true) }
+            it.dao.putBoolean(PreferenceKeys.User.LEFT_HANDED, true)
         }
         Thread.sleep(1_000)
         performSearch("red") {

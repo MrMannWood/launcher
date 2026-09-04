@@ -1,2 +1,0 @@
-Fixed accessibility issues
-Improved performance

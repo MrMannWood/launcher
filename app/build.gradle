@@ -4,19 +4,20 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 34
-    buildToolsVersion "33.0.2"
+    buildToolsVersion "35.0.0"
 
     buildFeatures {
         dataBinding true
+        buildConfig true
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 
     kotlin {
-        jvmToolchain(11)
+        jvmToolchain(21)
     }
 
     defaultConfig {

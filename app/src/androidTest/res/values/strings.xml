@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Modified for Rune Launcher, 2026: test product identity. -->
 <resources>
-    <string name="app_name">Test - Hex Launcher</string>
+    <string name="app_name">Test - Rune Launcher</string>
     <string name="file_provider_name">com.mrmannwood.hexlauncher.test.fileprovider</string>
 </resources>

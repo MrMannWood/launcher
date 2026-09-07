@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Modified for Rune Launcher, 2026: debug product identity. -->
 <resources>
-    <string name="app_name">Debug - Hex Launcher</string>
-    <string name="file_provider_name">com.mrmannwood.hexlauncher.debug.fileprovider</string>
+    <string name="app_name">Debug - Rune Launcher</string>
+    <string name="file_provider_name">io.github.jamiekaj.runelauncher.debug.fileprovider</string>
 </resources>

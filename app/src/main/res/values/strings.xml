@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Modified for Rune Launcher, 2026: product identity. -->
 <resources>
-    <string name="app_name">Hex Launcher</string>
+    <string name="app_name">Rune Launcher</string>
     <string name="dev_email">intentionalhexlauncher@gmail.com</string>
-    <string name="file_provider_name">com.mrmannwood.hexlauncher.fileprovider</string>
+    <string name="file_provider_name">io.github.jamiekaj.runelauncher.fileprovider</string>
 
     <string name="unable_to_start_app">Unable to start app</string>
     <string name="no_app_selected">No app selected</string>
@@ -15,7 +16,7 @@
     <string name="menu_item_app_details">App Details</string>
     <string name="menu_item_app_customize">Customize</string>
 
-    <string name="preferences_role_set_home">Set Hex Launcher as Home app</string>
+    <string name="preferences_role_set_home">Set Rune Launcher as Home app</string>
 
     <string name="preferences_category_feedback">Feedback</string>
     <string name="preferences_feedback_rate">Rate %s</string>
@@ -61,7 +62,7 @@
 
     <string name="settings_title">Settings</string>
 
-    <string name="nux_welcome_message">Welcome to Hex Launcher</string>
+    <string name="nux_welcome_message">Welcome to Rune Launcher</string>
     <string name="nux_welcome_image_content_description">Welcome Image of stacked hexagons</string>
     <string name="nux_swipe_message">Swipe up to search</string>
     <string name="nux_settings_message">Double tap then long press for settings</string>

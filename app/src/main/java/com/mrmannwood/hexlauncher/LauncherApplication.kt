@@ -1,3 +1,4 @@
+// Modified for Rune Launcher, 2026: use the fork's application-specific provider authority.
 package com.mrmannwood.hexlauncher
 
 import android.app.Activity
@@ -107,7 +108,7 @@ class LauncherApplication : Application() {
             val uris = ArrayList(
                 rageShakeDir.listFiles()?.map {
                     FileProvider.getUriForFile(
-                        activity, "com.mrmannwood.hexlauncher.fileprovider", it
+                        activity, "${BuildConfig.APPLICATION_ID}.fileprovider", it
                     )
                 } ?: emptyList()
             )

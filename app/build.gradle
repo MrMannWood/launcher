@@ -1,3 +1,4 @@
+// Modified for Rune Launcher, 2026: independent application identity and versioning.
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
@@ -20,11 +21,11 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.mrmannwood.hexlauncher"
+        applicationId "io.github.jamiekaj.runelauncher"
         minSdkVersion 26
         targetSdkVersion 33
-        versionCode 52
-        versionName "1.4.10"
+        versionCode 1
+        versionName "0.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

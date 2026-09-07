@@ -1,26 +1,34 @@
-Hex Launcher
-------------
+# Rune Launcher
 
-Hex Launcher is a minimalist, performant, private, and open-source home screen replacement.
+Rune Launcher is a privacy-first Android home screen built around fast,
+muscle-memory gestures and expandable, stave-inspired branches.
 
-* Minimalist: Hex Launcher is optimized to bring the app you want directly to your thumb. Nothing more, nothing less.
-* Performant: Hex Launcher was written from the ground up to be as small and fast as possible. It will not drain your battery, and it will not leave you waiting.
-* Private: Hex Launcher does not track you. It contains no ads, and no analytics of any kind. It can't even connect to the internet. If you want privacy, you will find it with Hex Launcher.
-* Open Source: Hex Launcher is designed and maintained by one person, with a commitment towards being open and accepting feedback.
+The project is a fork of
+[Hex Launcher](https://github.com/MrMannWood/launcher) by Marshall Mann-Wood.
+It preserves Hex Launcher's minimalist, offline foundation while developing a
+new interaction model: a direction can launch a default app immediately, or a
+brief dwell can expand that direction into a small group of related apps.
 
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="80">](https://f-droid.org/packages/com.mrmannwood.hexlauncher/)
-[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
-     alt="Get it on Google Play"
-     height="80">](https://play.google.com/store/apps/details?id=com.mrmannwood.hexlauncher)
+## Project status
 
-## Make Your Phone Work For You
+Rune Launcher is in early development. Version 0.1 focuses on:
 
-Hex Launcher was designed to get you into your apps as quickly as possible, and to prevent you from mindlessly looking for a new way to doom scroll.
-It provides a search-first UI that puts your results directly under your thumb, and allows you to set up six apps for fast access with gestures.
+- a distinct app identity that can be installed alongside Hex Launcher;
+- reliable one-time onboarding;
+- returning to a clean home state after search launches;
+- a carved, Icelandic magical-stave-inspired visual language; and
+- the foundation for configurable nested gesture branches.
 
-## Take Back Your Privacy
+See [Development](docs/DEVELOPMENT.md) for Debian and Android Studio setup and
+[Roadmap](docs/ROADMAP.md) for the staged feature plan.
 
-Hex Launcher does not contain trackers, analytics, or data gathering mechanisms; it can't even connect to the internet. With Hex Launcher, what happens on your home screen stays on your phone.
-If you want to help the developer, you can choose to enable on device logging and provide bug reports via email. These options are off by default. Your phone and your data are yours.
+## Privacy
+
+Rune Launcher does not include advertising, analytics, trackers, or an
+Internet permission. App and gesture configuration stays on the device.
+
+## License and attribution
+
+Rune Launcher remains licensed under the Apache License 2.0. See
+[LICENSE](LICENSE) and [NOTICE](NOTICE). Modified files are tracked in Git
+history and the project retains attribution to Hex Launcher.

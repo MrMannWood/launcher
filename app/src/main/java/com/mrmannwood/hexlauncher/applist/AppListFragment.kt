@@ -1,3 +1,4 @@
+// Modified for Rune Launcher, 2026: reliably dismiss search state before launch.
 package com.mrmannwood.hexlauncher.applist
 
 import android.app.Activity
@@ -17,6 +18,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -101,7 +104,9 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
             if (actionId != EditorInfo.IME_ACTION_SEARCH) {
                 false
             } else {
-                getAppListHost()?.onSearchButtonPressed(searchView.text.toString())
+                val searchTerm = searchView.text.toString()
+                dismissSearchUi()
+                getAppListHost()?.onSearchButtonPressed(searchTerm)
                 true
             }
         }
@@ -179,6 +184,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
                 }
                 getAppListHost()?.onAppInfoBinding(vdb.root, appInfo)
                 vdb.root.setOnClickListener {
+                    dismissSearchUi()
                     getAppListHost()?.onAppSelected(appInfo)
                 }
             }
@@ -233,6 +239,14 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
                 )
             }
         }
+    }
+
+    private fun dismissSearchUi() {
+        showKeyboardJob?.cancel()
+        ViewCompat.getWindowInsetsController(searchView)
+            ?.hide(WindowInsetsCompat.Type.ime())
+        searchView.clearFocus()
+        searchView.setText("")
     }
 
     private fun showAllApps() {

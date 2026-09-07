@@ -1,3 +1,4 @@
+// Modified for Rune Launcher, 2026: make onboarding completion durable and idempotent.
 package com.mrmannwood.hexlauncher.nux
 
 import android.os.Bundle
@@ -13,8 +14,11 @@ import com.mrmannwood.hexlauncher.settings.PreferenceKeys
 import com.mrmannwood.hexlauncher.settings.PreferencesRepository
 import com.mrmannwood.launcher.BuildConfig
 import com.mrmannwood.launcher.R
+import java.util.concurrent.atomic.AtomicBoolean
 
 class NUXHostFragment : Fragment(R.layout.fragment_nux_host), HandleBackPressed {
+
+    private val completionRequested = AtomicBoolean(false)
 
     interface NuxCompleted {
         fun onNuxCompleted()
@@ -33,15 +37,19 @@ class NUXHostFragment : Fragment(R.layout.fragment_nux_host), HandleBackPressed 
             if (fragment is AcceptsNuxCompleted) {
                 fragment.acceptNuxCompleted(object : NuxCompleted {
                     override fun onNuxCompleted() {
+                        if (!completionRequested.compareAndSet(false, true)) return
                         PreferencesRepository.getPrefs(requireContext()) { repo ->
                             repo.dao.putString(
                                 PreferenceKeys.Version.LAST_RUN_VERSION_NAME,
                                 BuildConfig.VERSION_NAME
                             )
+                            activity?.runOnUiThread {
+                                if (!isAdded) return@runOnUiThread
+                                parentFragmentManager.beginTransaction()
+                                    .replace(R.id.container, HomeFragment())
+                                    .commit()
+                            }
                         }
-                        parentFragmentManager.beginTransaction()
-                            .replace(R.id.container, HomeFragment())
-                            .commit()
                     }
                 })
             }

@@ -1,3 +1,4 @@
+// Modified for Rune Launcher, 2026: restore neutral navigation state before app launch.
 package com.mrmannwood.hexlauncher.launcher
 
 import android.app.SearchManager
@@ -92,18 +93,22 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
     }
 
     private val appListFragmentHost = object : AppListFragment.Host<Void>(
-        killFragment = { supportFragmentManager.popBackStack("HomeFragment", 0) }
+        killFragment = { supportFragmentManager.popBackStackImmediate("HomeFragment", 0) }
     ) {
         override fun onSearchButtonPressed(searchTerm: String) {
+            end()
             startActivity(
                 Intent(Intent.ACTION_WEB_SEARCH).apply {
                     putExtra(SearchManager.QUERY, searchTerm)
                 }
             )
-            end()
         }
 
         override fun onAppSelected(appInfo: AppInfo) {
+            // Restore a neutral launcher state before Android backgrounds this activity.
+            // Otherwise the search fragment can still be on the back stack when the user
+            // returns from the selected app.
+            end()
             if (!isTestLab(this@LauncherActivity)) {
                 try {
                     startActivity(
@@ -118,7 +123,6 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
                     ).show()
                 }
             }
-            end()
         }
 
         override fun onAppInfoBinding(view: View, appInfo: AppInfo) {

@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 34
+    compileSdkVersion 36
     buildToolsVersion "35.0.0"
 
     buildFeatures {
@@ -23,7 +23,7 @@ android {
     defaultConfig {
         applicationId "com.mrmannwood.hexlauncher"
         minSdkVersion 26
-        targetSdkVersion 33
+        targetSdkVersion 36
         versionCode 52
         versionName "1.4.10"
 
@@ -52,7 +52,7 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:2.1.4"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation "androidx.core:core-ktx:1.10.0"
+    implementation "androidx.core:core-ktx:$android_core_ktx"
     implementation "androidx.core:core-role:1.0.0"
     implementation "androidx.fragment:fragment-ktx:1.5.7"
     implementation "androidx.appcompat:appcompat:1.6.1"

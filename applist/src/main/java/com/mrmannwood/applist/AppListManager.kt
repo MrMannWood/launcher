@@ -13,6 +13,8 @@ import android.os.UserHandle
 import android.os.UserManager
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
+import androidx.core.content.ContextCompat.registerReceiver
+import androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
 import timber.log.Timber
 
 class AppListManager(context: Context) {
@@ -82,12 +84,14 @@ class AppListManager(context: Context) {
                 callback()
             }
         }
-        context.registerReceiver(
+        registerReceiver(
+            context,
             receiver,
             IntentFilter().apply {
                 addAction(Intent.ACTION_MANAGED_PROFILE_ADDED)
                 addAction(Intent.ACTION_MANAGED_PROFILE_REMOVED)
-            }
+            },
+            RECEIVER_NOT_EXPORTED,
         )
         return receiver
     }

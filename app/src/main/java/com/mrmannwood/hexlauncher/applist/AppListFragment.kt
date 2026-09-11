@@ -27,6 +27,7 @@ import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.fragment.InstrumentedFragment
 import com.mrmannwood.hexlauncher.launcher.*
 import com.mrmannwood.hexlauncher.levenshtein
+import com.mrmannwood.hexlauncher.padBottomForKeyboard
 import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager
 import com.mrmannwood.hexlauncher.view.HexagonalGridLayoutManager.Corner
 import com.mrmannwood.hexlauncher.view.KeyboardEditText
@@ -83,6 +84,8 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
     ): View = inflater.inflate(R.layout.fragment_app_list, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        view.padBottomForKeyboard()
+
         resultListAdapter = createResultAdapter(view.context)
         resultListView = view.findViewById<RecyclerView>(R.id.result_list).apply {
             layoutManager = createLayoutManager()

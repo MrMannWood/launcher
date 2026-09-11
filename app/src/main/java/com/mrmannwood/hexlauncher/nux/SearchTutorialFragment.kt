@@ -22,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.mrmannwood.hexlauncher.executors.InlineExecutor
+import com.mrmannwood.hexlauncher.padBottomForKeyboard
 import com.mrmannwood.hexlauncher.launcher.Adapter
 import com.mrmannwood.hexlauncher.launcher.HexItem
 import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
@@ -47,6 +48,8 @@ class SearchTutorialFragment : Fragment(R.layout.fragment_nux_search_tutorial) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        view.padBottomForKeyboard()
 
         message = view.findViewById(R.id.nux_search_message)
         resultListAdapter = createResultAdapter(view.context)

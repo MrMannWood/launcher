@@ -127,11 +127,15 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         })
     }
 
+    /**
+     * Runs once the IME is already hidden: the system consumes the first back
+     * press to dismiss the keyboard (onKeyPreIme does not fire for BACK while
+     * the IME is shown on Android 13+), so by the time we see a back press the
+     * keyboard is down. Exit the app list outright instead of clearing the
+     * text, which would park the UI in a keyboard-less half state.
+     */
     override fun handleBackPressed(): Boolean {
-        if (TextUtils.isEmpty(searchView.text)) {
-            return false
-        }
-        searchView.setText("")
+        getAppListHost()?.end(null)
         return true
     }
 

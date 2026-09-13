@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.DisplayMetrics
@@ -141,6 +142,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         }
         viewModel.enableAllAppsSearch.observe(viewLifecycleOwner) { enable ->
             enableAllAppsSearch = enable == true
+            updateOverflowDotsFilter()
         }
         viewModel.leftHandedLayout.observe(viewLifecycleOwner) { leftHanded ->
             if (leftHanded == null) return@observe
@@ -158,7 +160,7 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         }
         viewModel.apps.observe(viewLifecycleOwner) { appList ->
             apps = appList
-            performSearch()
+            refreshResults()
         }
     }
 
@@ -188,14 +190,35 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
         )
     }
 
+    /**
+     * Drops any edit that would leave a run of more than three dots in the
+     * search field, so typing past the "..." all-apps trigger is ignored
+     * instead of turning into a term that matches nothing.
+     */
+    private val dropOverflowDotsFilter = InputFilter { source, start, end, dest, dstart, dend ->
+        val result = buildString {
+            append(dest.subSequence(0, dstart))
+            append(source.subSequence(start, end))
+            append(dest.subSequence(dend, dest.length))
+        }
+        if (result.length > 3 && result.all { it == '.' }) "" else null
+    }
+
+    /**
+     * Must be called from the enableAllAppsSearch observer, not onViewCreated:
+     * at onViewCreated time the flag is still its default (false), because
+     * LiveData only delivers once the view lifecycle reaches STARTED.
+     */
+    private fun updateOverflowDotsFilter() {
+        val base = searchView.filters.filterNot { it === dropOverflowDotsFilter }
+        searchView.filters =
+            (if (enableAllAppsSearch) base + dropOverflowDotsFilter else base).toTypedArray()
+    }
+
     private fun createSearchTextListener(): TextWatcher = object : TextWatcher {
 
         override fun afterTextChanged(p0: Editable) {
-            if (enableAllAppsSearch && searchView.text.toString() == "...") {
-                showAllApps()
-            } else {
-                performSearch()
-            }
+            refreshResults()
         }
 
         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
@@ -266,6 +289,25 @@ class AppListFragment : InstrumentedFragment(), HandleBackPressed {
             showKeyboardJob?.cancelAndJoin()
             hideKeyboard(activity)
         }
+    }
+
+    private fun refreshResults() {
+        if (isAllAppsTrigger(searchView.text.toString())) {
+            showAllApps()
+        } else {
+            performSearch()
+        }
+    }
+
+    /**
+     * The all-apps trigger is a run of three or more dots, not exactly "..." —
+     * extra dots typed before the keyboard collapses must not fall through to
+     * performSearch(), which would show an empty result list.
+     */
+    private fun isAllAppsTrigger(text: String): Boolean {
+        if (!enableAllAppsSearch) return false
+        val trimmed = text.trim()
+        return trimmed.length >= 3 && trimmed.all { it == '.' }
     }
 
     private fun performSearch() {

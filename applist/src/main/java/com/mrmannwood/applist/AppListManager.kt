@@ -30,6 +30,33 @@ class AppListManager(context: Context) {
                 launcherItem.componentName, launcherItem.userHandle, location, null
             )
         }
+
+        /**
+         * Android 16 blocks explicit component intents that do not match the target
+         * activity's <intent-filter> (e.g. a bare component intent), unless the intent
+         * was created by the platform. LauncherApps is the designated launcher API;
+         * fall back to a filter-matching intent when the launcher role is not held.
+         */
+        @MainThread
+        fun startMainActivity(
+            context: Context,
+            launcherItem: LauncherItem,
+            sourceBounds: Rect? = null
+        ) {
+            try {
+                getLauncherApps(context).startMainActivity(
+                    launcherItem.componentName, launcherItem.userHandle, sourceBounds, null
+                )
+            } catch (e: SecurityException) {
+                context.startActivity(
+                    Intent(Intent.ACTION_MAIN).apply {
+                        addCategory(Intent.CATEGORY_LAUNCHER)
+                        component = launcherItem.componentName
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                )
+            }
+        }
     }
 
     private val context = context.applicationContext

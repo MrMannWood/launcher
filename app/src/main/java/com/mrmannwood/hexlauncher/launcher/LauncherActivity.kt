@@ -106,10 +106,7 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
         override fun onAppSelected(appInfo: AppInfo) {
             if (!isTestLab(this@LauncherActivity)) {
                 try {
-                    startActivity(
-                        Intent().apply { component = appInfo.componentName }
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    )
+                    AppListManager.startMainActivity(this@LauncherActivity, appInfo.launcherItem)
                 } catch (e: Exception) {
                     Toast.makeText(
                         this@LauncherActivity,

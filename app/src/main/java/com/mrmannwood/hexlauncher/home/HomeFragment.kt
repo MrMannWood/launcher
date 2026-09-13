@@ -27,6 +27,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
+import com.mrmannwood.applist.AppListManager
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
@@ -652,8 +653,7 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
 
     private fun makeOpenAppRunnable(appInfo: AppInfo): Runnable = Runnable {
         try {
-            startActivity(Intent().apply { component = appInfo.componentName }
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            context?.let { AppListManager.startMainActivity(it, appInfo.launcherItem) }
         } catch (e: Exception) {
             Timber.e(e, "Unable to open app: ${appInfo.componentName}")
         }

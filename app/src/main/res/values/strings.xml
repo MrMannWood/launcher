@@ -137,6 +137,8 @@
     <string name="error_cannot_set_app">Unable to use that app as a shortchut</string>
     <string name="error_cannot_change_wallpaper">Unable to set that wallpaper</string>
     <string name="error_exception_while_searching">An unknown error occurred while searching. Please submit an error report in Settings.</string>
+    <string name="error_app_requires_default_launcher">App Must be Default Launcher</string>
+    <string name="error_app_profile_unavailable">Profile Not Available</string>
 
     <!-- region app categories -->
     <string-array name="APP_CATEGORY_UNDEFINED"/>

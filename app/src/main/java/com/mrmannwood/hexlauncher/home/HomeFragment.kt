@@ -27,7 +27,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
-import com.mrmannwood.applist.AppListManager
 import com.mrmannwood.hexlauncher.HandleBackPressed
 import com.mrmannwood.hexlauncher.applist.AppListActivity
 import com.mrmannwood.hexlauncher.applist.AppListActivity.Companion.decorateForAppListLaunch
@@ -37,6 +36,7 @@ import com.mrmannwood.hexlauncher.executors.InlineExecutor
 import com.mrmannwood.hexlauncher.executors.OriginalThreadCallback
 import com.mrmannwood.hexlauncher.executors.PackageManagerExecutor
 import com.mrmannwood.hexlauncher.launcher.AppInfo
+import com.mrmannwood.hexlauncher.launcher.AppLauncher
 import com.mrmannwood.hexlauncher.launcher.HexItem
 import com.mrmannwood.hexlauncher.launcher.LauncherFragmentDatabindingAdapter
 import com.mrmannwood.hexlauncher.launcher.Provider
@@ -652,11 +652,12 @@ class HomeFragment : WidgetHostFragment(), HandleBackPressed {
     }
 
     private fun makeOpenAppRunnable(appInfo: AppInfo): Runnable = Runnable {
-        try {
-            context?.let { AppListManager.startMainActivity(it, appInfo.launcherItem) }
-        } catch (e: Exception) {
-            Timber.e(e, "Unable to open app: ${appInfo.componentName}")
+        val context = context
+        if (context == null) {
+            Timber.w("Unable to open app, fragment has no context: ${appInfo.componentName}")
+            return@Runnable
         }
+        AppLauncher.launch(context, appInfo)
     }
 
     private fun performViewAction(v: View, action: (View) -> Unit) {

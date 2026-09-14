@@ -6,7 +6,6 @@ import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.view.WindowCompat
 import com.mrmannwood.applist.AppListManager
@@ -105,15 +104,7 @@ class LauncherActivity : BaseActivity(), AppListFragment.AppListHostActivity {
 
         override fun onAppSelected(appInfo: AppInfo) {
             if (!isTestLab(this@LauncherActivity)) {
-                try {
-                    AppListManager.startMainActivity(this@LauncherActivity, appInfo.launcherItem)
-                } catch (e: Exception) {
-                    Toast.makeText(
-                        this@LauncherActivity,
-                        R.string.unable_to_start_app,
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+                AppLauncher.launch(this@LauncherActivity, appInfo)
             }
             end()
         }

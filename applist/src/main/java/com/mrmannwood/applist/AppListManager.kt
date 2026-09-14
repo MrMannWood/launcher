@@ -9,6 +9,7 @@ import android.content.pm.LauncherApps
 import android.content.pm.LauncherApps.Callback
 import android.content.pm.PackageManager
 import android.graphics.Rect
+import android.os.Process
 import android.os.UserHandle
 import android.os.UserManager
 import androidx.annotation.MainThread
@@ -34,29 +35,70 @@ class AppListManager(context: Context) {
         /**
          * Android 16 blocks explicit component intents that do not match the target
          * activity's <intent-filter> (e.g. a bare component intent), unless the intent
-         * was created by the platform. LauncherApps is the designated launcher API;
-         * fall back to a filter-matching intent when the launcher role is not held.
+         * was created by the platform. LauncherApps is the designated launcher API, and
+         * is required (rather than optional) for launching an app that lives in a
+         * different profile (e.g. a Private Space or work profile app) than the caller,
+         * since a plain startActivity() call can never cross a user/profile boundary,
+         * regardless of role status.
+         *
+         * A [LauncherItem] in the caller's own profile can always be launched via
+         * LauncherApps, independent of whether the launcher role is held, so a
+         * SecurityException in that case falls back to a filter-matching intent. A
+         * SecurityException for a [LauncherItem] in a different profile means there is no
+         * permitted way for this call to succeed right now (the role is not held, or the
+         * target profile is unavailable/locked) - that is reported back as
+         * [LaunchResult.CrossProfileAccessDenied] so the caller can decide what to tell
+         * the user, rather than attempting a fallback intent that cannot work.
          */
         @MainThread
         fun startMainActivity(
             context: Context,
             launcherItem: LauncherItem,
             sourceBounds: Rect? = null
-        ) {
-            try {
+        ): LaunchResult {
+            return try {
                 getLauncherApps(context).startMainActivity(
                     launcherItem.componentName, launcherItem.userHandle, sourceBounds, null
                 )
+                LaunchResult.Success
             } catch (e: SecurityException) {
-                context.startActivity(
-                    Intent(Intent.ACTION_MAIN).apply {
-                        addCategory(Intent.CATEGORY_LAUNCHER)
-                        component = launcherItem.componentName
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (launcherItem.userHandle != Process.myUserHandle()) {
+                    LaunchResult.CrossProfileAccessDenied
+                } else {
+                    try {
+                        context.startActivity(
+                            Intent(Intent.ACTION_MAIN).apply {
+                                addCategory(Intent.CATEGORY_LAUNCHER)
+                                component = launcherItem.componentName
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                        )
+                        LaunchResult.Success
+                    } catch (fallbackException: Exception) {
+                        LaunchResult.Failure(fallbackException)
                     }
-                )
+                }
+            } catch (e: Exception) {
+                LaunchResult.Failure(e)
             }
         }
+    }
+
+    sealed class LaunchResult {
+        /** The app was launched (or a launch request was successfully dispatched). */
+        object Success : LaunchResult()
+
+        /**
+         * The target app lives in a different profile than the caller, and there is no
+         * permitted way to launch it right now - either the default launcher role is not
+         * held, or the target profile is unavailable (e.g. locked). Callers should check
+         * [com.mrmannwood.hexlauncher.role.RoleManagerHelper] to distinguish the two and
+         * show an appropriate message.
+         */
+        object CrossProfileAccessDenied : LaunchResult()
+
+        /** Launching failed for a reason unrelated to cross-profile access. */
+        data class Failure(val exception: Exception) : LaunchResult()
     }
 
     private val context = context.applicationContext
